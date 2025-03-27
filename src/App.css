@@ -1,0 +1,9 @@
+body{
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.homepage-header{
+  background: linear-gradient(0deg, #F9F8FF, #F9F8FF ),
+linear-gradient(89.75deg, #F9F8FF 0.3%, #FDF4F2 99.86%);
+
+}
