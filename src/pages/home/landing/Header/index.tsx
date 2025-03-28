@@ -18,10 +18,10 @@ const Header = () => {
             50+ logistics companies for your deliveries
           </p>
         </div>
-        <p className="font-clash xl:text-[60px] lg:text-[50px] text-[40px] font-semibold xl:leading-[130%] leading-[110%] my-6 lg:w-[90%]">
+        <h1 className="font-clash xl:text-[60px] lg:text-[50px] text-[40px] font-semibold xl:leading-[130%] leading-[110%] my-6 lg:w-[90%]">
           Pairing you with logistics that works{" "}
           <span className="font-tiempos font-normal italic"> best for you</span>
-        </p>
+        </h1>
         <p className="text-neutral600 lg:w-[85%]">
           Trust us to optimize your supply chain, providing you the peace of
           mind to grow and focus on your core business
