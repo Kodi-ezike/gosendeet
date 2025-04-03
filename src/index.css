@@ -1,11 +1,7 @@
-/* @import "tailwindcss"; */
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @font-face {
   font-family: "Clash Display";
@@ -126,11 +122,46 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* @layer base {
+@layer base {
   * {
     @apply border-border outline-ring/50;
+    font-family: var(--instrument);
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Outfit", "sans-serif";
   }
-} */
+}
+
+@theme {
+  --font-instrument: "Instrument Sans", "sans-serif";
+  --font-outfit: "Outfit", "sans-serif";
+  --font-clash: "Clash Display", "sans-serif";
+  --font-tiempos: "Test Tiempos Fine", "sans-serif";
+
+  --color-neutral100: #fafafa;
+  --color-neutral200: #eeeeee;
+  --color-neutral300: #e1e1e1;
+  --color-neutral500: #8e8e8e;
+  --color-neutral600: #4b4b4b;
+  --color-purple100: #e0d8ff;
+  --color-purple200: #ede9ff;
+  --color-purple300: #f9f8ff;
+  --color-purple400: #714eff;
+  --color-purple500: #7b43ea;
+  --color-purple600: #e6e0ff;
+  --color-blue100: #f1f8ff;
+  --color-blue200: #cef0ff;
+  --color-blue300: #3edffb;
+  --color-blue400: #0ba5ec;
+  --color-blue500: #dafaff;
+  --color-orange100: #fff3e8;
+  --color-orange200: #ffd9b4;
+  --color-orange300: #fe9b0e;
+  --color-orange400: #ff8c1a;
+  --color-brown100: #573312;
+
+  --shadow-deliveryShadow: 2px 4px 44.7px 0px #e0d8ffb2;
+  --shadow-scheduleShadow: 0px 1px 20.9px 0px #714eff1a;
+
+}

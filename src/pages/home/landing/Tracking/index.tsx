@@ -4,8 +4,9 @@ import { useState } from "react";
 
 const Tracking = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+
   return (
-    <div className="lg:flex md:px-20 px-6 justify-center gap-10 items-end pb-10 mb-8">
+    <div className="lg:flex md:px-20 px-6 justify-center gap-10 items-end py-10 mb-8">
       <div className="lg:w-[40%] md:h-[500px] h-[275px] overflow-hidden">
         <div className=" ">
           <img src={gif} alt="gif" className="md:h-[550px] h-[300px]" />
@@ -16,7 +17,7 @@ const Tracking = () => {
           onClick={() => setActiveTab("dashboard")}
           className={cn(
             activeTab === "dashboard"
-              ? "border-l-4 border-l-purple400 opacity-1"
+              ? "border-l-4 border-l-purple400 opacity-100"
               : "opacity-10",
             "p-4 mb-8 cursor-pointer"
           )}
@@ -31,7 +32,7 @@ const Tracking = () => {
           onClick={() => setActiveTab("tracking")}
           className={cn(
             activeTab === "tracking"
-              ? "border-l-4 border-l-purple400 opacity-1"
+              ? "border-l-4 border-l-purple400 opacity-100"
               : "opacity-10",
             "p-4 mb-8 cursor-pointer"
           )}
@@ -48,7 +49,7 @@ const Tracking = () => {
           onClick={() => setActiveTab("pickup")}
           className={cn(
             activeTab === "pickup"
-              ? "border-l-4 border-l-purple400 opacity-1"
+              ? "border-l-4 border-l-purple400 opacity-100"
               : "opacity-10",
             "p-4 cursor-pointer"
           )}
