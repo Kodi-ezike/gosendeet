@@ -4,6 +4,7 @@ import size from "@/assets/icons/size.png";
 import { useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { PiGpsFixFill } from "react-icons/pi";
+import { SpecsModal } from "./modals/specs";
 
 
 const Header = () => {
@@ -31,7 +32,7 @@ const Header = () => {
         <div className="md:w-[90%] mx-auto border md:h-[450px] bg-purple300 border-purple100 rounded-3xl shadow-deliveryShadow py-8 px-4">
           <div className="w-full rounded-full bg-purple200 h-[60px] flex p-1">
             <button
-              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white ${
+              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white cursor-pointer ${
                 activeTab === "delivery"
                   ? "bg-white text-black"
                   : "border-transparent text-black"
@@ -41,7 +42,7 @@ const Header = () => {
               Delivery/Pickup
             </button>
             <button
-              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white ${
+              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white cursor-pointer ${
                 activeTab === "track"
                   ? "bg-white text-black"
                   : "border-transparent text-black"
@@ -98,9 +99,8 @@ const Header = () => {
                       >
                         Packaging
                       </label>
-                      <button className="bg-purple200 text-black px-4 py-1 outline-0 rounded-full font-outfit w-fit">
-                        Select specifications
-                      </button>
+                      
+                      <SpecsModal/>
                     </div>
                   </div>
 

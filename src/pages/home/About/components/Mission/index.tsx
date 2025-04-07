@@ -8,7 +8,7 @@ const Mission = () => {
       <div className="flex lg:flex-row flex-col lg:gap-4 gap-8 justify-between items-center mb-8">
         <div className="lg:w-1/2">
           <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
-            <img src={admission} alt="admission" className="w-[18px] h-18px" />
+            <img src={admission} alt="admission" className="w-[18px] h-[18px]" />
             <span>Our Mission</span>
           </p>
           <p className="leading-[140%] lg:w-[90%]">
@@ -26,7 +26,7 @@ const Mission = () => {
       <div className="flex lg:flex-row flex-col lg:gap-4 gap-8 justify-between items-center">
         <div className="lg:w-1/2">
           <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
-            <img src={simple} alt="simple" className="w-[18px] h-18px" />
+            <img src={simple} alt="simple" className="w-[18px] h-[18px]" />
             <span>Our Vision</span>
           </p>
           <p className="leading-[140%] lg:w-[90%]">

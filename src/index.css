@@ -125,11 +125,10 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    font-family: var(--instrument);
   }
   body {
     @apply bg-background text-foreground;
-    font-family: "Outfit", "sans-serif";
+    font-family: "Instrument Sans", "sans-serif";
   }
 }
 
@@ -142,6 +141,7 @@
   --color-neutral100: #fafafa;
   --color-neutral200: #eeeeee;
   --color-neutral300: #e1e1e1;
+  --color-neutral400: #FEFEFE;
   --color-neutral500: #8e8e8e;
   --color-neutral600: #4b4b4b;
   --color-purple100: #e0d8ff;
@@ -150,6 +150,7 @@
   --color-purple400: #714eff;
   --color-purple500: #7b43ea;
   --color-purple600: #e6e0ff;
+  --color-purple700: #432F9C;
   --color-blue100: #f1f8ff;
   --color-blue200: #cef0ff;
   --color-blue300: #3edffb;
@@ -163,5 +164,9 @@
 
   --shadow-deliveryShadow: 2px 4px 44.7px 0px #e0d8ffb2;
   --shadow-scheduleShadow: 0px 1px 20.9px 0px #714eff1a;
+  --shadow-faqShadow: 0px 8px 32px 0px #00000014;
+
+/* box-shadow: 0px 2px 20px 0px #0000000A; */
+
 
 }

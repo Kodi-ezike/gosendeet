@@ -10,7 +10,7 @@ const FAQ = () => {
   return (
     <div className="md:px-20 px-6 py-20 flex lg:flex-row flex-col gap-8">
       <div className="lg:w-[40%]">
-        <h2 className="font-clash font-semibold lg:text-[40px] text-[32px] xl:w-2/3 leading-[130%] mb-2">Your Questions Answered</h2>
+        <h2 className="font-clash font-semibold lg:text-[40px] md:text-[32px] text-2xl xl:w-2/3 leading-[130%] mb-2">Your Questions Answered</h2>
         <p className="font-medium text-neutral500">Quick answers to the questions you may have. </p>
       </div>
       <div className="lg:w-[60%]">
