@@ -1,7 +1,12 @@
+import Layout from "@/layouts/HomePageLayout"
+import Calculator from "./components/Calculator"
 
 const CostCalculator = () => {
   return (
-    <div>CostCalculator</div>
+    
+    <Layout>
+        <Calculator/>
+    </Layout>
   )
 }
 
