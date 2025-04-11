@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { DetailsModal } from "./modals/details";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
 const Calculator = () => {
   const options = [
     { value: "price", title: "Price (cheapest first)" },
@@ -146,9 +148,11 @@ const Calculator = () => {
               </p>
             </div>
             <div className="md:justify-self-end">
-              <Button className="px-12 py-3 rounded-full bg-purple400 hover:bg-purple500 text-white text-sm font-medium outline-purple400">
-                Book Now
-              </Button>
+              <Link to="/delivery">
+                <Button className="px-12 py-3 rounded-full bg-purple400 hover:bg-purple500 text-white text-sm font-medium outline-purple400">
+                  Book Now
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
