@@ -92,7 +92,7 @@ const Mission = () => {
             services you need into one easy-to-use platform. Join us as we
             simplify logistics and help you focus on what truly matters.
           </p>
-          <button className="w-fit mt-8 bg-black hover:bg-white hover:text-black px-5 py-2 text-white rounded-full">
+          <button className="w-fit mt-8 bg-black hover:bg-black/80 hover:text-white px-5 py-2 text-white rounded-full">
             Get started now
           </button>
         </div>

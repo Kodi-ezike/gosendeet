@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/InputField";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const schema = z.object({
     card_number: z
       .string({ required_error: "Card number is required" })
@@ -30,7 +30,7 @@ const Checkout = () => {
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     console.log(data);
-    // navigate("/checkout");
+    navigate("/confirmation");
   };
 
   return (
