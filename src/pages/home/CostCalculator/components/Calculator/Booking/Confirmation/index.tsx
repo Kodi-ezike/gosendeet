@@ -30,7 +30,7 @@ const Confirmation = () => {
               </div>
 
               <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-20">
-                <p>Need help with delivery</p>
+                <p className="font-medium">Need help with delivery</p>
                 <Button variant="secondary">
                   Contact Support
                 </Button>

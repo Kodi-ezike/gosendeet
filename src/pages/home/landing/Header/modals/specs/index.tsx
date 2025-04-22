@@ -7,6 +7,7 @@ import {
   //   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { IoIosArrowDown } from "react-icons/io";
 
 export function SpecsModal() {
@@ -18,6 +19,8 @@ export function SpecsModal() {
         </button>
       </DialogTrigger>
       <DialogContent className="">
+        <DialogTitle className="hidden"></DialogTitle>
+        <DialogDescription className="hidden"></DialogDescription>
         <form action="">
           <div className="grid md:grid-cols-2 gap-8 py-4">
             <div className="flex flex-col gap-2">
@@ -94,11 +97,12 @@ export function SpecsModal() {
             </div>
           </div>
 
-          <p className="flex items-center gap-2 my-4 text-purple500 font-clash font-semibold text-sm">Advanced <IoIosArrowDown size={18}/>
+          <p className="flex items-center gap-2 my-4 text-purple500 font-clash font-semibold text-sm">
+            Advanced <IoIosArrowDown size={18} />
           </p>
 
           <div className="grid md:grid-cols-2 gap-8 py-4">
-          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <label
                 htmlFor="category"
                 className="font-clash font-semibold text-sm"
@@ -116,14 +120,12 @@ export function SpecsModal() {
                 <option value="">is fragile</option>
               </select>
             </div>
-            </div>
+          </div>
 
           <button className="bg-black text-white rounded-full px-8 py-3 outline-black my-6">
-          Add selection
+            Add selection
           </button>
-
         </form>
-        
       </DialogContent>
     </Dialog>
   );

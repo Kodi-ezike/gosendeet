@@ -8,6 +8,7 @@ import Track from "./pages/home/Track";
 import Delivery from "./pages/home/CostCalculator/components/Calculator/Booking/Delivery";
 import Checkout from "./pages/home/CostCalculator/components/Calculator/Booking/Checkout";
 import Confirmation from "./pages/home/CostCalculator/components/Calculator/Booking/Confirmation";
+import Tracking from "./pages/home/Track/Tracking";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/delivery" element={<Delivery />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/track/:id" element={<Tracking />} />
         </Routes>
     </Router>
   );

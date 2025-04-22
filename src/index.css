@@ -11,7 +11,7 @@
 
 @font-face {
   font-family: "Test Tiempos Fine";
-  src: url("/src/assets/fonts/tiempos-font-family/TestTiemposFine-Regular-BF66457a50e8bc9.otf")
+  src: url("/src/assets/fonts/tiempos-font-family/TestTiemposFine-RegularItalic-BF66457a50e36f9.otf")
     format("opentype");
 }
 
@@ -159,6 +159,7 @@
   --color-neutral500: #8e8e8e;
   --color-neutral600: #4b4b4b;
   --color-neutral700: #CACACA;
+  --color-neutral800: #121212;
   --color-purple100: #e0d8ff;
   --color-purple200: #ede9ff;
   --color-purple300: #f9f8ff;
