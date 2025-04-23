@@ -1,20 +1,26 @@
 import {
   Dialog,
   DialogContent,
-  //   DialogDescription,
-  // DialogFooter,
-  //   DialogHeader,
-  //   DialogTitle,
+  DialogDescription,
+  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 
 export function SpecsModal() {
+  const [count, setCount] = useState(1);
+  const plus = () => setCount((prev) => prev + 1);
+  const minus = () => {
+    if (count === 0) {
+      return;
+    }
+    setCount((prev) => prev - 1);
+  };
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="bg-purple200 text-black px-4 py-1 outline-0 rounded-full font-outfit w-fit">
+        <button className="bg-purple200 text-black px-4 py-1 outline-0 rounded-full font-outfit w-fit cursor-pointer">
           Select specifications
         </button>
       </DialogTrigger>
@@ -30,10 +36,30 @@ export function SpecsModal() {
               >
                 Item Quantity
               </label>
-              <div className="border border-neutral200  rounded-xl h-[40px] px-3 flex items-center justify-between w-[100px]">
-                <p className="text-neutral500 text-2xl">-</p>
-                <p className="text-neutral600 ">1</p>
-                <p className="text-neutral500 text-2xl">+</p>
+              <div className="border border-neutral200 rounded-xl h-[40px] px-3 flex items-center justify-between w-[100px]">
+                <p
+                  className="text-neutral500 text-2xl cursor-pointer"
+                  onClick={minus}
+                >
+                  -
+                </p>
+                <input
+                  className="text-neutral600 border-0 outline-0 w-[40px] px-1 text-center"
+                  value={count}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    const regex = /^\d*$/; // only digits, empty string allowed
+                    if (regex.test(inputValue)) {
+                      setCount(Number(inputValue));
+                    }
+                  }}
+                />
+                <p
+                  className="text-neutral500 text-2xl cursor-pointer"
+                  onClick={plus}
+                >
+                  +
+                </p>
               </div>
             </div>
 

@@ -1,20 +1,39 @@
 import logos from "@/assets/images/logos.png";
 import location from "@/assets/icons/location.png";
 import size from "@/assets/icons/size.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { PiGpsFixFill } from "react-icons/pi";
 import { SpecsModal } from "./modals/specs";
 
-
 const Header = () => {
   const [activeTab, setActiveTab] = useState("delivery");
+  const [paused, setPaused] = useState(false);
+
+  const tabs = [
+    { key: "delivery", label: "Delivery/Pickup" },
+    { key: "track", label: "Track" },
+  ];
+
+  useEffect(() => {
+    if (paused) return;
+    const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
+    const nextIndex = (currentIndex + 1) % tabs.length;
+    const timer = setTimeout(() => {
+      setActiveTab(tabs[nextIndex].key);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [activeTab, paused]);
 
   return (
     <div className="homepage-header lg:h-[90vh] lg:flex items-center md:px-20 px-6 lg:py-0 py-20">
       <div className="lg:w-1/2">
         <div className="flex gap-2 items-center w-fit pl-4 pr-8  bg-white rounded-full">
-          <img src={logos} alt="logos" className="xl:h-full md:h-[50px] h-[30px]" />
+          <img
+            src={logos}
+            alt="logos"
+            className="xl:h-full md:h-[50px] h-[30px]"
+          />
           <p className="font-medium text-neutral600 xl:text-md md:text-sm text-xs">
             50+ logistics companies for your deliveries
           </p>
@@ -30,31 +49,44 @@ const Header = () => {
       </div>
       <div className="lg:w-1/2 lg:mt-0 mt-10">
         <div className="md:w-[90%] mx-auto border md:h-[450px] bg-purple300 border-purple100 rounded-3xl shadow-deliveryShadow py-8 px-4">
-          <div className="w-full rounded-full bg-purple200 h-[60px] flex p-1">
-            <button
-              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white cursor-pointer ${
-                activeTab === "delivery"
-                  ? "bg-white text-black"
-                  : "border-transparent text-black"
-              }`}
-              onClick={() => setActiveTab("delivery")}
-            >
-              Delivery/Pickup
-            </button>
-            <button
-              className={`flex-1 py-2 rounded-full font-outfit font-medium outline-white cursor-pointer ${
-                activeTab === "track"
-                  ? "bg-white text-black"
-                  : "border-transparent text-black"
-              }`}
-              onClick={() => setActiveTab("track")}
-            >
-              Track
-            </button>
+          {/* Tab Buttons */}
+          <div className="w-full rounded-full bg-purple200 h-[60px] flex py-1 px-4 relative overflow-hidden">
+            <div
+              className={`absolute top-1 left-1  h-[calc(100%-8px)] rounded-full bg-white shadow-scheduleShadow transition-all duration-500`}
+              style={{
+                width: `${98.5 / tabs.length}%`,
+                transform: `translateX(${
+                  tabs.findIndex((tab) => tab.key === activeTab) * 100
+                }%)`,
+              }}
+            ></div>
+
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                className={`flex-1 relative z-10 py-2 rounded-full font-outfit font-medium transition-colors duration-300 cursor-pointer ${
+                  activeTab === tab.key ? "text-black" : "text-black opacity-70"
+                }`}
+                onMouseEnter={() => {
+                  setPaused(true);
+                  setActiveTab(tab.key);
+                }}
+                onMouseLeave={() => setPaused(false)}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
           <div className="bg-white rounded-3xl">
             {activeTab === "delivery" ? (
-              <div className="p-4 text-sm">
+              <div
+                className="p-4 text-sm"
+                onMouseEnter={() => {
+                  setPaused(true);
+                }}
+                onMouseLeave={() => setPaused(false)}
+              >
                 <form action="">
                   <div className="flex gap-3 items-center py-3 px-4 border-b">
                     <img src={location} alt="location" />
@@ -99,8 +131,8 @@ const Header = () => {
                       >
                         Packaging
                       </label>
-                      
-                      <SpecsModal/>
+
+                      <SpecsModal />
                     </div>
                   </div>
 
@@ -111,11 +143,17 @@ const Header = () => {
                 </form>
               </div>
             ) : (
-              <div className="p-4 text-sm">
+              <div
+                className="p-4 text-sm"
+                onMouseEnter={() => {
+                  setPaused(true);
+                }}
+                onMouseLeave={() => setPaused(false)}
+              >
                 <form action="">
                   <div className="flex gap-3 items-center py-3 px-4 border-b">
-                  <PiGpsFixFill className="text-purple400 text-xl" />
-                  <div className="flex flex-col gap-2 w-full">
+                    <PiGpsFixFill className="text-purple400 text-xl" />
+                    <div className="flex flex-col gap-2 w-full">
                       <label
                         htmlFor="track"
                         className="font-clash font-semibold"

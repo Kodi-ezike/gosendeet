@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Layout from "@/layouts/HomePageLayout";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import OrderHistory from "./components/OrderHistory";
 import ItemDetails from "./components/ItemDetails";
@@ -9,6 +9,28 @@ import ReceiverDetails from "./components/ReceiverDetails";
 const Tracking = () => {
   const { id } = useParams();
   const [activeTab, setActiveTab] = useState("history");
+  const [underlineLeft, setUnderlineLeft] = useState(0);
+  const [underlineWidth, setUnderlineWidth] = useState(0);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const tabs = [
+    { key: "history", label: "Order History" },
+    { key: "item_details", label: "Item Details" },
+    { key: "receiver_details", label: "Receiver Details" },
+  ];
+
+  const updateUnderline = (index: number) => {
+    const tab = tabRefs.current[index];
+    if (tab) {
+      setUnderlineLeft(tab.offsetLeft);
+      setUnderlineWidth(tab.offsetWidth);
+    }
+  };
+
+  useEffect(() => {
+    const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
+    updateUnderline(currentIndex);
+  }, [activeTab]);
 
   return (
     <Layout>
@@ -21,7 +43,7 @@ const Tracking = () => {
           <div className="grid md:grid-cols-2 gap-4 md:text-base text-sm">
             <div className="flex flex-col gap-1">
               <p className="text-md font-semibold font-clash">Item #{id}</p>
-              <p className="">2464 Royal Ln. Mesa, New Jersey 45463</p>
+              <p>2464 Royal Ln. Mesa, New Jersey 45463</p>
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-md font-semibold font-clash">Weight</p>
@@ -33,56 +55,46 @@ const Tracking = () => {
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-md font-semibold font-clash">Start Time</p>
-              <p>11:37 PM, 27 May 2023 </p>
+              <p>11:37 PM, 27 May 2023</p>
             </div>
           </div>
 
-          <div className="w-full border-b border-b-neutral300 md:h-[40px] h-[60px] flex md:gap-4 mt-6">
-            <button
-              className={`px-4 font-medium md:text-base text-sm outline-white cursor-pointer ${
-                activeTab === "history"
-                  ? " text-purple500 border-b border-b-purple500"
-                  : "border-transparent text-black"
-              }`}
-              onClick={() => setActiveTab("history")}
-            >
-              Order History
-            </button>
-            <button
-              className={`px-4 font-medium md:text-base text-sm outline-white cursor-pointer ${
-                activeTab === "item_details"
-                  ? " text-purple500 border-b border-b-purple500"
-                  : "border-transparent text-black"
-              }`}
-              onClick={() => setActiveTab("item_details")}
-            >
-              Item Details
-            </button>
-            <button
-              className={`px-4 font-medium md:text-base text-sm outline-white cursor-pointer ${
-                activeTab === "receiver_details"
-                  ? " text-purple500 border-b border-b-purple500"
-                  : "border-transparent text-black"
-              }`}
-              onClick={() => setActiveTab("receiver_details")}
-            >
-              Receiver Details
-            </button>
+          {/* Tab Buttons */}
+          <div className="w-full border-b border-b-neutral300 md:h-[40px] h-[60px] flex md:gap-4 mt-6 relative overflow-hidden">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.key}
+                ref={(el) => {
+                  tabRefs.current[index] = el;
+                }}
+                className={`relative z-10 px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
+                  activeTab === tab.key ? "text-purple500" : "text-black"
+                }`}
+                onMouseEnter={() => {
+                  updateUnderline(index);
+                  setActiveTab(tab.key);
+                }}
+                onClick={() => setActiveTab(tab.key)}
+              >
+                {tab.label}
+              </button>
+            ))}
+
+            {/* Active underline */}
+            <div
+              className="absolute bottom-0 h-[1px] bg-purple500 transition-all duration-300 rounded-full"
+              style={{
+                left: underlineLeft,
+                width: underlineWidth,
+              }}
+            />
           </div>
-          <div className="">
-            {activeTab === "history" ? (
-              <div>
-                <OrderHistory />
-              </div>
-            ) : activeTab === "item_details" ? (
-              <div>
-                <ItemDetails />
-              </div>
-            ) : (
-              <div>
-                <ReceiverDetails />
-              </div>
-            )}
+
+          {/* Tab Content */}
+          <div className="mt-4">
+            {activeTab === "history" && <OrderHistory />}
+            {activeTab === "item_details" && <ItemDetails />}
+            {activeTab === "receiver_details" && <ReceiverDetails />}
           </div>
 
           <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-5">
