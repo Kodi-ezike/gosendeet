@@ -26,7 +26,7 @@ const Navbar = () => {
 
         {/* Hamburger Icon (mobile view) */}
         <div className="lg:hidden flex items-center gap-4">
-        <Link to="/login">
+        <Link to="/signin">
             <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl">
             Log In
             </button>
@@ -60,13 +60,13 @@ const Navbar = () => {
         </ul>
 
         <div className="hidden lg:flex lg:flex-row gap-8 flex-col">
-        <Link to="/login">
+        <Link to="/signup">
             <button className="bg-black hover:bg-white hover:text-black border px-5 py-2 text-white rounded-3xl">
             Sign Up
             </button>
           </Link>
 
-          <Link to="/login">
+          <Link to="/signin">
             <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl">
             Log In
             </button>
@@ -107,13 +107,13 @@ const Navbar = () => {
               );
             })}
           </ul>
-          <a href="/login">
+          <a href="/signup">
             <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-white bg-black rounded mb-4">
             Sign Up
             </button>
           </a>
 
-          <a href="/login">
+          <a href="/signin">
             <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-black bg-white rounded">
               Log In
             </button>

@@ -9,6 +9,12 @@ import Delivery from "./pages/home/CostCalculator/components/Calculator/Booking/
 import Checkout from "./pages/home/CostCalculator/components/Calculator/Booking/Checkout";
 import Confirmation from "./pages/home/CostCalculator/components/Calculator/Booking/Confirmation";
 import Tracking from "./pages/home/Track/Tracking";
+import Signin from "./pages/auth/Signin";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyEmail from "./pages/auth/VerifyEmail";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 function App() {
   return (
@@ -23,6 +29,12 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/track/:id" element={<Tracking />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Routes>
     </Router>
   );
