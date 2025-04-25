@@ -40,7 +40,7 @@ const Tracking = () => {
             className={cn(
               activeTab === tab
                 ? "border-l-4 border-l-purple400 opacity-100 bg-purple50"
-                : "opacity-50",
+                : "opacity-10",
               "p-4 mb-8 cursor-pointer transition-all duration-500 ease-in-out rounded"
             )}
           >
