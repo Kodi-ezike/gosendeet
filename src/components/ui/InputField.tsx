@@ -37,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       startIcon,
       ...rest
     },
-    ref
+    _ref
   ) => {
     return (
       <div className={cls("mb-0", className)}>
