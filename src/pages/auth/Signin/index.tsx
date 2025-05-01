@@ -6,14 +6,17 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineMailOutline } from "react-icons/md";
+import { useMutation } from "@tanstack/react-query";
+import { validateEmail } from "@/services/auth";
+import { toast } from "sonner";
 
 const Signin = () => {
   const navigate = useNavigate();
 
   const schema = z.object({
-    details: z
-      .string({ required_error: "Email Address or Phone Number is required" })
-      .min(1, { message: "Email Address or Phone Number cannot be empty" }),
+    email: z
+      .string({ required_error: "Email Address is required" })
+      .min(1, { message: "Email Address cannot be empty" }),
   });
 
   const {
@@ -24,15 +27,27 @@ const Signin = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    const username = data?.details.split("@")[0] || "";
+  const { mutate, isPending } = useMutation({
+    mutationFn: validateEmail,
+    onSuccess: (data) => {
+      toast.success("Successful");
+      navigate("/login", {
+        state: {
+          username: data?.data?.username,
+          email: data?.data?.email,
+        },
+      });
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+      if (data?.message.endsWith(`not found`)) {
+        navigate("/signup");
+      }
+    },
+  });
 
-    navigate("/login", {
-      state: {
-        username,
-        details: data?.details,
-      },
-    });
+  const onSubmit = (data: z.infer<typeof schema>) => {
+    mutate(data.email);
   };
 
   return (
@@ -61,18 +76,18 @@ const Signin = () => {
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
                 <MdOutlineMailOutline className="text-purple400 text-xl" />
                 <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="details" className="font-clash font-semibold">
-                    Email Address or Phone Number
+                  <label htmlFor="email" className="font-clash font-semibold">
+                    Email Address
                   </label>
                   <input
                     type="text"
-                    {...register("details")}
-                    placeholder="Enter your email address or phone number"
+                    {...register("email")}
+                    placeholder="Enter your email address"
                     className="w-full outline-0"
                   />
-                  {errors.details && (
+                  {errors.email && (
                     <p className="error text-xs text-[#FF0000]">
-                      {errors.details.message}
+                      {errors.email.message}
                     </p>
                   )}
                 </div>
@@ -84,7 +99,11 @@ const Signin = () => {
               >
                 Forgot Password?
               </Link>
-              <Button variant={"secondary"} className=" w-full my-5">
+              <Button
+                variant={"secondary"}
+                loading={isPending}
+                className=" w-full my-5"
+              >
                 Continue
               </Button>
             </form>

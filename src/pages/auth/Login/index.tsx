@@ -9,18 +9,23 @@ import { TbLockPassword } from "react-icons/tb";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { login } from "@/services/auth";
+import { toast } from "sonner";
 
 const Login = () => {
   const [toggle, setToggle] = useState(false);
   // const navigate = useNavigate();
   const location = useLocation();
 
-  const { username, details } = location.state || {};
+  const { username, email } = location.state || {};
 
   const schema = z.object({
-    details: z
-      .string({ required_error: "Email Address or Phone Number is required" })
-      .min(1, { message: "Email Address or Phone Number cannot be empty" }),
+    email: z
+      .string({ required_error: "Email address is required" })
+      .min(1, { message: "Email address cannot be empty" })
+      .email({ message: "Invalid email address" }),
+
     password: z
       .string({ required_error: "Password is required" })
       .min(8, { message: "Password must be at least 8 characters" }),
@@ -34,9 +39,24 @@ const Login = () => {
     resolver: zodResolver(schema),
   });
 
+  const { mutate, isPending } = useMutation({
+      mutationFn: login,
+      onSuccess: (data) => {
+        toast.success("Login Successful");
+        console.log(data)
+        // navigate("/verify-email", {
+        //   state: {
+        //     email: data?.email,
+        //   },
+        // });
+      },
+      onError: (data) => {
+        toast.error(data?.message);
+      },
+    });
+
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data);
-    // navigate(`/track/${data?.details}`);
+    mutate(data)
   };
 
   return (
@@ -58,20 +78,20 @@ const Login = () => {
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
                 <MdOutlineMailOutline className="text-purple400 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="details" className="font-clash font-semibold">
-                    Email Address or Phone Number
+                  <label htmlFor="email" className="font-clash font-semibold">
+                    Email Address
                   </label>
                   <input
                     type="text"
-                    {...register("details")}
-                    value={details}
+                    {...register("email")}
+                    value={email}
                     disabled={true}
-                    placeholder="Enter your email address or phone number"
+                    placeholder="Enter your email address"
                     className="w-full outline-0 cursor-not-allowed text-gray-600"
                   />
-                  {errors.details && (
+                  {errors.email && (
                     <p className="error text-xs text-[#FF0000]">
-                      {errors.details.message}
+                      {errors.email.message}
                     </p>
                   )}
                 </div>
@@ -123,7 +143,7 @@ const Login = () => {
                 </Link>
               </div>
 
-              <Button variant={"secondary"} className=" w-full my-5">
+              <Button variant={"secondary"} loading={isPending} className=" w-full my-5">
                 Continue
               </Button>
             </form>

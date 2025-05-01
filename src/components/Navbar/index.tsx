@@ -61,13 +61,13 @@ const Navbar = () => {
 
         <div className="hidden lg:flex lg:flex-row gap-8 flex-col">
         <Link to="/signup">
-            <button className="bg-black hover:bg-white hover:text-black border px-5 py-2 text-white rounded-3xl">
+            <button className="bg-black hover:bg-white hover:text-black border px-5 py-2 text-white rounded-3xl cursor-pointer">
             Sign Up
             </button>
           </Link>
 
           <Link to="/signin">
-            <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl">
+            <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl cursor-pointer">
             Log In
             </button>
           </Link>

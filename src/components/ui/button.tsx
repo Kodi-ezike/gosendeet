@@ -3,6 +3,8 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
+import { Loader } from "lucide-react"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
@@ -10,7 +12,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-purple500 text-white shadow-xs hover:bg-primary/90 cursor-pointer",
+          "bg-purple500 text-white shadow-xs hover:bg-purple400 cursor-pointer",
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 cursor-pointer",
         outline:
@@ -40,20 +42,47 @@ function Button({
   variant,
   size,
   asChild = false,
+  loading = false,
   ...props
-}: React.ComponentProps<"button"> &
+}: Omit<
+  React.ComponentProps<"button">,
+  "loading"
+> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    loading?: boolean
   }) {
   const Comp = asChild ? Slot : "button"
+  const [isLoading, setLoading] = React.useState(loading)
+
+  React.useEffect(() => {
+    setLoading(loading)
+  }, [loading])
+
+  // Optional: Access and call props.onClick manually
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (!navigator.onLine) {
+      toast.error("Please check your internet connection.")
+      setLoading(false)
+      return
+    }
+
+    props?.onClick?.(event)
+  }
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
+      onClick={handleClick}
+      disabled={isLoading || props.disabled}
+      {...props} // spread props after removing `loading`
+    >
+       {props.children}
+       {isLoading && <Loader className="ml-2 animate-spin" />}
+    </Comp>
   )
 }
+
 
 export { Button, buttonVariants }

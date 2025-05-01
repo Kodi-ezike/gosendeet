@@ -8,21 +8,32 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import purple from "@/assets/icons/big-purple-checkmark.png";
+import { Link, useLocation } from "react-router-dom";
+import { resetPassword } from "@/services/auth";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 
 const ResetPassword = () => {
-  //   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const resetToken = queryParams.get("resetToken") || "";
   const [isSuccess, setIsSuccess] = useState(false);
 
   const [toggle, setToggle] = useState(false);
 
-  const schema = z.object({
-    password: z
-      .string({ required_error: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
-    confirm_password: z
-      .string({ required_error: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
-  });
+  const schema = z
+    .object({
+      password: z
+        .string({ required_error: "Password is required" })
+        .min(8, { message: "Password must be at least 8 characters" }),
+      confirmPassword: z
+        .string({ required_error: "Please confirm your password" })
+        .min(8, { message: "Password must be at least 8 characters" }),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"], // Error will show on confirmPassword field
+      message: "Passwords do not match",
+    });
 
   const {
     register,
@@ -32,9 +43,23 @@ const ResetPassword = () => {
     resolver: zodResolver(schema),
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: resetPassword,
+    onSuccess: () => {
+      toast.success("Successful");
+      setIsSuccess(true);
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+    },
+  });
+
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data);
-    setIsSuccess(true);
+    mutate({
+      resetToken,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    });
   };
 
   return (
@@ -51,7 +76,9 @@ const ResetPassword = () => {
               <p className="text-neutral600 lg:w-3/4">
                 You have successfully reset password for your account
               </p>
-              <Button className="mt-6">Continue to Dashboard</Button>
+              <Link to={"/signin"}>
+                <Button className="mt-6">Proceed to Login</Button>
+              </Link>
             </div>
           ) : (
             <>
@@ -101,7 +128,7 @@ const ResetPassword = () => {
                     <TbLockPassword className="text-purple400 text-2xl" />
                     <div className="flex flex-col gap-2 w-full">
                       <label
-                        htmlFor="confirm_password"
+                        htmlFor="confirmPassword"
                         className="font-clash font-semibold"
                       >
                         Confirm Password
@@ -109,7 +136,7 @@ const ResetPassword = () => {
                       <div className="flex justify-between gap-2">
                         <input
                           type={toggle ? "text" : "password"}
-                          {...register("confirm_password")}
+                          {...register("confirmPassword")}
                           placeholder="********"
                           className="w-full outline-0 border-b-0"
                         />
@@ -121,15 +148,19 @@ const ResetPassword = () => {
                           {toggle ? <FaRegEye /> : <FaRegEyeSlash />}
                         </span>
                       </div>
-                      {errors.confirm_password && (
+                      {errors.confirmPassword && (
                         <p className="error text-xs text-[#FF0000]">
-                          {errors.confirm_password.message}
+                          {errors.confirmPassword.message}
                         </p>
                       )}
                     </div>
                   </div>
 
-                  <Button variant={"secondary"} className=" w-full my-1">
+                  <Button
+                    variant={"secondary"}
+                    className=" w-full my-1"
+                    loading={isPending}
+                  >
                     Reset Password
                   </Button>
                 </form>
