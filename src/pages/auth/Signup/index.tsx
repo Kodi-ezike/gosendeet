@@ -3,7 +3,6 @@ import AuthLayout from "@/layouts/AuthLayout";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { TbLockPassword } from "react-icons/tb";
 import { FaRegEye } from "react-icons/fa";
@@ -78,12 +77,6 @@ const Signup = () => {
           <h1 className="lg:text-[40px] text-[30px] font-semibold font-clash mb-1">
             Sign up
           </h1>
-          <Link
-            to={"/signin"}
-            className="text-purple500 border-b border-b-purple500 text-base"
-          >
-            Try another details
-          </Link>
 
           <div className="py-4 text-sm mt-8">
             <form onSubmit={handleSubmit(onSubmit)}>
