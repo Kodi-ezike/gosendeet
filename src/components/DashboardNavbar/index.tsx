@@ -5,7 +5,7 @@ import logo from "@/assets/images/gosendeet-logo.png";
 import { HiBars3 } from "react-icons/hi2";
 import { GoX } from "react-icons/go";
 
-const Navbar = () => {
+const DashboardNavbar = () => {
   const [navOpen, setNavOpen] = useState(false);
 
   const handleNavToggle = () => {
@@ -26,11 +26,11 @@ const Navbar = () => {
 
         {/* Hamburger Icon (mobile view) */}
         <div className="lg:hidden flex items-center gap-4">
-        <Link to="/signin">
-            <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl">
-            Log In
-            </button>
-          </Link>
+        <div className="flex flex-row gap-4 items-center">
+          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+            V
+          </div>
+        </div>
           <button onClick={handleNavToggle}>
             <HiBars3 size={24} />
           </button>
@@ -56,21 +56,13 @@ const Navbar = () => {
               </li>
             );
           })}
-         
         </ul>
 
-        <div className="hidden lg:flex lg:flex-row gap-8 flex-col">
-        <Link to="/signup">
-            <button className="bg-black hover:bg-white hover:text-black border px-5 py-2 text-white rounded-3xl cursor-pointer">
-            Sign Up
-            </button>
-          </Link>
-
-          <Link to="/signin">
-            <button className="bg-neutral200  hover:bg-black hover:text-white border border-darkGreen px-5 py-2 text-black rounded-3xl cursor-pointer">
-            Log In
-            </button>
-          </Link>
+        <div className="hidden lg:flex lg:flex-row gap-4 items-center flex-col">
+          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+            V
+          </div>
+          <p className="text-neutral600 font-medium">Hello, Victor</p>
         </div>
 
         {/* Links (mobile view) */}
@@ -107,9 +99,9 @@ const Navbar = () => {
               );
             })}
           </ul>
-          <a href="/signup">
+          {/* <a href="/signup">
             <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-white bg-black rounded mb-4">
-            Sign Up
+              Sign Up
             </button>
           </a>
 
@@ -117,11 +109,11 @@ const Navbar = () => {
             <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-black bg-white rounded">
               Log In
             </button>
-          </a>
+          </a> */}
         </div>
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+export default DashboardNavbar;

@@ -15,6 +15,7 @@ import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ResetPassword from "./pages/auth/ResetPassword";
+import Dashboard from "./pages/dashboard";
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/:id/verify-email" element={<VerifyEmail />} />
           <Route path="/:id/reset-password" element={<ResetPassword />} />
+
+          <Route path="/dashboard" element={<Dashboard />} />
+
         </Routes>
     </Router>
   );

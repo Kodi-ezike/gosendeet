@@ -136,7 +136,7 @@ const Header = () => {
                     </div>
                   </div>
 
-                  <button className="flex items-center gap-3 bg-black rounded-full px-8 py-4 outline-black mt-4">
+                  <button className="flex items-center gap-3 bg-black rounded-full px-8 py-3 outline-black mt-4">
                     <FiSearch className="text-white text-xl" />
                     <span className="text-white">Get a quick quote</span>
                   </button>

@@ -4,9 +4,9 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="bg-purple300 md:px-20 px-6 py-20 flex lg:flex-row lg:justify-between flex-col gap-8">
+    <div className="bg-purple300 xl:px-30 md:px-20 px-6 py-20 flex lg:flex-row lg:justify-between flex-col gap-8">
       <div className="xl:w-1/3 lg:w-1/2">
-        <img src={logo} alt="logo" className="mb-6 h-[40px]" />
+        <img src={logo} alt="logo" className="mb-6 h-[36px]" />
         <div className="flex lg:flex-row flex-col gap-4">
           <a href="/" className="font-medium">
             How it works
