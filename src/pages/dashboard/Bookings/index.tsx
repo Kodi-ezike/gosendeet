@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { IoPrintOutline, IoSearchOutline } from "react-icons/io5";
-import { MdOutlineFileDownload } from "react-icons/md";
+import { IoSearchOutline } from "react-icons/io5";
 
 import {
   Select,
@@ -10,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LuDownload } from "react-icons/lu";
+import { BookingDetails } from "./details";
 
 const statusOptions = [
   { value: "paid", title: "Paid" },
@@ -170,20 +171,12 @@ const Bookings = () => {
                 {/* Modal */}
                 {activeModalId === index && ( // Show modal only for the active event
                   <div
-                    className="modal w-fit bg-white shadow-md rounded-md z-10 absolute top-12 right-6"
+                    className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                     ref={modalRef} // Attach ref to the modal
                   >
-                    <p className="flex items-center gap-2 py-2 px-4 hover:bg-primary-100 rounded-t-md cursor-pointer">
-                      <MdOutlineFileDownload /> Download
-                    </p>
-                    <p
-                      className="flex items-center gap-2 py-2 px-4 hover:bg-primary-100 rounded-b-md cursor-pointer"
-                      onClick={() => {
-                        // setIsOpen(true);
-                        // setEventId(event.id);
-                      }}
-                    >
-                      <IoPrintOutline /> Print
+                      <BookingDetails />
+                    <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                      <LuDownload size={18} /> Download
                     </p>
                   </div>
                 )}

@@ -50,7 +50,7 @@ const Header = () => {
       <div className="lg:w-1/2 lg:mt-0 mt-10">
         <div className="md:w-[90%] mx-auto border md:h-[450px] bg-purple300 border-purple100 rounded-3xl shadow-deliveryShadow py-8 px-4">
           {/* Tab Buttons */}
-          <div className="w-full rounded-full bg-purple200 h-[60px] flex py-1 px-4 relative overflow-hidden">
+          <div className="w-full rounded-full bg-purple200 h-[60px] flex py-1 relative overflow-hidden">
             <div
               className={`absolute top-1 left-1  h-[calc(100%-8px)] rounded-full bg-white shadow-scheduleShadow transition-all duration-500`}
               style={{
