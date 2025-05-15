@@ -52,7 +52,7 @@ const Bookings = () => {
   }, []);
 
   return (
-    <div>
+    <div className="md:px-4">
       <h2 className="font-clash font-semibold text-[20px] mb-4">Bookings</h2>
       <div className="flex lg:flex-row flex-col justify-between lg:items-center gap-4 mb-6">
         <p className="text-sm text-neutral600">

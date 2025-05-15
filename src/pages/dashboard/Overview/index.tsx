@@ -12,13 +12,13 @@ const Overview = () => {
         <h2 className="font-clash font-semibold text-[20px]">Hello Victor,</h2>
 
         <div>
-          <p className="text-md font-clash font-semibold ">Your User ID</p>
-          <p>3948774</p>
+          <p className="md:text-md text-sm font-clash font-semibold ">Your User ID</p>
+          <p className="md:text-sm text-xs">3948774</p>
         </div>
       </div>
 
       <div className="flex lg:flex-row flex-col gap-8 mb-10">
-        <div className="lg:w-[60%] bg-white xl:p-10 p-6 rounded-3xl">
+        <div className="lg:w-[60%] bg-white xl:p-10 py-6 px-2 rounded-3xl text-sm">
           <h3 className="text-md font-clash font-semibold mb-4">
             Add New Shipment
           </h3>
@@ -71,9 +71,9 @@ const Overview = () => {
             </button>
           </form>
         </div>
-        <div className="lg:w-[40%] bg-white xl:p-10 p-6 rounded-3xl">
+        <div className="lg:w-[40%] bg-white xl:p-10 py-6 px-2 rounded-3xl">
           <h3 className="text-md font-clash font-semibold">Customer Support</h3>
-          <p className="my-6 text-neutral600">
+          <p className="my-6 text-sm text-neutral600">
             Need help with your shipment, costing or anything at all?
           </p>
 

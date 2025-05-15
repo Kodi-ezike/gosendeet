@@ -1,8 +1,58 @@
+import { ChangePassword } from "./modals/ChangePassword";
+import { DeactivateAccount } from "./modals/DeactivateAccount";
+import { DeleteAccount } from "./modals/DeleteAccount";
 
 const Security = () => {
   return (
-    <div>Security</div>
-  )
-}
+    <div className="md:px-4">
+      <div className="mb-8">
+        <h2 className="font-clash font-semibold text-[20px] mb-2">Security</h2>
+        <p className="text-sm text-neutral600">Protect your account here </p>
+      </div>
 
-export default Security
+      <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
+        <div className="xl:w-[40%] lg:w-[50%]">
+          <h2 className="font-clash font-semibold text-[20px] mb-2">
+            Password
+          </h2>
+          <p className="text-sm text-neutral600">
+            Unique password to protect your account
+          </p>
+        </div>
+        <div>
+          <ChangePassword />
+        </div>
+      </div>
+
+      <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
+        <div className="xl:w-[40%] lg:w-[50%]">
+          <h2 className="font-clash font-semibold text-[20px] mb-2">
+            Deactivate Account
+          </h2>
+          <p className="text-sm text-neutral600">
+            Your account will be in active but you can reactivate it anytime{" "}
+          </p>
+        </div>
+        <div>
+          <DeactivateAccount />
+        </div>
+      </div>
+
+      <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
+        <div className="xl:w-[40%] lg:w-[50%]">
+          <h2 className="font-clash font-semibold text-[20px] mb-2">
+            Delete Account
+          </h2>
+          <p className="text-sm text-neutral600">
+            Your account will be permanently removed from GoSendeet{" "}
+          </p>
+        </div>
+        <div>
+          <DeleteAccount />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Security;
