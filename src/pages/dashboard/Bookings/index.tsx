@@ -29,6 +29,7 @@ const Bookings = () => {
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null); // add this
 
   const showModal = (id: number) => {
     setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
@@ -37,11 +38,14 @@ const Bookings = () => {
   // Close modal on outside click
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
+        !modalRef.current.contains(target) &&
+        dialogRef.current &&
+        !dialogRef.current.contains(target)
       ) {
-        setActiveModalId(null); // Close modal
+        setActiveModalId(null); // Close only if clicked outside both
       }
     };
 
@@ -174,7 +178,10 @@ const Bookings = () => {
                     className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                     ref={modalRef} // Attach ref to the modal
                   >
-                      <BookingDetails />
+                    <BookingDetails
+                      setActiveModalId={setActiveModalId}
+                      dialogRef={dialogRef}
+                    />
                     <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
                       <LuDownload size={18} /> Download
                     </p>

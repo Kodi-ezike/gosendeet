@@ -16,6 +16,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/dashboard";
+import AdminDashboard from "./pages/admin"
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/:id/reset-password" element={<ResetPassword />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
 
         </Routes>
     </Router>
