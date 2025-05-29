@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 import { AccountStatusModal } from "./modals/AccountStatusModal";
+import { Link } from "react-router-dom";
 
 const Profiles = () => {
   const [status, setStatus] = useState<"active" | "inactive">("active");
@@ -18,7 +19,7 @@ const Profiles = () => {
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const dialogRef = useRef<HTMLDivElement | null>(null); // add this
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const showModal = (id: number) => {
     setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
@@ -27,14 +28,11 @@ const Profiles = () => {
   // Close modal on outside click
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
+      if (isDialogOpen) return; // Skip if dialog is open
+
       const target = event.target as Node;
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(target) &&
-        dialogRef.current &&
-        !dialogRef.current.contains(target)
-      ) {
-        setActiveModalId(null); // Close only if clicked outside both
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        setActiveModalId(null); // Close parent modal
       }
     };
 
@@ -42,7 +40,8 @@ const Profiles = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, []);
+  }, [isDialogOpen]);
+
   return (
     <div>
       <div className="mb-4">
@@ -200,12 +199,14 @@ const Profiles = () => {
                     className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                     ref={modalRef} // Attach ref to the modal
                   >
-                    <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                      View Profile
-                    </p>
+                    <Link to={`/admin-dashboard/user/${index}`}>
+                      <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                        View Profile
+                      </p>
+                    </Link>
                     <AccountStatusModal
                       setActiveModalId={setActiveModalId}
-                      dialogRef={dialogRef}
+                      setIsDialogOpen={setIsDialogOpen}
                     />
                   </div>
                 )}

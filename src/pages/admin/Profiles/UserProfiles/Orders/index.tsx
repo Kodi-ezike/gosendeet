@@ -1,35 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
+// import { AccountStatusModal } from "./modals/AccountStatusModal";
+import { Link } from "react-router-dom";
+const Orders = () => {
+  const [activeStatusTab, setActiveStatusTab] = useState("All");
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { LuDownload } from "react-icons/lu";
-import { BookingDetails } from "./details";
+  const statusTabs = [
+    { label: "All", count: 1000 },
+    { label: "Ongoing", count: 2 },
+    { label: "Completed", count: 990 },
+    { label: "Canceled", count: 6 },
+    { label: "Refunded", count: 2 },
+  ];
 
-const statusOptions = [
-  { value: "paid", title: "Paid" },
-  { value: "canceled", title: "Canceled" },
-  { value: "refunded", title: "Refunded" },
-];
-
-const categoryOptions = [
-  { value: "all", title: "All" },
-  { value: "envelope", title: "Envelope" },
-  { value: "package", title: "Package" },
-];
-
-const Bookings = () => {
   const results = [1, 2, 3, 4, 5];
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const showModal = (id: number) => {
     setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
@@ -38,7 +26,7 @@ const Bookings = () => {
   // Close modal on outside click
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
-      if (isDialogOpen) return; // Skip if dialog is open
+      // if (isDialogOpen) return; // Skip if dialog is open
 
       const target = event.target as Node;
       if (modalRef.current && !modalRef.current.contains(target)) {
@@ -50,68 +38,40 @@ const Bookings = () => {
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, [isDialogOpen]);
+  }, []);
 
   return (
-    <div className="md:px-4">
-      <h2 className="font-clash font-semibold text-[20px] mb-4">Bookings</h2>
-      <div className="flex lg:flex-row flex-col justify-between lg:items-center gap-4 mb-6">
-        <p className="text-sm text-neutral600">
-          This contains all your shipment orders
-        </p>
+    <div>
+      <div className="flex xl:flex-row flex-col justify-between xl:items-center gap-4 mb-6">
+        <div className="flex gap-4 flex-wrap">
+          {statusTabs.map((tab) => (
+            <button
+              key={tab.label}
+              onClick={() => setActiveStatusTab(tab.label)}
+              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium ${
+                activeStatusTab === tab.label
+                  ? "bg-neutral300 text-neutral800 "
+                  : "bg-neutral200 text-neutral500"
+              }`}
+            >
+              {tab.label} ({tab.count})
+            </button>
+          ))}
+        </div>
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
             <IoSearchOutline className="text-neutral500" />
             <input
               type="text"
               role="search"
-              className="border-0 outline-0 w-[150px] text-sm text-neutral600"
+              className="border-0 outline-0 w-[200px] text-sm text-neutral600"
               placeholder="Search order"
             />
           </div>
-          <div>
-            {/* Select options */}
-            <Select>
-              <SelectTrigger className="bg-white h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {statusOptions?.map((item, index) => (
-                  <SelectItem
-                    value={item.title}
-                    key={index}
-                    className="focus:bg-purple200"
-                  >
-                    {item.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            {/* Select options */}
-            <Select>
-              <SelectTrigger className="bg-white h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categoryOptions?.map((item, index) => (
-                  <SelectItem
-                    value={item.title}
-                    key={index}
-                    className="focus:bg-purple200"
-                  >
-                    {item.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </div>
-
       <div className="overflow-x-auto">
-        <div className="min-w-[1100px] w-full">
+        <div className="min-w-[1100px] w-full relative">
           <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple300 w-full">
             <span className="w-[1%] mr-4">
               <input type="checkbox" name="" id="" className="mt-[2px]" />
@@ -122,7 +82,8 @@ const Bookings = () => {
             <span className="flex-1">Parcel Weight</span>
             <span className="flex-1">Pickup Created</span>
             <span className="flex-1">Destination</span>
-            <span className="w-[9%]">Status</span>
+            <span className="w-[10%]">Status</span>
+            <span className="w-[10%]">Progress</span>
             <span className="w-[2%]"></span>
           </div>
 
@@ -137,28 +98,35 @@ const Bookings = () => {
                 <span className="w-[1%] mr-4">
                   <input type="checkbox" name="" id="" className="mt-1" />
                 </span>
-                <div className="flex-1 text-left">
-                  <p>#3948774</p>
+                <div className="flex-1">
+                  <p>#95214362</p>
                 </div>
                 <div className="flex-1">
                   <p>DHL Logistics</p>
                 </div>
                 <div className="flex-1">
-                  <p className="text-neutral600">Envelope</p>
+                  <p>Envelope</p>
                 </div>
-                <div className="flex-1">15kg | 3x5x8 cm</div>
-                <div className="flex-1">11:37 PM, 27 May 2023 </div>
+                <div className="flex-1">
+                  <p>15kg | 3x5x8 cm</p>
+                </div>
+                <div className="flex-1">
+                  <p>11:37 PM, 27 May 2023 </p>
+                </div>
                 <div className="flex-1">
                   <p>Emery Torff</p>
-                  <p className="text-neutral600">Marina, VI, Lagos</p>
+                  <p>Marina, VI, Lagos</p>
                 </div>
-                <div className="w-[9%]">
-                  <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-[#FEF2F2] text-[#EC2D30]">
-                    Canceled
+                <div className="w-[10%]">
+                  {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-[#FEF2F2] text-[#EC2D30]">
+                                  Inactive
+                                </p> */}
+                  <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-green100 text-green500">
+                    Active
                   </p>
-                  {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-neutral200 text-neutral600">Refunded</p> */}
-                  {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-green100 text-green500">Paid</p> */}
                 </div>
+                <div className="w-[10%]">On the way</div>
+
                 <div className="w-[2%]">
                   <button className="border p-1 rounded-md border-neutral200">
                     <BsThreeDotsVertical
@@ -175,13 +143,21 @@ const Bookings = () => {
                     className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                     ref={modalRef} // Attach ref to the modal
                   >
-                    <BookingDetails
-                      setActiveModalId={setActiveModalId}
-                      setIsDialogOpen={setIsDialogOpen}
-                    />
-                    <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                      <LuDownload size={18} /> Download
-                    </p>
+                    <Link to={`/admin-dashboard/user/${index}`}>
+                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                        View full details
+                      </p>
+                    </Link>
+                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                        Update progress
+                      </p>
+                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                        Refund
+                      </p>
+                    {/* <AccountStatusModal
+                              setActiveModalId={setActiveModalId}
+                              dialogRef={dialogRef}
+                            /> */}
                   </div>
                 )}
               </div>
@@ -193,4 +169,4 @@ const Bookings = () => {
   );
 };
 
-export default Bookings;
+export default Orders;

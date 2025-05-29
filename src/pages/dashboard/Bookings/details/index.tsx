@@ -11,10 +11,11 @@ import { FiDownloadCloud } from "react-icons/fi";
 import card from "@/assets/images/mastercard.png";
 import { RxExternalLink } from "react-icons/rx";
 
-export function BookingDetails({ setActiveModalId, dialogRef }: any) {
+export function BookingDetails({ setActiveModalId, setIsDialogOpen }: any) {
   return (
     <Dialog
       onOpenChange={(open) => {
+        setIsDialogOpen(open);
         if (!open) {
           setActiveModalId(null); // Close parent modal when Dialog closes
         }
@@ -25,10 +26,7 @@ export function BookingDetails({ setActiveModalId, dialogRef }: any) {
           <BiDetail size={18} /> View Details
         </p>
       </DialogTrigger>
-      <DialogContent
-        ref={dialogRef}
-        className="lg:max-w-[800px] md:max-w-[700px]"
-      >
+      <DialogContent className="lg:max-w-[800px] md:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>
             <p className="font-clash text-[20px] text-left font-semibold mt-2">

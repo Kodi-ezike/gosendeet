@@ -14,10 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-export function AccountStatusModal({ setActiveModalId, dialogRef }: any) {
+export function AccountStatusModal({ setActiveModalId, setIsDialogOpen }: any) {
   return (
     <Dialog
       onOpenChange={(open) => {
+        setIsDialogOpen(open)
         if (!open) {
           setActiveModalId(null); // Close parent modal when Dialog closes
         }
@@ -28,7 +29,7 @@ export function AccountStatusModal({ setActiveModalId, dialogRef }: any) {
           Change Account Status
         </p>
       </DialogTrigger>
-      <DialogContent ref={dialogRef} className=" md:max-w-[500px]">
+      <DialogContent className=" md:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
             <p className="font-clash text-[20px] text-left font-semibold mt-2">
@@ -46,7 +47,7 @@ export function AccountStatusModal({ setActiveModalId, dialogRef }: any) {
               <SelectTrigger className="data-[placeholder]:text-black outline-0 border-0 text-sm text-black w-full p-0">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent ref={dialogRef}>
+              <SelectContent>
                 <SelectItem value="1">Active</SelectItem>
                 <SelectItem value="2">Inactive</SelectItem>
               </SelectContent>

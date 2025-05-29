@@ -1,14 +1,14 @@
 import DashboardNavbar from "@/components/DashboardNavbar";
 import DashboardFooter from "@/components/DashboardFooter";
-import { LayoutProps } from "@/lib/types";
+import { Outlet } from "react-router-dom";
 
-const DashboardLayout = ({ children }: LayoutProps) => {
+const DashboardLayout = () => {
   return (
     <div>
       <header>
         <DashboardNavbar />
       </header>
-      <main>{children}</main>
+      <main><Outlet/></main>
       <footer>
         <DashboardFooter />
       </footer>
