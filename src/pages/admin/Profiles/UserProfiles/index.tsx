@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import Orders from "./Orders";
 import LoginHistory from "./LoginHistory";
-import Settings from "./Settings";
+// import Settings from "./Settings";
 const UserProfiles = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("orders");
@@ -15,7 +15,7 @@ const UserProfiles = () => {
   const tabs = [
     { key: "orders", label: "Orders" },
     { key: "login", label: "Login History" },
-    { key: "settings", label: "Settings" },
+    // { key: "settings", label: "Settings" },
   ];
 
   const updateUnderline = (index: number) => {
@@ -123,7 +123,7 @@ const UserProfiles = () => {
       <div className="mt-6">
         {activeTab === "orders" && <Orders />}
         {activeTab === "login" && <LoginHistory />}
-        {activeTab === "settings" && <Settings />}
+        {/* {activeTab === "settings" && <Settings />} */}
       </div>
     </div>
   );

@@ -19,6 +19,7 @@ import Dashboard from "./pages/dashboard";
 import AdminDashboard from "./pages/admin";
 import UserProfiles from "./pages/admin/Profiles/UserProfiles";
 import DashboardLayout from "./layouts/DashboardLayout";
+import OrderDetails from "./pages/admin/Orders/OrderDetails";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path="admin-dashboard" element={<DashboardLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="user/:id" element={<UserProfiles />} />
+          <Route path="order/:id" element={<OrderDetails />} />
         </Route>
         
       </Routes>

@@ -143,7 +143,7 @@ const Orders = () => {
                     className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                     ref={modalRef} // Attach ref to the modal
                   >
-                    <Link to={`/admin-dashboard/user/${index}`}>
+                    <Link to={`/admin-dashboard/order/${index}`}>
                       <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
                         View full details
                       </p>
