@@ -3,15 +3,16 @@ import AuthLayout from "@/layouts/AuthLayout";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { useNavigate } from "react-router-dom";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { useMutation } from "@tanstack/react-query";
 import { forgotPassword } from "@/services/auth";
 import { toast } from "sonner";
+import { ResetPasswordModal } from "./ResetPasswordModal";
+import { useState } from "react";
 
 const ForgotPassword = () => {
-  // const navigate = useNavigate();
-
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
   const schema = z.object({
     email: z
       .string({ required_error: "Email Address is required" })
@@ -21,6 +22,7 @@ const ForgotPassword = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -29,7 +31,8 @@ const ForgotPassword = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: forgotPassword,
     onSuccess: () => {
-      toast.success("Successful");
+      setOpen(true);
+      reset();
     },
     onError: (data) => {
       toast.error(data?.message);
@@ -37,6 +40,7 @@ const ForgotPassword = () => {
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
+    setEmail(data.email);
     mutate(data.email);
   };
 
@@ -74,7 +78,11 @@ const ForgotPassword = () => {
                 </div>
               </div>
 
-              <Button variant={"secondary"} className=" w-full my-5" loading={isPending}>
+              <Button
+                variant={"secondary"}
+                className=" w-full my-5"
+                loading={isPending}
+              >
                 Get reset link
               </Button>
             </form>
@@ -87,6 +95,8 @@ const ForgotPassword = () => {
           </p>
         </div>
       </div>
+
+      <ResetPasswordModal open={open} setOpen={setOpen} email={email} />
     </AuthLayout>
   );
 };

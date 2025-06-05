@@ -12,18 +12,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
-import { resetPassword } from "@/services/auth";
+import { changePassword } from "@/services/auth";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 
 export function ChangePassword() {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const resetToken = queryParams.get("resetToken") || "";
-//   const [isSuccess, setIsSuccess] = useState(false);
-
   const [toggle, setToggle] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const schema = z
     .object({
@@ -45,16 +40,18 @@ export function ChangePassword() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
 
   const { mutate, isPending } = useMutation({
-    mutationFn: resetPassword,
+    mutationFn: changePassword,
     onSuccess: () => {
       toast.success("Successful");
-    //   setIsSuccess(true);
+      setOpen(false);
+      reset();
     },
     onError: (data) => {
       toast.error(data?.message);
@@ -63,14 +60,14 @@ export function ChangePassword() {
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     mutate({
-      resetToken,
-      password: data.password,
+      oldPassword: data.currentPassword,
+      newPassword: data.password,
       confirmPassword: data.confirmPassword,
     });
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={"secondary"}>Change password</Button>
       </DialogTrigger>
@@ -83,7 +80,10 @@ export function ChangePassword() {
         </DialogDescription>
         <>
           <div className="py-4 text-sm mt-4">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-8"
+            >
               <div className="flex flex-col gap-2 w-full ">
                 <label htmlFor="password" className="font-clash font-semibold">
                   Current Password

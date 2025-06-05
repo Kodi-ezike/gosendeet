@@ -75,7 +75,7 @@ const Navbar = () => {
 
         {/* Links (mobile view) */}
         <div
-          className={`lg:hidden absolute top-0 left-0 w-full h-[80vh] bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
+          className={`lg:hidden absolute top-0 left-0 w-full h-[90vh] z-10 bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
             navOpen ? "transform translate-x-0" : "transform -translate-x-full"
           }`}
         >

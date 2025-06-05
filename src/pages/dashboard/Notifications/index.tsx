@@ -1,7 +1,8 @@
 import { RxExternalLink } from "react-icons/rx";
-const results = [1, 2, 3];
-
-const Notifications = () => {
+// const results = [1, 2, 3];
+import bell from "@/assets/images/no-notifications-empty-state.png";
+import { Button } from "@/components/ui/button";
+const Notifications = ({setActiveTab}: any) => {
   return (
     <div>
       <div className="flex justify-between md:items-center mb-4 md:px-4">
@@ -15,7 +16,7 @@ const Notifications = () => {
 
       <div className="flex lg:flex-row flex-col gap-8 mb-10">
         <div className="lg:w-[60%] min-h-[370px] bg-white xl:p-10 py-6 px-2 rounded-3xl">
-          <div className="flex flex-col gap-4 text-sm ">
+          {/* <div className="flex flex-col gap-4 text-sm ">
             {results.map((index) => (
               <div className="flex flex-col gap-2" key={index}>
                 <h3 className="font-clash font-semibold">
@@ -31,6 +32,24 @@ const Notifications = () => {
                 </div>
               </div>
             ))}
+          </div> */}
+          <div className="flex flex-col justify-center items-center ">
+            <img src={bell} alt="bell" className="w-[200px]" />
+            <p className="font-clash font-semibold text-md my-6">
+              You have no notifications yet!
+            </p>
+            <p className="text-neutral600 text-sm mb-1">
+              Looks like you're all caught up.
+            </p>
+            <p className="text-neutral600 text-sm mb-1">
+              Check back later for new notifications
+            </p>
+            <hr className="border border-neutral200 my-8 w-full" />
+
+            <p className="text-neutral600 text-sm mb-4">
+              Ready to send something special or track a delivery?
+            </p>
+              <Button onClick={()=>setActiveTab('overview')}>Book a delivery</Button>
           </div>
         </div>
         <div className="lg:w-[40%] bg-white xl:p-10 py-6 px-2 rounded-3xl">

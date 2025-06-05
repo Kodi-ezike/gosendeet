@@ -7,7 +7,8 @@ import ProfileSettings from "./ProfileSettings";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("profiles");
+  const initialTab = sessionStorage.getItem("activeTab") || "profiles";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -55,8 +56,12 @@ const AdminDashboard = () => {
                   onMouseEnter={() => {
                     updateUnderline(index);
                     setActiveTab(tab.key);
+                    sessionStorage.setItem("activeTab", tab.key);
                   }}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => {
+                    setActiveTab(tab.key);
+                    sessionStorage.setItem("activeTab", tab.key);
+                  }}
                 >
                   {/* <ViewIcon/> */}
                   {tab.label}

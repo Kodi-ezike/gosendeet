@@ -13,9 +13,12 @@ import google from "@/assets/icons/google.png";
 import { googleLogin, signup } from "@/services/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { SignupModal } from "./SignupModal";
 
 const Signup = () => {
   const [toggle, setToggle] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
 
   const schema = z
     .object({
@@ -41,6 +44,7 @@ const Signup = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -49,7 +53,8 @@ const Signup = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: signup,
     onSuccess: () => {
-      toast.success("Account created successfully");
+      setOpen(true);
+      reset();
     },
     onError: (data) => {
       toast.error(data?.message);
@@ -57,6 +62,7 @@ const Signup = () => {
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
+    setEmail(data.email);
     mutate(data);
   };
 
@@ -84,12 +90,12 @@ const Signup = () => {
                 <MdOutlinePersonOutline className="text-purple400 text-[25px]" />
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="details" className="font-clash font-semibold">
-                    Your Full Name
+                    Username
                   </label>
                   <input
                     type="text"
                     {...register("username")}
-                    placeholder="Enter your full name"
+                    placeholder="Enter your username"
                     className="w-full outline-0 text-gray-600"
                   />
                   {errors.username && (
@@ -195,7 +201,7 @@ const Signup = () => {
             <Button
               variant={"outline"}
               className="border-neutral500 bg-transparent w-full mt-5 mb-4 hover:bg-purple200"
-              onClick={()=>googleMutation()}
+              onClick={() => googleMutation()}
             >
               <img src={google} alt="google" className="w-[20px]" />
               <span>Continue with Google</span>
@@ -209,6 +215,8 @@ const Signup = () => {
           </p>
         </div>
       </div>
+
+      <SignupModal open={open} setOpen={setOpen} email={email} />
     </AuthLayout>
   );
 };

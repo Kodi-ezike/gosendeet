@@ -4,6 +4,7 @@ import { MENU } from "../../constants";
 import logo from "@/assets/images/gosendeet-logo.png";
 import { HiBars3 } from "react-icons/hi2";
 import { GoX } from "react-icons/go";
+import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 
 const DashboardNavbar = () => {
   const [navOpen, setNavOpen] = useState(false);
@@ -13,6 +14,10 @@ const DashboardNavbar = () => {
   };
 
   const location = useLocation(); // Get current location
+
+  const { data: userData } = useGetUserDetails();
+  const username = userData?.data?.username ?? "";
+  const firstLetter = username.charAt(0).toUpperCase(); // First letter capitalized
 
   return (
     <nav className="w-full z-10">
@@ -26,11 +31,11 @@ const DashboardNavbar = () => {
 
         {/* Hamburger Icon (mobile view) */}
         <div className="lg:hidden flex items-center gap-4">
-        <div className="flex flex-row gap-4 items-center">
-          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
-            V
+          <div className="flex flex-row gap-4 items-center">
+            <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+              {firstLetter}
+            </div>
           </div>
-        </div>
           <button onClick={handleNavToggle}>
             <HiBars3 size={24} />
           </button>
@@ -60,14 +65,14 @@ const DashboardNavbar = () => {
 
         <div className="hidden lg:flex lg:flex-row gap-4 items-center flex-col">
           <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
-            V
+            {firstLetter}
           </div>
-          <p className="text-neutral600 font-medium">Hello, Victor</p>
+          <p className="text-neutral600 font-medium">Hello, {username}</p>
         </div>
 
         {/* Links (mobile view) */}
         <div
-          className={`lg:hidden absolute top-0 left-0 w-full h-[80vh] bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
+          className={`lg:hidden absolute top-0 left-0 w-full h-[70vh] z-10 bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
             navOpen ? "transform translate-x-0" : "transform -translate-x-full"
           }`}
         >

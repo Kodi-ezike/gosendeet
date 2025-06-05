@@ -50,7 +50,6 @@ function App() {
           <Route path="user/:id" element={<UserProfiles />} />
           <Route path="order/:id" element={<OrderDetails />} />
         </Route>
-        
       </Routes>
     </Router>
   );

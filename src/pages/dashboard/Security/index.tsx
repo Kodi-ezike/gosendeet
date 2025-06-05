@@ -1,15 +1,18 @@
+import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 import { ChangePassword } from "./modals/ChangePassword";
 import { DeactivateAccount } from "./modals/DeactivateAccount";
 import { DeleteAccount } from "./modals/DeleteAccount";
+import { ReactivateAccount } from "./modals/ReactivateAccount";
 
 const Security = () => {
+  const { data: userData } = useGetUserDetails();
+  const userStatus = userData?.data?.status ?? "";
   return (
     <div className="md:px-4">
       <div className="mb-8">
         <h2 className="font-clash font-semibold text-[20px] mb-2">Security</h2>
         <p className="text-sm text-neutral600">Protect your account here </p>
       </div>
-
       <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
         <div className="xl:w-[40%] lg:w-[50%]">
           <h2 className="font-clash font-semibold text-[20px] mb-2">
@@ -23,21 +26,38 @@ const Security = () => {
           <ChangePassword />
         </div>
       </div>
-
-      <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
-        <div className="xl:w-[40%] lg:w-[50%]">
-          <h2 className="font-clash font-semibold text-[20px] mb-2">
-            Deactivate Account
-          </h2>
-          <p className="text-sm text-neutral600">
-            Your account will be in active but you can reactivate it anytime{" "}
-          </p>
+      
+      {userStatus === "active" && (
+        <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
+          <div className="xl:w-[40%] lg:w-[50%]">
+            <h2 className="font-clash font-semibold text-[20px] mb-2">
+              Deactivate Account
+            </h2>
+            <p className="text-sm text-neutral600">
+              Your account will be in active but you can reactivate it anytime{" "}
+            </p>
+          </div>
+          <div>
+            <DeactivateAccount />
+          </div>
         </div>
-        <div>
-          <DeactivateAccount />
-        </div>
-      </div>
+      )}
 
+      {userStatus === "inactive" && (
+        <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
+          <div className="xl:w-[40%] lg:w-[50%]">
+            <h2 className="font-clash font-semibold text-[20px] mb-2">
+              Reactivate Account
+            </h2>
+            <p className="text-sm text-neutral600">
+              Your account will be active once you reactivate it anytime
+            </p>
+          </div>
+          <div>
+            <ReactivateAccount />
+          </div>
+        </div>
+      )}
       <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
         <div className="xl:w-[40%] lg:w-[50%]">
           <h2 className="font-clash font-semibold text-[20px] mb-2">

@@ -3,7 +3,7 @@ import AuthLayout from "@/layouts/AuthLayout";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { TbLockPassword } from "react-icons/tb";
 import { FaRegEye } from "react-icons/fa";
@@ -15,7 +15,7 @@ import { toast } from "sonner";
 
 const Login = () => {
   const [toggle, setToggle] = useState(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const { username, email } = location.state || {};
@@ -42,13 +42,10 @@ const Login = () => {
   const { mutate, isPending } = useMutation({
       mutationFn: login,
       onSuccess: (data) => {
+        localStorage.setItem("authToken", data.data.token)
+        localStorage.setItem("userId", data.data.user.id)
         toast.success("Login Successful");
-        console.log(data)
-        // navigate("/verify-email", {
-        //   state: {
-        //     email: data?.email,
-        //   },
-        // });
+        navigate("/dashboard");
       },
       onError: (data) => {
         toast.error(data?.message);

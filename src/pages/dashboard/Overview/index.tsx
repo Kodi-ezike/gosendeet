@@ -4,15 +4,22 @@ import location from "@/assets/icons/location.png";
 import { RxExternalLink } from "react-icons/rx";
 import { SpecsModal } from "./specs";
 import Bookings from "../Bookings";
+import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 
 const Overview = () => {
+  const { data: userData } = useGetUserDetails();
+  const username = userData?.data?.username ?? "";
   return (
     <div>
       <div className="flex justify-between md:items-center mb-4 md:px-4">
-        <h2 className="font-clash font-semibold text-[20px]">Hello Victor,</h2>
+        <h2 className="font-clash font-semibold text-[20px]">
+          Hello {username},
+        </h2>
 
         <div>
-          <p className="md:text-md text-sm font-clash font-semibold ">Your User ID</p>
+          <p className="md:text-md text-sm font-clash font-semibold ">
+            Your User ID
+          </p>
           <p className="md:text-sm text-xs">3948774</p>
         </div>
       </div>
@@ -92,7 +99,7 @@ const Overview = () => {
         </div>
       </div>
 
-      <Bookings/>
+      <Bookings />
     </div>
   );
 };

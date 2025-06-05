@@ -6,10 +6,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { activateAccount } from "@/services/auth";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export function DeactivateAccount() {
+  const [open, setOpen] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: activateAccount,
+    onSuccess: () => {
+      toast.success("Successful");
+      setOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      });
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+    },
+  });
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={"secondary"}>Deactivate my account</Button>
       </DialogTrigger>
@@ -32,7 +54,8 @@ export function DeactivateAccount() {
             <Button
               variant={"secondary"}
               className=" w-fit"
-              // loading={isPending}
+              loading={isPending}
+              onClick={() => mutate("inactive")}
             >
               Deactivate
             </Button>
