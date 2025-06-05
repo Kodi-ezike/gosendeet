@@ -1,3 +1,4 @@
+import { UpdateProgressModal } from "@/pages/admin/Orders/modals/UpdateProgressModal";
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
@@ -5,7 +6,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 const Orders = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
-
+  const [open, setOpen] = useState(false);
   const statusTabs = [
     { label: "All", count: 1000 },
     { label: "Ongoing", count: 2 },
@@ -148,12 +149,15 @@ const Orders = () => {
                         View full details
                       </p>
                     </Link>
-                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        Update progress
-                      </p>
-                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        Refund
-                      </p>
+                    <p
+                      className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                      onClick={() => setOpen(true)}
+                    >
+                      Update progress
+                    </p>
+                    <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                      Refund
+                    </p>
                     {/* <AccountStatusModal
                               setActiveModalId={setActiveModalId}
                               dialogRef={dialogRef}
@@ -165,6 +169,7 @@ const Orders = () => {
           })}
         </div>
       </div>
+      <UpdateProgressModal open={open} setOpen={setOpen} />
     </div>
   );
 };

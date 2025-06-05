@@ -13,10 +13,11 @@ import bellComplete from "@/assets/icons/bell-complete.png";
 import bellOff from "@/assets/icons/bell-off.png";
 // import { AccountStatusModal } from "./modals/AccountStatusModal";
 import { Link } from "react-router-dom";
+import { UpdateProgressModal } from "./modals/UpdateProgressModal";
 
 const Orders = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
-
+  const [open, setOpen] = useState(false);
   const statusTabs = [
     { label: "All", count: 1000 },
     { label: "Ongoing", count: 2 },
@@ -260,12 +261,15 @@ const Orders = () => {
                         View full details
                       </p>
                     </Link>
+                    <p
+                      className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                      onClick={() => setOpen(true)}
+                    >
+                      Update progress
+                    </p>
                     <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        Update progress
-                      </p>
-                      <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        Refund
-                      </p>
+                      Refund
+                    </p>
                     {/* <AccountStatusModal
                       setActiveModalId={setActiveModalId}
                       setIsDialogOpen={setIsDialogOpen}
@@ -277,6 +281,7 @@ const Orders = () => {
           })}
         </div>
       </div>
+      <UpdateProgressModal open={open} setOpen={setOpen} />
     </div>
   );
 };

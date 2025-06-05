@@ -33,7 +33,7 @@ const Notifications = ({setActiveTab}: any) => {
               </div>
             ))}
           </div> */}
-          <div className="flex flex-col justify-center items-center ">
+          <div className="flex flex-col justify-center items-center text-center">
             <img src={bell} alt="bell" className="w-[200px]" />
             <p className="font-clash font-semibold text-md my-6">
               You have no notifications yet!

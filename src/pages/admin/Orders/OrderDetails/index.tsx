@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { BiEditAlt } from "react-icons/bi";
+import { useState } from "react";
+import { UpdateProgressModal } from "../modals/UpdateProgressModal";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="md:px-20 px-6 py-8 bg-neutral100">
       <div className="flex justify-between items-center mb-8">
@@ -18,7 +22,11 @@ const OrderDetails = () => {
           Back
         </Button>
 
-        <Button variant={"secondary"} className="md:text-base text-sm">
+        <Button
+          variant={"secondary"}
+          className="md:text-base text-sm"
+          onClick={() => setOpen(true)}
+        >
           <BiEditAlt />
           Update Progress
         </Button>
@@ -217,6 +225,8 @@ const OrderDetails = () => {
           </div>
         </div>
       </div>
+
+      <UpdateProgressModal open={open} setOpen={setOpen} />
     </div>
   );
 };
