@@ -25,7 +25,7 @@ const options = [
   { value: "time", title: "Delivered" },
 ];
 
-export function UpdateProgressModal({open, setOpen}:{open:boolean; setOpen:any}) {
+export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) {
 
   const schema = z.object({
     progress: z

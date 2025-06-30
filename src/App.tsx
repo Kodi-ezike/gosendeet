@@ -20,6 +20,8 @@ import AdminDashboard from "./pages/admin";
 import UserProfiles from "./pages/admin/Profiles/UserProfiles";
 import DashboardLayout from "./layouts/DashboardLayout";
 import OrderDetails from "./pages/admin/Orders/OrderDetails";
+import AddCompany from "./pages/admin/Companies/AddCompany";
+import CompanyDetails from "./pages/admin/Companies/CompanyDetails";
 
 function App() {
   return (
@@ -49,6 +51,8 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="user/:id" element={<UserProfiles />} />
           <Route path="order/:id" element={<OrderDetails />} />
+          <Route path="companies/add-company" element={<AddCompany />} />
+          <Route path="company/:id" element={<CompanyDetails />} />
         </Route>
       </Routes>
     </Router>

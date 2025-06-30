@@ -7,8 +7,8 @@ import Security from "./Security";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const Dashboard = () => {
-  const initialTab = sessionStorage.getItem("activeTab") || "overview";
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const initialTab = sessionStorage.getItem("dashboardTab");
+  const [activeTab, setActiveTab] = useState(initialTab || "overview");
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -53,14 +53,15 @@ const Dashboard = () => {
                   className={`relative px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
                     activeTab === tab.key ? "text-purple500" : "text-neutral500"
                   }`}
-                  onMouseEnter={() => {
+                  // onMouseEnter={() => {
+                  //   updateUnderline(index);
+                  //   setActiveTab(tab.key);
+                  //   sessionStorage.setItem("dashboardTab", tab.key);
+                  // }}
+                  onClick={() => {
                     updateUnderline(index);
                     setActiveTab(tab.key);
-                    sessionStorage.setItem("activeTab", tab.key);
-                  }}
-                  onClick={() => {
-                    setActiveTab(tab.key);
-                    sessionStorage.setItem("activeTab", tab.key);
+                    sessionStorage.setItem("dashboardTab", tab.key);
                   }}
                 >
                   {/* <ViewIcon/> */}

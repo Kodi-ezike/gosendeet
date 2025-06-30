@@ -7,8 +7,8 @@ import ProfileSettings from "./ProfileSettings";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const AdminDashboard = () => {
-  const initialTab = sessionStorage.getItem("activeTab") || "profiles";
-  const [activeTab, setActiveTab] = useState(initialTab);
+  const initialTab = sessionStorage.getItem("adminTab");
+  const [activeTab, setActiveTab] = useState(initialTab || "profiles");
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -53,14 +53,15 @@ const AdminDashboard = () => {
                   className={`relative px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
                     activeTab === tab.key ? "text-purple500" : "text-neutral500"
                   }`}
-                  onMouseEnter={() => {
+                  // onMouseEnter={() => {
+                  //   updateUnderline(index);
+                  //   setActiveTab(tab.key);
+                  //   sessionStorage.setItem("adminTab", tab.key);
+                  // }}
+                  onClick={() => {
                     updateUnderline(index);
                     setActiveTab(tab.key);
-                    sessionStorage.setItem("activeTab", tab.key);
-                  }}
-                  onClick={() => {
-                    setActiveTab(tab.key);
-                    sessionStorage.setItem("activeTab", tab.key);
+                    sessionStorage.setItem("adminTab", tab.key);
                   }}
                 >
                   {/* <ViewIcon/> */}
