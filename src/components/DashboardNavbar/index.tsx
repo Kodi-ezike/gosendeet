@@ -14,8 +14,9 @@ const DashboardNavbar = () => {
   };
 
   const location = useLocation(); // Get current location
+  const userId = localStorage.getItem("userId") || "";
 
-  const { data: userData } = useGetUserDetails();
+  const { data: userData } = useGetUserDetails(userId);
   const username = userData?.data?.username ?? "";
   const firstLetter = username.charAt(0).toUpperCase(); // First letter capitalized
 

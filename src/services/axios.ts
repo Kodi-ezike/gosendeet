@@ -1,5 +1,12 @@
 import axios from "axios";
 
+export const authApi = axios.create({
+  baseURL: "https://gosendeet-backend.onrender.com/api/v1",
+  timeout: 60000,
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true,
+});
+
 export const api = axios.create({
   baseURL: "https://gosendeet-backend.onrender.com/api/v1",
   timeout: 60000,

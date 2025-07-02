@@ -1,11 +1,8 @@
 import { api } from "./axios";
 
-const userId = localStorage.getItem("userId")
-
-export const userDetails = async () => {
-
+export const userDetails = async (id: string) => {
   try {
-    const res = await api.get(`/users/${userId}`);
+    const res = await api.get(`/users/${id}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

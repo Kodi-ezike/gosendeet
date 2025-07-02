@@ -1,4 +1,5 @@
 import { api } from "./axios";
+import { authApi } from "./axios";
 
 export const signup = async (data: {
   email: string;
@@ -7,7 +8,7 @@ export const signup = async (data: {
   confirmPassword: string;
 }) => {
   try {
-    const res = await api.post("/auth/create-account", data);
+    const res = await authApi.post("/auth/create-account", data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -16,7 +17,7 @@ export const signup = async (data: {
 
 export const validateEmail = async (email: string) => {
   try {
-    const res = await api.post(`/auth?email=${email}`);
+    const res = await authApi.post(`/auth?email=${email}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -25,7 +26,7 @@ export const validateEmail = async (email: string) => {
 
 export const login = async (data: { email: string; password: string }) => {
   try {
-    const res = await api.post("/auth/login", data);
+    const res = await authApi.post("/auth/login", data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -34,7 +35,7 @@ export const login = async (data: { email: string; password: string }) => {
 
 export const resendVerification = async (email: string) => {
   try {
-    const res = await api.post(`/auth/resend-verification?email=${email}`);
+    const res = await authApi.post(`/auth/resend-verification?email=${email}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -43,7 +44,7 @@ export const resendVerification = async (email: string) => {
 
 export const forgotPassword = async (email: string) => {
   try {
-    const res = await api.post(`/auth/forgot-password?email=${email}`);
+    const res = await authApi.post(`/auth/forgot-password?email=${email}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -60,7 +61,7 @@ export const resetPassword = async ({
   confirmPassword: string;
 }) => {
   try {
-    const res = await api.post(
+    const res = await authApi.post(
       `/auth/reset-password?resetToken=${resetToken}&newPassword=${password}&confirmPassword=${confirmPassword}`
     );
     return res.data;
