@@ -5,7 +5,9 @@ import { DeleteAccount } from "./modals/DeleteAccount";
 import { ReactivateAccount } from "./modals/ReactivateAccount";
 
 const Security = () => {
-  const { data: userData } = useGetUserDetails();
+  const userId = localStorage.getItem("userId") || "";
+
+  const { data: userData } = useGetUserDetails(userId);
   const userStatus = userData?.data?.status ?? "";
   return (
     <div className="md:px-4">
@@ -26,7 +28,7 @@ const Security = () => {
           <ChangePassword />
         </div>
       </div>
-      
+
       {userStatus === "active" && (
         <div className="flex lg:flex-row flex-col lg:items-center mb-8 gap-4">
           <div className="xl:w-[40%] lg:w-[50%]">

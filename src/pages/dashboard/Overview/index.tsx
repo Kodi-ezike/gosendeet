@@ -7,7 +7,9 @@ import Bookings from "../Bookings";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 
 const Overview = () => {
-  const { data: userData } = useGetUserDetails();
+  const userId = localStorage.getItem("userId") || "";
+
+  const { data: userData } = useGetUserDetails(userId);
   const username = userData?.data?.username ?? "";
   return (
     <div>
