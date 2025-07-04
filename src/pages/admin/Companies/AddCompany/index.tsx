@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+// import { SelectInput } from "@/components/ui/selectInput";
+// import { countries } from "@/constants";
 // import { FiEdit } from "react-icons/fi";
 // import { useState } from "react";
 
@@ -293,7 +295,21 @@ const AddCompany = () => {
                   className="w-full outline-0 border-b-0 py-2 px-4 "
                 />
 
-                
+                {/* <SelectInput
+                variant="bordered"
+                labelPlacement="outside"
+                size="lg"
+                required={true}
+                options={countries}
+                // selectedKey={country?.name}
+                {...register("country")}
+                // isLoading={get_all_countries?.isLoading}
+                onSelectionChange={(selectedKey: string) => {
+                  // Update the form value directly
+                  setValue("country", selectedKey);
+                }}
+              /> */}
+
               </div>
               {errors.country && (
                 <p className="error text-xs text-[#FF0000] px-4">

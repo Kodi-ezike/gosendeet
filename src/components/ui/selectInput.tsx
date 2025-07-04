@@ -106,9 +106,10 @@ const SelectInput = React.forwardRef<HTMLSelectElement, Props>(
             popoverContent: "rounded-none bg-none",
           }}
           ref={ref}
+          {...rest}
         >
           {options?.map((option) => (
-            <AutocompleteItem key={option.key} value={option.value}>
+            <AutocompleteItem key={option.key} value={option.label}>
               {option.label}
             </AutocompleteItem>
           ))}
