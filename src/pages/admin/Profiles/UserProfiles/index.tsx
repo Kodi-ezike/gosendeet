@@ -45,7 +45,7 @@ const UserProfiles = () => {
       <div className="grid xl:grid-cols-5 md:grid-cols-3 md:gap-6 gap-6 mb-8">
         <div>
           <p className="text-neutral600 text-sm mb-2">CONTACT</p>
-          <p className="text-neutral800 md:text-[20px] text-md font-clash font-semibold mb-2">
+          <p className="text-neutral800 md:text-[20px] text-md font-inter font-semibold mb-2">
             Robert Fox
           </p>
           <p className="font-medium text-sm mb-1">wenzlaff@mac.com</p>
@@ -55,19 +55,19 @@ const UserProfiles = () => {
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">USER ID</p>
-          <p className="text-neutral800 md:text-[20px] text-md font-clash font-semibold ">
+          <p className="text-neutral800 md:text-[20px] text-md font-inter font-semibold ">
             #673971743
           </p>
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">RECOVERY PHONE</p>
-          <p className="text-neutral800 md:text-[20px] text-md font-clash font-semibold">
+          <p className="text-neutral800 md:text-[20px] text-md font-inter font-semibold">
             (270) 555-0117
           </p>
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">ACCOUNT CREATED</p>
-          <p className="text-neutral800 md:text-[20px] text-md font-clash font-semibold">
+          <p className="text-neutral800 md:text-[20px] text-md font-inter font-semibold">
             11:37 PM, 27 May 2023
           </p>
         </div>

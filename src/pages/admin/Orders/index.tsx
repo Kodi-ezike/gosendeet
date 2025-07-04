@@ -55,7 +55,7 @@ const Orders = () => {
   return (
     <div>
       <div className="mb-4">
-        <h2 className="font-clash font-semibold text-[20px] mb-2">Orders</h2>
+        <h2 className="font-inter font-semibold text-[20px] mb-2">Orders</h2>
         <p className="text-sm text-neutral600">
           This contains all placed orders
         </p>
@@ -66,7 +66,7 @@ const Orders = () => {
             <p className="text-neutral500 text-sm">Active Orders</p>
             <img src={bellActive} alt="bellActive" />
           </div>
-          <p className="text-[20px] font-clash font-semibold my-2">50</p>
+          <p className="text-[20px] font-inter font-semibold my-2">50</p>
           <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
@@ -78,7 +78,7 @@ const Orders = () => {
                 <SelectItem value="2">This week</SelectItem>
               </SelectContent>
             </Select>
-            <p className="font-clash font-semibold text-green400">9.12%</p>
+            <p className="font-inter font-semibold text-green400">9.12%</p>
           </div>
         </div>
 
@@ -89,7 +89,7 @@ const Orders = () => {
             <p className="text-neutral500 text-sm ">Completed Orders</p>
             <img src={bellComplete} alt="bellComplete" />
           </div>
-          <p className="text-[20px] font-clash font-semibold my-2">2</p>
+          <p className="text-[20px] font-inter font-semibold my-2">2</p>
           <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
@@ -101,7 +101,7 @@ const Orders = () => {
                 <SelectItem value="2">This week</SelectItem>
               </SelectContent>
             </Select>
-            <p className="font-clash font-semibold text-neutral500">0%</p>
+            <p className="font-inter font-semibold text-neutral500">0%</p>
           </div>
         </div>
 
@@ -112,7 +112,7 @@ const Orders = () => {
             <p className="text-neutral500 text-sm ">Cancelled Orders</p>
             <img src={bellOff} alt="bellOff" />
           </div>
-          <p className="text-[20px] font-clash font-semibold my-2">2</p>
+          <p className="text-[20px] font-inter font-semibold my-2">2</p>
           <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
@@ -124,7 +124,7 @@ const Orders = () => {
                 <SelectItem value="2">This week</SelectItem>
               </SelectContent>
             </Select>
-            <p className="font-clash font-semibold text-neutral500">0%</p>
+            <p className="font-inter font-semibold text-neutral500">0%</p>
           </div>
         </div>
       </div>
@@ -183,7 +183,7 @@ const Orders = () => {
       </div>
       <div className="overflow-x-auto">
         <div className="min-w-[1100px] w-full relative">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple300 w-full">
+          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
             <span className="w-[1%] mr-4">
               <input type="checkbox" name="" id="" className="mt-[2px]" />
             </span>

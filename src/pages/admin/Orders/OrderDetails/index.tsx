@@ -35,7 +35,7 @@ const OrderDetails = () => {
       <div className="grid xl:grid-cols-4 grid-cols-2 md:gap-6 gap-6 mb-4">
         <div>
           <p className="text-neutral600 text-sm mb-2">CONTACT</p>
-          <p className="text-neutral800 md:text-[20px] text-sm font-clash font-semibold mb-2">
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold mb-2">
             Robert Fox
           </p>
           {/* <p className="font-medium text-sm mb-1">wenzlaff@mac.com</p>
@@ -45,13 +45,13 @@ const OrderDetails = () => {
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">EMAIL</p>
-          <p className="text-neutral800 md:text-[20px] text-sm font-clash font-semibold break-all">
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold break-all">
             wenzlaff@mac.com
           </p>
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">ORDER NUMBER</p>
-          <p className="text-neutral800 md:text-[20px] text-sm font-clash font-semibold ">
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold ">
             #673971743
           </p>
         </div>
@@ -70,7 +70,7 @@ const OrderDetails = () => {
         <div className="xl:w-3/4">
           <div className="overflow-x-auto">
             <div className="min-w-[600px] w-full relative">
-              <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple200 w-full">
+              <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">
                 <span className="flex-1">Order Details</span>
                 <span className="flex-1">Company Details</span>
                 <span className="flex-1">Additional Info</span>
@@ -115,7 +115,7 @@ const OrderDetails = () => {
           </div>
         </div>
         <div className="xl:w-1/4">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple200 w-full">
+          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">
             <span className="flex-1">Order Summary</span>
           </div>
           <div className="flex justify-between text-left px-3 xl:px-4 py-4 w-full bg-white">
@@ -135,7 +135,7 @@ const OrderDetails = () => {
 
       <div className="overflow-x-auto">
         <div className="min-w-[600px] w-full relative mb-4">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple200 w-full">
+          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">
             <span className="flex-1">Parcel Specs</span>
             <span className="flex-1">Pick From</span>
             <span className="flex-1">Ship To</span>
@@ -173,7 +173,7 @@ const OrderDetails = () => {
       </div>
 
       <div>
-        <div className="px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple200 w-full">
+        <div className="px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">
           <p>Delivery Progress</p>
         </div>
         <div className="grid xl:grid-cols-3 text-sm px-3 xl:px-4 py-4 bg-white mb-6">
@@ -183,7 +183,7 @@ const OrderDetails = () => {
               <p className="flex-1 w-[1.5px] bg-green500/50"></p>
             </div>
             <div>
-              <h4 className="font-semibold font-clash mb-1">On the way</h4>
+              <h4 className="font-semibold font-inter mb-1">On the way</h4>
               <p className="text-neutral500 mb-1">11:37 PM, 27 May 2023 </p>
               <p className="text-neutral600 mb-2">
                 Parcel is on the way to its destination
@@ -197,7 +197,7 @@ const OrderDetails = () => {
               <p className="flex-1 w-[1.5px] bg-green500/50"></p>
             </div>
             <div>
-              <h4 className="font-semibold font-clash mb-1">
+              <h4 className="font-semibold font-inter mb-1">
                 Received by Logistic Company
               </h4>
               <p className="text-neutral500 mb-1">11:37 PM, 27 May 2023 </p>
@@ -214,7 +214,7 @@ const OrderDetails = () => {
               <p className="flex-1 w-[1.5px] bg-neutral300/50"></p>
             </div>
             <div>
-              <h4 className="font-semibold font-clash mb-1">
+              <h4 className="font-semibold font-inter mb-1">
                 Pickup request accepted
               </h4>
               <p className="text-neutral500 mb-1">11:37 PM, 27 May 2023 </p>

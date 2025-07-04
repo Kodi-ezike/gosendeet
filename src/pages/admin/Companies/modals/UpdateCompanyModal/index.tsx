@@ -74,7 +74,7 @@ export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="gap-0">
-        <DialogTitle className="text-[20px] font-semibold font-clash mb-2">
+        <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
           Update Order Progress
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600">
@@ -88,7 +88,7 @@ export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) 
               className="flex flex-col gap-8"
             >
               <div className="flex flex-col gap-2 w-full ">
-                <label htmlFor="password" className="font-clash font-semibold">
+                <label htmlFor="password" className="font-inter font-semibold">
                   Shipment Progress
                 </label>
                 <Select>
@@ -115,7 +115,7 @@ export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) 
               </div>
 
               <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-clash font-semibold">
+                <label htmlFor="password" className="font-inter font-semibold">
                   Estimated Date of Occurrence
                 </label>
                 <div className="flex justify-between items-center gap-2 border-b">
@@ -133,7 +133,7 @@ export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) 
               </div>
 
               <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-clash font-semibold">
+                <label htmlFor="password" className="font-inter font-semibold">
                   Estimated Time of Occurrence
                 </label>
                 <div className="flex justify-between items-center gap-2 border-b">
@@ -151,7 +151,7 @@ export function UpdateCompanyModal({open, setOpen}:{open:boolean; setOpen:any}) 
               </div>
 
               <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-clash font-semibold">
+                <label htmlFor="password" className="font-inter font-semibold">
                   Additional Message
                 </label>
                 <div className="flex justify-between items-center gap-2 border-b">

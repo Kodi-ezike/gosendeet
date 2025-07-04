@@ -12,27 +12,27 @@ const Ratings = () => {
         <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
           <div>
             <p className="font-medium text-sm mb-2">Responses Received</p>
-            <p className="font-semibold text-2xl">18</p>
+            <p className="font-semibold text-2xl font-inter">18</p>
           </div>
           <div className="flex gap-2 items-center">
             <img src={positive} alt="positive" />
             <div>
               <p className="font-medium text-sm mb-2">Positive</p>
-              <p className="font-semibold text-2xl">85%</p>
+              <p className="font-semibold text-2xl font-inter">85%</p>
             </div>
           </div>
           <div className="flex gap-2 items-center">
             <img src={neutral} alt="neutral" />
             <div>
               <p className="font-medium text-sm mb-2">Neutral</p>
-              <p className="font-semibold text-2xl">10%</p>
+              <p className="font-semibold text-2xl font-inter">10%</p>
             </div>
           </div>
           <div className="flex gap-2 items-center">
             <img src={negative} alt="negative" />
             <div>
               <p className="font-medium text-sm mb-2">Negative</p>
-              <p className="font-semibold text-2xl">5%</p>
+              <p className="font-semibold text-2xl font-inter">5%</p>
             </div>
           </div>
         </div>

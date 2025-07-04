@@ -104,7 +104,7 @@ const Orders = () => {
       </div>
       <div className="overflow-x-auto">
         <div className="min-w-[1100px] w-full relative">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple300 w-full">
+          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
             <span className="w-[1%] mr-4">
               <input type="checkbox" name="" id="" className="mt-[2px]" />
             </span>

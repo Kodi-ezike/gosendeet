@@ -32,7 +32,7 @@ export function AccountStatusModal({ setActiveModalId, setIsDialogOpen }: any) {
       <DialogContent className=" md:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            <p className="font-clash text-[20px] text-left font-semibold mt-2">
+            <p className="font-inter text-[20px] text-left font-semibold mt-2">
               Change Account Status
             </p>
           </DialogTitle>
@@ -42,7 +42,7 @@ export function AccountStatusModal({ setActiveModalId, setIsDialogOpen }: any) {
         </DialogHeader>
         <div>
           <div className="p-4 border-b border-neutral300 rounded-lg mb-4">
-            <p className="font-clash font-semibold mb-4">Account Status</p>
+            <p className="font-inter font-semibold mb-4">Account Status</p>
             <Select>
               <SelectTrigger className="data-[placeholder]:text-black outline-0 border-0 text-sm text-black w-full p-0">
                 <SelectValue placeholder="Status" />
@@ -55,7 +55,7 @@ export function AccountStatusModal({ setActiveModalId, setIsDialogOpen }: any) {
           </div>
 
           <div className="p-4 border-b border-neutral300 rounded-lg mb-6">
-            <p className="font-clash font-semibold mb-4">
+            <p className="font-inter font-semibold mb-4">
               Reason for status change
             </p>
             <input

@@ -5,3 +5,10 @@ export type LayoutProps = {
 };
 
 export type TWClassNames = HTMLProps<HTMLElement>["className"];
+
+export type optionProps = {
+  label: string;
+  key: string;
+  value: string;
+  register: any;
+};

@@ -16,7 +16,7 @@ const ArchiveCompanyModal = ({
   return (
     <Dialog open={openArchive} onOpenChange={setOpenArchive}>
       <DialogContent className="gap-0">
-        <DialogTitle className="text-[20px] font-semibold font-clash mb-2">
+        <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
           Are you sure you want to archive DHL Logistics?
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600 mt-4">

@@ -65,13 +65,13 @@ const CompanyDetails = () => {
       <div className="grid lg:grid-cols-3 md:grid-cols-2 md:gap-6 gap-6 mb-4">
         <div>
           <p className="text-neutral600 text-sm mb-2">COMPANY NAME</p>
-          <p className="text-neutral800 md:text-[20px] text-sm font-clash font-semibold mb-2">
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold mb-2">
             DHL Logistics
           </p>
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">ACCOUNT CREATED</p>
-          <p className="text-neutral800 md:text-[20px] text-sm font-clash font-semibold break-all">
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold break-all">
             11:37 PM, 27 May 2023
             {/* (Adedoyin Ester)  */}
           </p>

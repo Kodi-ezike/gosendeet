@@ -3,7 +3,7 @@ import Profiles from "./Profiles";
 import Orders from "./Orders";
 import Companies from "./Companies";
 import Reports from "./Reports";
-import ProfileSettings from "./ProfileSettings";
+import Settings from "./Settings";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const AdminDashboard = () => {
@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     { key: "orders", label: "Orders" },
     { key: "companies", label: "Companies" },
     { key: "reports", label: "Reports" },
-    { key: "settings", label: "Profile Settings" },
+    { key: "settings", label: "Settings" },
   ];
 
   const updateUnderline = (index: number) => {
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
   return (
     <div className="md:px-20 px-6 py-10 bg-neutral100">
       <div className="flex xl:flex-row flex-col gap-2 justify-between xl:items-center">
-        <h1 className="lg:text-[40px] text-[30px] font-clash font-semibold">
+        <h1 className="lg:text-[40px] text-[30px] font-inter font-semibold">
           Dashboard
         </h1>
 
@@ -88,7 +88,7 @@ const AdminDashboard = () => {
         {activeTab === "orders" && <Orders />}
         {activeTab === "companies" && <Companies />}
         {activeTab === "reports" && <Reports />}
-        {activeTab === "settings" && <ProfileSettings />}
+        {activeTab === "settings" && <Settings />}
       </div>
     </div>
   );
