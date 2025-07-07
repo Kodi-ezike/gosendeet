@@ -9,6 +9,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // import { countries } from "@/constants";
 // import { FiEdit } from "react-icons/fi";
 // import { useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { countries } from "@/constants";
+import { AddServiceModal } from "./modals/AddServiceModal";
+import { AddPricingModal } from "./modals/AddPricingModal";
+import { FiInfo } from "react-icons/fi";
 
 type FormValues = {
   companyNumber: string;
@@ -35,25 +46,24 @@ const AddCompany = () => {
     companyNumber: z
       .string({ required_error: "Company number is required" })
       .min(11, { message: "Please enter valid phone number" }),
-      // companySecondaryNumber: z.string().optional(),
-      companyAddress: z
+    // companySecondaryNumber: z.string().optional(),
+    companyAddress: z
       .string({ required_error: "Company address is required" })
       .min(1, { message: "Please enter company address" }),
-      // companySecondaryAddress: z.string().optional(),
-      city: z
+    // companySecondaryAddress: z.string().optional(),
+    city: z
       .string({ required_error: "City is required" })
       .min(1, { message: "Please enter city" }),
-      state: z
+    state: z
       .string({ required_error: "State is required" })
       .min(1, { message: "Please enter state" }),
-      country: z
+    country: z
       .string({ required_error: "Country is required" })
       .min(1, { message: "Please enter country" }),
     // companySecondaryNumber: z
     //   .string({ required_error: "Company number is required" })
     //   .min(11, { message: "Please enter valid phone number" }),
-    
-  })
+  });
   // .refine((addNumber)=>{
   //     message:
   //       "Please enter valid phone number ",
@@ -91,8 +101,6 @@ const AddCompany = () => {
 
   const companyNumber = watch("companyNumber");
   // const companySecondaryNumber = watch("companySecondaryNumber");
-
-  
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     console.log(data);
@@ -145,7 +153,7 @@ const AddCompany = () => {
         </div>
       </div>
 
-      <div className="flex lg:flex-row items-stretch flex-col gap-8 justify-between">
+      <div className="flex lg:flex-row flex-col gap-8 justify-between">
         <div className="lg:w-1/2 border border-neutral700 rounded-2xl px-6 py-10">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -240,9 +248,27 @@ const AddCompany = () => {
             </div>
             <div className="flex flex-col gap-2 w-full">
               <label
-                htmlFor="city"
+                htmlFor="companyAddress"
                 className="font-inter font-semibold px-4"
               >
+                Company Address
+              </label>
+              <div className="flex justify-between items-center gap-2 border-b">
+                <input
+                  type="text"
+                  {...register("companyAddress")}
+                  placeholder="Enter company address"
+                  className="w-full outline-0 border-b-0 py-2 px-4"
+                />
+              </div>
+              {errors.companyAddress && (
+                <p className="error text-xs text-[#FF0000] px-4">
+                  {errors.companyAddress.message}
+                </p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-full">
+              <label htmlFor="city" className="font-inter font-semibold px-4">
                 City
               </label>
               <div className="flex justify-between items-center gap-2 border-b">
@@ -260,10 +286,7 @@ const AddCompany = () => {
               )}
             </div>
             <div className="flex flex-col gap-2 w-full">
-              <label
-                htmlFor="state"
-                className="font-inter font-semibold px-4"
-              >
+              <label htmlFor="state" className="font-inter font-semibold px-4">
                 State
               </label>
               <div className="flex justify-between items-center gap-2 border-b">
@@ -288,12 +311,21 @@ const AddCompany = () => {
                 Country
               </label>
               <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("country")}
-                  placeholder="Enter country"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
+                <Select
+                  onValueChange={(val) => setValue("country", val)}
+                  // value={field?.value}
+                >
+                  <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full p-4 mt-0">
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countries.map((country) => (
+                      <SelectItem value={country.label} key={country.key}>
+                        {country.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* <SelectInput
                 variant="bordered"
@@ -309,7 +341,6 @@ const AddCompany = () => {
                   setValue("country", selectedKey);
                 }}
               /> */}
-
               </div>
               {errors.country && (
                 <p className="error text-xs text-[#FF0000] px-4">
@@ -318,7 +349,6 @@ const AddCompany = () => {
               )}
             </div>
 
-            
             {/* <div>
               <p
                 className="flex items-center gap-2 text-base cursor-pointer  text-purple500 font-medium "
@@ -362,31 +392,9 @@ const AddCompany = () => {
                   )}
                 </div>
               )}
-            </div>
+            </div> */}
 
-            <div className="flex flex-col gap-2 w-full">
-              <label
-                htmlFor="companyAddress"
-                className="font-inter font-semibold px-4"
-              >
-                Company Address
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("companyAddress")}
-                  placeholder="Enter company address"
-                  className="w-full outline-0 border-b-0 py-2 px-4"
-                />
-              </div>
-              {errors.companyAddress && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.companyAddress.message}
-                </p>
-              )}
-            </div>
-
-            <div>
+            {/* <div>
               <p
                 className="flex items-center gap-2 text-base cursor-pointer  text-purple500 font-medium "
                 onClick={() => setAddress(true)}
@@ -429,7 +437,35 @@ const AddCompany = () => {
             </div> */}
           </form>
         </div>
-        <div className="lg:w-1/2 border border-neutral700 rounded-2xl px-6 py-10"></div>
+        <div className="lg:w-1/2 flex flex-col gap-8">
+          <div className="w-full border border-neutral700 rounded-2xl px-6 py-10">
+            <p className="font-semibold font-inter">Company Services</p>
+            <p className="text-sm mt-4 mb-6">
+              Configure your delivery rates by setting up pricing rules for
+              diverse package options and service types.
+            </p>
+            <div>
+              <AddServiceModal />
+            </div>
+          </div>
+          <div className="w-full h-full  border border-neutral700 rounded-2xl px-6 py-10">
+            <p className="font-semibold font-inter">Set Your Delivery Pricing</p>
+            <p className="text-sm mt-4 mb-6">
+              Configure your delivery rates by setting up pricing rules for
+              diverse service types.
+            </p>
+            <div className="mb-8">
+              <AddPricingModal />
+            </div>
+            <div className="bg-purple900 w-fit p-4 flex flex-wrap items-center gap-2 rounded-xl">
+              <FiInfo />
+              <p className="text-sm">
+                If no custom pricing is configured, API rates will be used by
+                default.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
