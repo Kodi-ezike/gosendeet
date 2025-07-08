@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU } from "../../constants";
 import logo from "@/assets/images/gosendeet-logo.png";
 import { HiBars3 } from "react-icons/hi2";
 import { GoX } from "react-icons/go";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
+import { PiSignOutBold } from "react-icons/pi";
+import { Button } from "../ui/button";
 
 const DashboardNavbar = () => {
+  const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
 
   const handleNavToggle = () => {
@@ -14,14 +17,14 @@ const DashboardNavbar = () => {
   };
 
   const location = useLocation(); // Get current location
-  const userId = localStorage.getItem("userId") || "";
 
+  const userId = localStorage.getItem("userId") || "";
   const { data: userData } = useGetUserDetails(userId);
   const username = userData?.data?.username ?? "";
   const firstLetter = username.charAt(0).toUpperCase(); // First letter capitalized
 
   return (
-    <nav className="w-full z-10">
+    <nav className="w-full z-20">
       <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-white border-b border-b-neutral300">
         {/* Logo or Brand Name */}
         <div>
@@ -64,16 +67,25 @@ const DashboardNavbar = () => {
           })}
         </ul>
 
-        <div className="hidden lg:flex lg:flex-row gap-4 items-center flex-col">
+        <div className="hidden lg:flex lg:flex-row items-center flex-col">
           <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
             {firstLetter}
           </div>
-          <p className="text-neutral600 font-medium">Hello, {username}</p>
+          <Button
+            variant={"ghost"}
+            className="h-[40px]"
+            onClick={() => {
+              localStorage.clear();
+              navigate("/");
+            }}
+          >
+            Log out <PiSignOutBold />{" "}
+          </Button>
         </div>
 
         {/* Links (mobile view) */}
         <div
-          className={`lg:hidden absolute top-0 left-0 w-full h-[70vh] z-10 bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
+          className={`lg:hidden absolute top-0 left-0 w-full h-[70vh] z-20 bg-white py-6 md:px-20 px-10 transition-transform duration-300 ${
             navOpen ? "transform translate-x-0" : "transform -translate-x-full"
           }`}
         >
@@ -105,17 +117,15 @@ const DashboardNavbar = () => {
               );
             })}
           </ul>
-          {/* <a href="/signup">
-            <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-white bg-black rounded mb-4">
-              Sign Up
-            </button>
-          </a>
-
-          <a href="/signin">
-            <button className="border-2 w-full font-semibold hover:bg-green-900 px-4 py-4 text-black bg-white rounded">
-              Log In
-            </button>
-          </a> */}
+          <button
+            className="border-2 w-full font-semibold px-4 py-4 bg-black text-white rounded"
+            onClick={() => {
+              localStorage.clear();
+              navigate("/");
+            }}
+          >
+            Log Out
+          </button>
         </div>
       </div>
     </nav>

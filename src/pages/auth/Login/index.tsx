@@ -44,6 +44,7 @@ const Login = () => {
       onSuccess: (data) => {
         localStorage.setItem("authToken", data.data.token)
         localStorage.setItem("userId", data.data.user.id)
+        localStorage.setItem("role", data.data.user.role)
         toast.success("Login Successful");
         navigate("/dashboard");
       },

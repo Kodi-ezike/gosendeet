@@ -22,38 +22,48 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import OrderDetails from "./pages/admin/Orders/OrderDetails";
 import AddCompany from "./pages/admin/Companies/AddCompany";
 import CompanyDetails from "./pages/admin/Companies/CompanyDetails";
+import PrivateRoutes from "./lib/PrivateRoutes";
+import PublicRoutes from "./lib/PublicRoutes";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/cost-calculator" element={<CostCalculator />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/track" element={<Track />} />
-        <Route path="/delivery" element={<Delivery />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/confirmation" element={<Confirmation />} />
-        <Route path="/track/:id" element={<Tracking />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/:id/verify-email" element={<VerifyEmail />} />
-        <Route path="/:id/reset-password" element={<ResetPassword />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/cost-calculator" element={<CostCalculator />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/track" element={<Track />} />
+          <Route path="/delivery" element={<Delivery />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/track/:id" element={<Tracking />} />
 
-        <Route path="dashboard" element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
+        <Route element={<PublicRoutes />}>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/signin" element={<Signin />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/:id/verify-email" element={<VerifyEmail />} />
+          <Route path="/:id/reset-password" element={<ResetPassword />} />
         </Route>
 
-        <Route path="admin-dashboard" element={<DashboardLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="user/:id" element={<UserProfiles />} />
-          <Route path="order/:id" element={<OrderDetails />} />
-          <Route path="companies/add-company" element={<AddCompany />} />
-          <Route path="company/:id" element={<CompanyDetails />} />
+        <Route element={<PrivateRoutes />}>
+          <Route path="dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+          </Route>
         </Route>
+
+        <Route element={<PrivateRoutes />}>
+          <Route path="admin-dashboard" element={<DashboardLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="user/:id" element={<UserProfiles />} />
+            <Route path="order/:id" element={<OrderDetails />} />
+            <Route path="companies/add-company" element={<AddCompany />} />
+            <Route path="company/:id" element={<CompanyDetails />} />
+          </Route>
+        </Route>
+
       </Routes>
     </Router>
   );
