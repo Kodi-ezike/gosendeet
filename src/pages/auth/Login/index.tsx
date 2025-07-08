@@ -40,21 +40,22 @@ const Login = () => {
   });
 
   const { mutate, isPending } = useMutation({
-      mutationFn: login,
-      onSuccess: (data) => {
-        localStorage.setItem("authToken", data.data.token)
-        localStorage.setItem("userId", data.data.user.id)
-        localStorage.setItem("role", data.data.user.role)
-        toast.success("Login Successful");
-        navigate("/dashboard");
-      },
-      onError: (data) => {
-        toast.error(data?.message);
-      },
-    });
+    mutationFn: login,
+    onSuccess: (data) => {
+      localStorage.setItem("authToken", data.data.token);
+      localStorage.setItem("userId", data.data.user.id);
+      localStorage.setItem("role", data.data.user.role);
+      toast.success("Login Successful");
+      data.data.user.role === "user" && navigate("/dashboard");
+      data.data.user.role === "admin" && navigate("/admin-dashboard");
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+    },
+  });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    mutate(data)
+    mutate(data);
   };
 
   return (
@@ -141,7 +142,11 @@ const Login = () => {
                 </Link>
               </div>
 
-              <Button variant={"secondary"} loading={isPending} className=" w-full my-5">
+              <Button
+                variant={"secondary"}
+                loading={isPending}
+                className=" w-full my-5"
+              >
                 Continue
               </Button>
             </form>
