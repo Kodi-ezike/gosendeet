@@ -47,7 +47,7 @@ const Login = () => {
       localStorage.setItem("role", data.data.user.role);
       toast.success("Login Successful");
       data.data.user.role === "user" && navigate("/dashboard");
-      data.data.user.role === "admin" && navigate("/admin-dashboard");
+      data.data.user.role === "super_admin" && navigate("/admin-dashboard");
     },
     onError: (data) => {
       toast.error(data?.message);

@@ -48,7 +48,7 @@ const Navbar = () => {
               className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
               onClick={() => {
                 role === "user" && navigate("/dashboard");
-                role === "admin" && navigate("/admin-dashboard");
+                role === "super_admin" && navigate("/admin-dashboard");
               }}
             >
               {firstLetter}
@@ -100,7 +100,7 @@ const Navbar = () => {
             className="w-[40px] h-[40px] hidden lg:flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
             onClick={() => {
               role === "user" && navigate("/dashboard");
-              role === "admin" && navigate("/admin-dashboard");
+              role === "super_admin" && navigate("/admin-dashboard");
             }}
           >
             {firstLetter}

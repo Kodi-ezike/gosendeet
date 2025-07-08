@@ -57,7 +57,7 @@ const Profiles = () => {
           <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
-              <SelectTrigger className="outline-0 border-0 text-xs text-grey500 w-[120px] p-0">
+              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
@@ -77,7 +77,7 @@ const Profiles = () => {
           <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
-              <SelectTrigger className="outline-0 border-0 text-xs text-grey500 w-[120px] p-0">
+              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>

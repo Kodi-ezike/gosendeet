@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU } from "../../constants";
 import logo from "@/assets/images/gosendeet-logo.png";
@@ -20,8 +20,16 @@ const DashboardNavbar = () => {
 
   const userId = localStorage.getItem("userId") || "";
   const { data: userData } = useGetUserDetails(userId);
-  const username = userData?.data?.username ?? "";
-  const firstLetter = username.charAt(0).toUpperCase(); // First letter capitalized
+
+  const [firstLetter, setFirstLetter] = useState("");
+
+  useEffect(() => {
+    if (userData?.data?.username) {
+      const username = userData.data.username;
+      const letter = username.charAt(0).toUpperCase();
+      setFirstLetter(letter);
+    }
+  }, [userData]);
 
   return (
     <nav className="w-full z-20">

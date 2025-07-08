@@ -5,12 +5,21 @@ import { RxExternalLink } from "react-icons/rx";
 import { SpecsModal } from "./specs";
 import Bookings from "../Bookings";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
+import { useEffect, useState } from "react";
 
 const Overview = () => {
   const userId = localStorage.getItem("userId") || "";
 
   const { data: userData } = useGetUserDetails(userId);
-  const username = userData?.data?.username ?? "";
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    if (userData?.data?.username) {
+      const username = userData.data.username;
+      setUsername(username);
+    }
+  }, [userData]);
+
   return (
     <div>
       <div className="flex justify-between md:items-center mb-4 md:px-4">

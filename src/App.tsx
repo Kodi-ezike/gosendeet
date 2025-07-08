@@ -24,6 +24,7 @@ import AddCompany from "./pages/admin/Companies/AddCompany";
 import CompanyDetails from "./pages/admin/Companies/CompanyDetails";
 import PrivateRoutes from "./lib/PrivateRoutes";
 import PublicRoutes from "./lib/PublicRoutes";
+import AdminRoutes from "./lib/AdminRoutes";
 
 function App() {
   return (
@@ -54,7 +55,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<PrivateRoutes />}>
+        <Route element={<AdminRoutes />}>
           <Route path="admin-dashboard" element={<DashboardLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="user/:id" element={<UserProfiles />} />
