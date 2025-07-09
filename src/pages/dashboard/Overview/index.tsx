@@ -5,20 +5,20 @@ import { RxExternalLink } from "react-icons/rx";
 import { SpecsModal } from "./specs";
 import Bookings from "../Bookings";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Overview = () => {
-  const userId = localStorage.getItem("userId") || "";
+  const userId = sessionStorage.getItem("userId") || "";
 
-  const { data: userData } = useGetUserDetails(userId);
-  const [username, setUsername] = useState("");
+  const { data: userData, refetchUserData } = useGetUserDetails(userId);
+
+  const username = userData?.data?.username;
 
   useEffect(() => {
-    if (userData?.data?.username) {
-      const username = userData.data.username;
-      setUsername(username);
+    if (userId) {
+      refetchUserData();
     }
-  }, [userData]);
+  }, [userId]);
 
   return (
     <div>

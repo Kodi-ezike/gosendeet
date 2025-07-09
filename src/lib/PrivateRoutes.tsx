@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
 const PrivateRoutes = () => {
-  const navigate = useNavigate()
-  const authToken = localStorage.getItem("authToken");
+  const navigate = useNavigate();
+  const authToken = sessionStorage.getItem("authToken");
 
-  const role = localStorage.getItem("role");
+  const role = sessionStorage.getItem("role");
 
-   // Redirect non-user roles (e.g., admins) back to previous page
+  // Redirect non-user roles (e.g., admins) back to previous page
   useEffect(() => {
     if (authToken && role !== "user") {
       navigate(-1); // Go back to the previous page

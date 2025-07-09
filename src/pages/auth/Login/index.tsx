@@ -42,9 +42,9 @@ const Login = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: login,
     onSuccess: (data) => {
-      localStorage.setItem("authToken", data.data.token);
-      localStorage.setItem("userId", data.data.user.id);
-      localStorage.setItem("role", data.data.user.role);
+      sessionStorage.setItem("authToken", data.data.token);
+      sessionStorage.setItem("userId", data.data.user.id);
+      sessionStorage.setItem("role", data.data.user.role);
       toast.success("Login Successful");
       data.data.user.role === "user" && navigate("/dashboard");
       data.data.user.role === "super_admin" && navigate("/admin-dashboard");

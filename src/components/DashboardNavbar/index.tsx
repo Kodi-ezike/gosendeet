@@ -18,18 +18,17 @@ const DashboardNavbar = () => {
 
   const location = useLocation(); // Get current location
 
-  const userId = localStorage.getItem("userId") || "";
-  const { data: userData } = useGetUserDetails(userId);
+  const userId = sessionStorage.getItem("userId") || "";
+  const { data: userData, refetchUserData } = useGetUserDetails(userId);
 
-  const [firstLetter, setFirstLetter] = useState("");
+  const username = userData?.data?.username;
+  const letter = username?.charAt(0).toUpperCase();
 
   useEffect(() => {
-    if (userData?.data?.username) {
-      const username = userData.data.username;
-      const letter = username.charAt(0).toUpperCase();
-      setFirstLetter(letter);
+    if (userId) {
+      refetchUserData();
     }
-  }, [userData]);
+  }, [userId]);
 
   return (
     <nav className="w-full z-20">
@@ -45,7 +44,7 @@ const DashboardNavbar = () => {
         <div className="lg:hidden flex items-center gap-4">
           <div className="flex flex-row gap-4 items-center">
             <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
-              {firstLetter}
+              {letter}
             </div>
           </div>
           <button onClick={handleNavToggle}>
@@ -77,13 +76,13 @@ const DashboardNavbar = () => {
 
         <div className="hidden lg:flex lg:flex-row items-center flex-col">
           <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
-            {firstLetter}
+            {letter}
           </div>
           <Button
             variant={"ghost"}
             className="h-[40px]"
             onClick={() => {
-              localStorage.clear();
+              sessionStorage.clear();
               navigate("/");
             }}
           >
@@ -128,7 +127,7 @@ const DashboardNavbar = () => {
           <button
             className="border-2 w-full font-semibold px-4 py-4 bg-black text-white rounded"
             onClick={() => {
-              localStorage.clear();
+              sessionStorage.clear();
               navigate("/");
             }}
           >

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU } from "../../constants";
 import logo from "@/assets/images/gosendeet-logo.png";
@@ -17,14 +17,19 @@ const Navbar = () => {
 
   const location = useLocation(); // Get current location
 
-  const authToken = localStorage.getItem("authToken");
+  const authToken = sessionStorage.getItem("authToken");
 
-  const userId = localStorage.getItem("userId") || "";
-  const role = localStorage.getItem("role") || "";
-  const { data: userData } = useGetUserDetails(userId);
-  const username = userData?.data?.username ?? "";
-  const firstLetter = username.charAt(0).toUpperCase(); // First letter capitalized
+  const userId = sessionStorage.getItem("userId") || "";
+  const role = sessionStorage.getItem("role") || "";
+  const { data: userData, refetchUserData } = useGetUserDetails(userId);
+  const username = userData?.data?.username;
+  const letter = username?.charAt(0).toUpperCase();
 
+  useEffect(() => {
+    if (userId) {
+      refetchUserData();
+    }
+  }, [userId]);
   return (
     <nav className="w-full z-20">
       <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-white border-b border-b-neutral300">
@@ -51,7 +56,7 @@ const Navbar = () => {
                 role === "super_admin" && navigate("/admin-dashboard");
               }}
             >
-              {firstLetter}
+              {letter}
             </div>
           )}
           <button onClick={handleNavToggle}>
@@ -103,7 +108,7 @@ const Navbar = () => {
               role === "super_admin" && navigate("/admin-dashboard");
             }}
           >
-            {firstLetter}
+            {letter}
           </div>
         )}
         {/* Links (mobile view) */}

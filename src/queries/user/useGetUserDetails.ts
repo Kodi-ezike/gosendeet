@@ -11,5 +11,6 @@ export const useGetUserDetails = (id: string) => {
     isSuccess: query.isSuccess,
     isError: query.isError,
     data: query.data,
+    refetchUserData: query.refetch,
   };
 };

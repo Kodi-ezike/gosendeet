@@ -17,7 +17,7 @@ export const api = axios.create({
 // Request interceptor to add authorization header if access token exists
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("authToken");
+    const accessToken = sessionStorage.getItem("authToken");
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -25,6 +25,10 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    if (error.response?.status === 401) {
+      sessionStorage.clear(); // Optional: clear session
+      window.location.href = "/signin"; // Redirect
+    }
     return Promise.reject(error);
   }
 );
