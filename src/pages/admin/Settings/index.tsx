@@ -16,7 +16,7 @@ const Settings = () => {
     { key: "type", label: "Package Type" },
     { key: "level", label: "Service Level" },
     { key: "area", label: "Coverage Area" },
-    { key: "option", label: "Pick up Option" },
+    { key: "option", label: "Pickup Options" },
     { key: "code", label: "Location Code" },
   ];
 

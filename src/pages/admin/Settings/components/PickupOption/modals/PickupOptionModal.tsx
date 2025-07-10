@@ -10,10 +10,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createServiceLevel, updateServiceLevel } from "@/services/adminSettings";
+import {
+  createPickupOptions,
+  updatePickupOptions,
+} from "@/services/adminSettings";
 import { useEffect } from "react";
 
-export function ServiceLevelModal({
+export function PickupOptionModal({
   open,
   setOpen,
   type,
@@ -25,9 +28,9 @@ export function ServiceLevelModal({
   info: any;
 }) {
   const schema = z.object({
-    serviceLevel: z
-      .string({ required_error: "Service level is required" })
-      .min(1, { message: "Please enter a level" }),
+    pickupOption: z
+      .string({ required_error: "Pickup option is required" })
+      .min(1, { message: "Please enter an option" }),
   });
 
   const {
@@ -43,25 +46,25 @@ export function ServiceLevelModal({
   useEffect(() => {
     if (open && type === "edit" && info) {
       reset({
-        serviceLevel: info.name,
+        pickupOption: info.name,
       });
     } else if (open && type === "create") {
       reset({
-        serviceLevel: "",
+        pickupOption: "",
       });
     }
   }, [open, info, type, reset]);
 
   const queryClient = useQueryClient();
 
-  const { mutate: createService, isPending: pendingCreate } = useMutation({
-    mutationFn: createServiceLevel,
+  const { mutate: createOption, isPending: pendingCreate } = useMutation({
+    mutationFn: createPickupOptions,
     onSuccess: () => {
       toast.success("Successful");
       setOpen(false);
       reset();
       queryClient.invalidateQueries({
-        queryKey: ["service_level"],
+        queryKey: ["pickup_options"],
       });
     },
     onError: (data) => {
@@ -69,16 +72,16 @@ export function ServiceLevelModal({
     },
   });
 
-  const { mutate: updateService, isPending: pendingUpdate } = useMutation({
+  const { mutate: updateOptions, isPending: pendingUpdate } = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
-      updateServiceLevel(id, data), // ✅ call with correct shape
+      updatePickupOptions(id, data), // ✅ call with correct shape
 
     onSuccess: () => {
       toast.success("Successful");
       setOpen(false);
       reset();
       queryClient.invalidateQueries({
-        queryKey: ["service_level"],
+        queryKey: ["pickup_options"],
       });
     },
 
@@ -89,14 +92,14 @@ export function ServiceLevelModal({
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     type === "create" &&
-      createService({
-        name: data.serviceLevel,
+      createOption({
+        name: data.pickupOption,
       });
 
     type === "edit" &&
-      updateService({
+      updateOptions({
         id: info?.id,
-        data: { name: data.serviceLevel },
+        data: { name: data.pickupOption },
       });
   };
 
@@ -104,10 +107,10 @@ export function ServiceLevelModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent autoFocus={false} className="gap-0">
         <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
-          Service Level
+          Pickup Options
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600">
-          {type === "create" ? "Add a service level." : "Edit a service level."}
+          {type === "create" ? "Add a pickup option." : "Edit a pickup option."}
         </DialogDescription>
         <>
           <div className="py-4 text-sm mt-4">
@@ -117,23 +120,23 @@ export function ServiceLevelModal({
             >
               <div className="flex flex-col gap-2 w-full">
                 {/* <label
-                  htmlFor="serviceLevel"
+                  htmlFor="pickupOption"
                   className="font-inter font-semibold px-4"
                 >
-                  Service Level
+                  Pickup options
                 </label> */}
                 <div className="flex justify-between items-center gap-2 border-b">
                   <input
                     type="text"
-                    {...register("serviceLevel")}
+                    {...register("pickupOption")}
                     defaultValue={info?.name}
-                    placeholder="Enter service level"
+                    placeholder="Enter pickup option"
                     className="w-full outline-0 border-b-0 py-2 px-4 "
                   />
                 </div>
-                {errors.serviceLevel && (
+                {errors.pickupOption && (
                   <p className="error text-xs text-[#FF0000] px-4">
-                    {errors.serviceLevel.message}
+                    {errors.pickupOption.message}
                   </p>
                 )}
               </div>

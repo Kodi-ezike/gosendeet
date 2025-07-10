@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import DeleteModal from "@/components/modals/DeleteModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteServiceLevel } from "@/services/admin";
+import { deleteServiceLevel } from "@/services/adminSettings";
 import { toast } from "sonner";
 
 const ServiceLevel = () => {
@@ -123,7 +123,7 @@ const ServiceLevel = () => {
         </div>
       )}
 
-      {data && data?.length === 0 && !isLoading && isSuccess && (
+      {data && data?.data?.length === 0 && !isLoading && isSuccess && (
         <div className="h-[50vh] w-full flex justify-center flex-col items-center">
           <p className="font-semibold font-inter text-xl text-center">
             There are no results

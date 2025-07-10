@@ -1,10 +1,43 @@
 import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { IoSearchOutline } from "react-icons/io5";
+import { PickupOptionModal } from "./modals/PickupOptionModal";
+import { useGetPickupOptions } from "@/queries/admin/useGetAdminSettings";
+import { Spinner } from "@/components/Spinner";
+import { FiEdit } from "react-icons/fi";
+import { deletePickupOptions } from "@/services/adminSettings";
+import { toast } from "sonner";
+import DeleteModal from "@/components/modals/DeleteModal";
 
 const PickupOption = () => {
-  const results = [1, 2, 3, 4, 5];
+  const { data, isLoading, isSuccess, isError } = useGetPickupOptions();
+
+  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [type, setType] = useState("");
+  const [info, setInfo] = useState<{ id: string; name: string } | null>(null);
+  const queryClient = useQueryClient();
+
+  const { mutate: deleteOptions, isPending: pendingDelete } = useMutation({
+    mutationFn: (id: string) => deletePickupOptions(id), // ✅ call with correct shape
+
+    onSuccess: () => {
+      toast.success("Successful");
+      setOpenDelete(false);
+      queryClient.invalidateQueries({
+        queryKey: ["pickup_options"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+
+  const handleDelete = (id: string) => deleteOptions(id);
 
   return (
     <div>
@@ -19,38 +52,103 @@ const PickupOption = () => {
           />
         </div>
 
-        <Button variant={"secondary"} className="h-[42px]">
+        <Button
+          variant={"secondary"}
+          className="h-[42px]"
+          onClick={() => {
+            setOpen(true);
+            setType("create");
+          }}
+        >
           <Plus /> Add new
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="min-w-[1000px] w-full relative">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
-            <span className="flex-1">Pick up Option</span>
-            <span className="w-[2%]"></span>
-          </div>
-
-          {results?.map((index) => {
-            return (
-              <div
-                key={index}
-                className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
-                  index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                } hover:bg-purple300`}
-              >
-                <div className="flex-1">
-                  <p>Doorstep delivery</p>
-                </div>
-                
-                <div className="w-[2%]">
-                  <BiSolidTrashAlt  size={20}/>
-                </div>
-              </div>
-            );
-          })}
+      {isLoading && !isSuccess && (
+        <div className="h-[50vh] w-full flex items-center justify-center">
+          <Spinner />
         </div>
-      </div>
+      )}
+
+      {isError && !isLoading && (
+        <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+          <p className="font-semibold font-inter text-xl text-center">
+            There was an error getting the data
+          </p>
+        </div>
+      )}
+
+      {!isLoading && isSuccess && data && data?.data?.length > 0 && (
+        <div className="overflow-x-auto">
+          <div className="min-w-[700px] w-full relative">
+            <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
+              <span className="flex-1">Pickup Options</span>
+              <span className="w-[5%]"></span>
+            </div>
+
+            {data?.data?.map((item: any, index: number) => {
+              return (
+                <div
+                  key={index}
+                  className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
+                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
+                  } hover:bg-purple300`}
+                >
+                  <div className="flex-1">
+                    <p>{item?.name}</p>
+                  </div>
+
+                  <div className="w-[5%] flex items-center gap-4">
+                    <FiEdit
+                      size={20}
+                      className="cursor-pointer text-purple500"
+                      onClick={() => {
+                        setOpen(true);
+                        setType("edit");
+                        setInfo(item);
+                      }}
+                    />
+
+                    <BiSolidTrashAlt
+                      size={20}
+                      className="cursor-pointer text-[#F56630]"
+                      onClick={() => {
+                        setOpenDelete(true);
+                        setInfo(item);
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {data && data?.data?.length === 0 && !isLoading && isSuccess && (
+        <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+          <p className="font-semibold font-inter text-xl text-center">
+            There are no results
+          </p>
+        </div>
+      )}
+
+      <PickupOptionModal
+        open={open}
+        setOpen={setOpen}
+        type={type}
+        info={info}
+      />
+
+      <DeleteModal
+        onOpenChange={setOpenDelete}
+        open={openDelete}
+        title={"Delete service level"}
+        data={info?.name ?? ""}
+        id={info?.id ?? ""}
+        handleDelete={handleDelete}
+        loading={pendingDelete}
+      />
     </div>
   );
 };
