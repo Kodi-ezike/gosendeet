@@ -13,11 +13,11 @@ const Settings = () => {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const tabs = [
-    { key: "type", label: "Package Type" },
-    { key: "level", label: "Service Level" },
-    { key: "area", label: "Coverage Area" },
+    { key: "type", label: "Package Types" },
+    { key: "level", label: "Service Levels" },
+    { key: "area", label: "Coverage Areas" },
     { key: "option", label: "Pickup Options" },
-    { key: "code", label: "Location Code" },
+    { key: "code", label: "Location Codes" },
   ];
 
   const updateUnderline = (index: number) => {

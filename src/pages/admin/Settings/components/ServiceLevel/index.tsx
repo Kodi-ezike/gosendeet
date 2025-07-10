@@ -130,13 +130,14 @@ const ServiceLevel = () => {
           </p>
         </div>
       )}
+
       <ServiceLevelModal
         open={open}
         setOpen={setOpen}
         type={type}
         info={info}
       />
-      
+
       <DeleteModal
         onOpenChange={setOpenDelete}
         open={openDelete}

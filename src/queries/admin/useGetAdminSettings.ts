@@ -1,4 +1,4 @@
-import { getCoverageArea, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
+import { getCoverageArea, getLocationCode, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetServiceLevel = () => {
@@ -31,6 +31,19 @@ export const useGetCoverageArea = () => {
   const query = useQuery({
     queryKey: ["coverage_areas"],
     queryFn: () => getCoverageArea(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+
+export const useGetLocationCode = () => {
+  const query = useQuery({
+    queryKey: ["location_codes"],
+    queryFn: () => getLocationCode(),
   });
   return {
     isLoading: query.isPending,

@@ -111,3 +111,41 @@ export const deleteCoverageArea = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+
+export const createLocationCode = async (data: any) => {
+  try {
+    const res = await api.post(`/location-codes`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getLocationCode = async () => {
+  try {
+    const res = await api.get(`/location-codes`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const updateLocationCode = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`/location-codes/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const deleteLocationCode = async (id: string) => {
+  try {
+    const res = await api.delete(`/location-codes/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
