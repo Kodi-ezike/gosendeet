@@ -136,6 +136,7 @@ const ServiceLevel = () => {
         type={type}
         info={info}
       />
+      
       <DeleteModal
         onOpenChange={setOpenDelete}
         open={openDelete}

@@ -73,3 +73,41 @@ export const deletePickupOptions = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+
+export const createCoverageArea = async (data: any) => {
+  try {
+    const res = await api.post(`/coverage-areas`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getCoverageArea = async () => {
+  try {
+    const res = await api.get(`/coverage-areas`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const updateCoverageArea = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`/coverage-areas/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const deleteCoverageArea = async (id: string) => {
+  try {
+    const res = await api.delete(`/coverage-areas/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
