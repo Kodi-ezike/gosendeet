@@ -25,10 +25,23 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    if (error.response?.status === 401) {
-      sessionStorage.clear(); // Optional: clear session
-      window.location.href = "/signin"; // Redirect
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    // const alreadyRedirected = sessionStorage.getItem("redirected401");
+
+    if (status === 401) {
+      // Prevent repeat redirects
+      sessionStorage.clear(); // clear all session data
+      // sessionStorage.setItem("redirected401", "true");
+      // window.location.href = "/signin";
     }
+
     return Promise.reject(error);
   }
 );
