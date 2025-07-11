@@ -89,7 +89,7 @@ const ServiceLevel = () => {
                 <div
                   key={index}
                   className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
+                    index === 0 ? "border-t-0" : "border-t border-t-neutral300"
                   } hover:bg-purple300`}
                 >
                   <div className="flex-1">

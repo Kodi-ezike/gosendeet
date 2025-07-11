@@ -149,3 +149,41 @@ export const deleteLocationCode = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+
+export const createPackageType = async (data: any) => {
+  try {
+    const res = await api.post(`/admin/package-types`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getPackageType = async () => {
+  try {
+    const res = await api.get(`/admin/package-types`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const updatePackageType = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`/admin/package-types/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const deletePackageType = async (id: string) => {
+  try {
+    const res = await api.delete(`/admin/package-types/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

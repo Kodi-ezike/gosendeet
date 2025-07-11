@@ -40,7 +40,7 @@ const CoverageArea = () => {
   const handleDelete = (id: string) => deleteService(id);
   return (
     <div>
-      <div className="flex items-center gap-4 justify-end">
+      <div className="flex items-center gap-4 justify-end mb-4">
         <div className="flex items-center gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
           <IoSearchOutline className="text-neutral500" />
           <input
@@ -90,7 +90,7 @@ const CoverageArea = () => {
                 <div
                   key={index}
                   className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
+                    index === 0 ? "border-t-0" : "border-t border-t-neutral300"
                   } hover:bg-purple300`}
                 >
                   <div className="flex-1">
@@ -142,7 +142,7 @@ const CoverageArea = () => {
       <DeleteModal
         onOpenChange={setOpenDelete}
         open={openDelete}
-        title={"Delete service level"}
+        title={"Delete coverage area"}
         data={info?.name ?? ""}
         id={info?.id ?? ""}
         handleDelete={handleDelete}
