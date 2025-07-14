@@ -5,6 +5,13 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +20,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPackageType, updatePackageType } from "@/services/adminSettings";
 import { useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
+import {
+  useGetAdminDimensionUnits,
+  useGetAdminWeightUnits,
+} from "@/queries/admin/useGetAdminSettings";
 
 export function PackageTypeModal({
   open,
@@ -25,6 +36,12 @@ export function PackageTypeModal({
   type: string;
   info: any;
 }) {
+  const { data: weightUnits } = useGetAdminWeightUnits();
+  const { data: dimensionUnits } = useGetAdminDimensionUnits();
+
+  console.log(weightUnits);
+  console.log(dimensionUnits);
+
   const schema = z.object({
     name: z
       .string({ required_error: "Name is required" })
@@ -62,10 +79,14 @@ export function PackageTypeModal({
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
+
+  const weightUnit = watch("weightUnit");
+  const dimensionUnit = watch("dimensionUnit");
 
   // ✅ Reset form with incoming info when modal opens
   useEffect(() => {
@@ -296,13 +317,18 @@ export function PackageTypeModal({
                     Weight Unit
                   </label>
                   <div className="border-b mb-2">
-                    <input
-                      type="text"
-                      {...register("weightUnit")}
-                      defaultValue={info?.weightUnit}
-                      placeholder="Enter weight unit"
-                      className="w-full outline-0 border-b-0 py-2 "
-                    />
+                    <Select
+                      onValueChange={(val) => setValue("weightUnit", val)}
+                      defaultValue={weightUnit}
+                    >
+                      <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
+                        <SelectValue placeholder="Select weight unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kg">kg</SelectItem>
+                        <SelectItem value="g">g</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {errors.weightUnit && (
                     <p className="error text-xs text-[#FF0000]">
@@ -318,13 +344,18 @@ export function PackageTypeModal({
                     Dimension Unit
                   </label>
                   <div className="border-b mb-2">
-                    <input
-                      type="text"
-                      {...register("dimensionUnit")}
-                      defaultValue={info?.dimensionUnit}
-                      placeholder="Enter dimension unit"
-                      className="w-full outline-0 border-b-0 py-2 "
-                    />
+                    <Select
+                      onValueChange={(val) => setValue("dimensionUnit", val)}
+                      defaultValue={dimensionUnit}
+                    >
+                      <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
+                        <SelectValue placeholder="Select dimension unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cm">cm</SelectItem>
+                        <SelectItem value="m">m</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   {errors.dimensionUnit && (
                     <p className="error text-xs text-[#FF0000]">

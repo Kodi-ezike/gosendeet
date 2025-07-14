@@ -1,4 +1,4 @@
-import { getCoverageArea, getLocationCode, getPackageType, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
+import { getAdminDimensionUnits, getAdminWeightUnits, getCoverageArea, getLocationCode, getPackageType, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetServiceLevel = () => {
@@ -57,6 +57,32 @@ export const useGetPackageType = () => {
   const query = useQuery({
     queryKey: ["package_types"],
     queryFn: () => getPackageType(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+
+export const useGetAdminWeightUnits = () => {
+  const query = useQuery({
+    queryKey: ["weight_units"],
+    queryFn: () => getAdminWeightUnits(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+
+export const useGetAdminDimensionUnits = () => {
+  const query = useQuery({
+    queryKey: ["dimension_units"],
+    queryFn: () => getAdminDimensionUnits(),
   });
   return {
     isLoading: query.isPending,
