@@ -12,21 +12,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BiSolidTrashAlt } from "react-icons/bi";
 import { countries } from "@/constants";
 import { AddServiceModal } from "./modals/AddServiceModal";
 import { AddPricingModal } from "./modals/AddPricingModal";
 import { FiEdit, FiInfo } from "react-icons/fi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createCompany } from "@/services/companies";
+import { createCompany, deleteCompanyServices } from "@/services/companies";
 import { toast } from "sonner";
+import {
+  // useGetCompanyList,
+  useGetCompanyServices,
+} from "@/queries/admin/useGetAdminCompanies";
+import DeleteModal from "@/components/modals/DeleteModal";
 
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
   const [companyId, setCompanyId] = useState("");
   const [openService, setOpenService] = useState(false);
-  const [openPricing, setOpenPricing] = useState(false);
+  const [serviceInfo, setServiceInfo] = useState({});
+  const [type, setType] = useState('');
 
+  const [openDeleteModal, setOpenDeleteModal] = useState<number | null>(null);
+  const handleDeleteModal = () => setOpenDeleteModal(null);
+
+  const [openPricing, setOpenPricing] = useState(false);
+  
+  const { data: company_services } = useGetCompanyServices(companyId);
+
+  // const page = 0;
+  // const size = 10;
+  // const companyStatus = "";
+  // const serviceLevelId = "";
+  // const search = "";
+
+  // const { data: company_list } = useGetCompanyList(
+  //   page,
+  //   size,
+  //   companyStatus,
+  //   serviceLevelId,
+  //   search
+  // );
+
+  // console.log(company_list?.data?.content)
+
+  const companyServices = company_services?.data || [];
+  
   const schema = z.object({
     name: z
       .string({ required_error: "Company name is required" })
@@ -85,6 +117,24 @@ const AddCompany = () => {
       toast.error(data?.message);
     },
   });
+
+  const { mutate: deleteService, isPending: pendingDelete } = useMutation({
+    mutationFn: (id: string) => deleteCompanyServices(id), // ✅ call with correct shape
+
+    onSuccess: () => {
+      toast.success("Successful");
+      handleDeleteModal()
+      queryClient.invalidateQueries({
+        queryKey: ["company_services"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+
+  const handleDelete = (id: string) => deleteService(id);
 
   const onSubmit = (data: z.infer<typeof schema>, status: string) => {
     create({ ...data, status });
@@ -422,14 +472,83 @@ const AddCompany = () => {
               Configure your delivery rates by setting up pricing rules for
               diverse package options and service types.
             </p>
+            {companyServices && companyServices?.length > 0
+              ? companyServices?.map((item: any, index: number) => {
+                  const isDeleteModalOpen = openDeleteModal === index;
+                  return (
+                    <div key={index} className="flex md:flex-row flex-col md:items-center md:gap-4 gap-2 justify-between mb-4">
+                      <p className="bg-purple100 py-2 px-4 font-medium w-fit">
+                        {item.companyServiceLevel.name}
+                      </p>
+
+                      <div className="flex gap-4 items-center">
+                        <Button
+                          variant={"ghost"}
+                          size={"ghost"}
+                          className="text-neutral600"
+                          onClick={() => {
+                            setServiceInfo(item);
+                            setOpenService(true);
+                            setType('edit')
+                          }}
+                          disabled={companyId === ""}
+                        >
+                          <FiEdit size={20} className="cursor-pointer" /> Edit
+                        </Button>
+
+                        <Button
+                          variant={"ghost"}
+                          size={"ghost"}
+                          className="text-[#F56630] hover:text-[#F56630]"
+                          onClick={() => {
+                            setOpenDeleteModal(index);
+                          }}
+                          disabled={companyId === ""}
+                        >
+                          <BiSolidTrashAlt
+                            size={20}
+                            className="cursor-pointer text-[#F56630]"
+                          />{" "}
+                          Delete
+                        </Button>
+                        <DeleteModal
+                          onOpenChange={(open) => {
+                            open
+                              ? setOpenDeleteModal(index)
+                              : setOpenDeleteModal(null);
+                          }}
+                          open={isDeleteModalOpen}
+                          title={"Delete company service"}
+                          data={item.companyServiceLevel.name ?? ""}
+                          id={item?.id ?? ""}
+                          handleDelete={handleDelete}
+                          loading={pendingDelete}
+                        />
+                      </div>
+                    </div>
+                  );
+                })
+              : null}
             <div className="">
-              <Button
-                variant={"secondary"}
-                onClick={() => setOpenService(true)}
-                disabled={companyId === ""}
-              >
-                <FiEdit /> Add New Service
-              </Button>
+              {companyServices && companyServices?.length > 0 ? (
+                <Button
+                  variant={"ghost"}
+                  size={"ghost"}
+                  className="text-purple500"
+                  onClick={() => {setType('create'); setOpenService(true)}}
+                  disabled={companyId === ""}
+                >
+                  <FiEdit /> Add another service
+                </Button>
+              ) : (
+                <Button
+                  variant={"secondary"}
+                  onClick={() => {setType('create'); setOpenService(true)}}
+                  disabled={companyId === ""}
+                >
+                  <FiEdit /> Add New Service
+                </Button>
+              )}
             </div>
           </div>
           <div className="w-full h-full  border border-neutral700 rounded-2xl px-6 py-10">
@@ -464,6 +583,9 @@ const AddCompany = () => {
         companyId={companyId}
         openService={openService}
         setOpenService={setOpenService}
+        info = {serviceInfo}
+        setInfo = {setServiceInfo}
+        type = {type}
       />
 
       <AddPricingModal

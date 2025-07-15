@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,9 +28,26 @@ import {
   useGetServiceLevel,
 } from "@/queries/admin/useGetAdminSettings";
 import { MultiSelect } from "@/components/ui/multi";
-import { createCompanyServices } from "@/services/companies";
+import {
+  createCompanyServices,
+  updateCompanyServices,
+} from "@/services/companies";
 
-export function AddServiceModal({ companyId, openService, setOpenService }: { companyId: string; openService: boolean; setOpenService:any }) {
+export function AddServiceModal({
+  companyId,
+  openService,
+  setOpenService,
+  info,
+  type,
+  setInfo,
+}: {
+  companyId: string;
+  openService: boolean;
+  setOpenService: any;
+  info: any;
+  type: string;
+  setInfo: any;
+}) {
   const [selectedPickupOptions, setSelectedPickupOptions] = useState<string[]>(
     []
   );
@@ -68,12 +85,18 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
     serviceLevelId: z
       .string({ required_error: "Service level is required" })
       .min(1, { message: "Please select an option" }),
-    pickupOptionIds: z.array(z.string()),
-    packageTypeIds: z.array(z.string()),
+    pickupOptionIds: z
+      .array(z.string())
+      .nonempty({ message: "Select at least one pickup option" }),
+    packageTypeIds: z
+      .array(z.string())
+      .nonempty({ message: "Select at least one package type" }),
+    locationCodeIds: z
+      .array(z.string())
+      .nonempty({ message: "Select at least one location code" }),
     coverageAreaId: z
       .string({ required_error: "Coverage area is required" })
       .min(1, { message: "Please select an option" }),
-    locationCodeIds: z.array(z.string()),
     weightLimit: z
       .string({ required_error: "Weight limit is required" })
       .min(1, { message: "Please enter a limit" }),
@@ -95,59 +118,138 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
+      serviceLevelId: "",
+      coverageAreaId: "",
       pickupOptionIds: [],
       packageTypeIds: [],
       locationCodeIds: [],
     },
   });
+
+  // Initialize once when `info` is available
+  useEffect(() => {
+    if (info?.pickupOptions) {
+      const defaultIds = info.pickupOptions.map((item: any) => item.id);
+      setSelectedPickupOptions(defaultIds);
+      setValue("pickupOptionIds", defaultIds);
+    }
+    if (info?.packageTypes) {
+      const defaultIds = info.packageTypes.map((item: any) => item.id);
+      setSelectedPackageTypes(defaultIds);
+      setValue("packageTypeIds", defaultIds);
+    }
+    if (info?.locationCodes) {
+      const defaultIds = info.locationCodes.map((item: any) => item.id);
+      setSelectedLocations(defaultIds);
+      setValue("locationCodeIds", defaultIds);
+    }
+  }, [info]);
+
+  // ✅ Reset form with incoming info when modal opens
+  useEffect(() => {
+    if (openService && type === "edit" && info) {
+      reset({
+        serviceLevelId: info?.companyServiceLevel?.id,
+        coverageAreaId: info?.coverageArea?.id,
+        pickupOptionIds: info?.pickupOptions?.map((item: any) => item.id) || [],
+        packageTypeIds: info?.packageTypes?.map((item: any) => item.id) || [],
+        locationCodeIds: info?.locationCodes?.map((item: any) => item.id) || [],
+        weightLimit: info.weightLimit?.toString() ?? "",
+        isNextDayDelivery: info?.isNextDayDelivery ?? false,
+        numberOfDaysForPickup: info.numberOfDaysForPickup?.toString() ?? "",
+        numberOfDaysForDelivery: info.numberOfDaysForDelivery?.toString() ?? "",
+      });
+    } else if (openService && type === "create") {
+      setInfo(null);
+      reset({
+        serviceLevelId: "", // or the default ID string if editing
+        pickupOptionIds: [], // empty array for multi-select
+        packageTypeIds: [],
+        locationCodeIds: [],
+        coverageAreaId: "",
+        weightLimit: "",
+        isNextDayDelivery: false,
+        numberOfDaysForPickup: "",
+        numberOfDaysForDelivery: "",
+      });
+      setSelectedPickupOptions([]);
+      setSelectedPackageTypes([]);
+      setSelectedLocations([]);
+    }
+  }, [openService, info, type, reset]);
   const queryClient = useQueryClient();
 
   const { mutate: createServices, isPending: pendingCreate } = useMutation({
     mutationFn: createCompanyServices,
     onSuccess: () => {
       toast.success("Successful");
-      reset( {
+      reset({
         serviceLevelId: "",
         coverageAreaId: "",
-      pickupOptionIds: [],
-      packageTypeIds: [],
-      locationCodeIds: [],
-      isNextDayDelivery: false
-    });
-    setSelectedPickupOptions([])
-    setSelectedPackageTypes([])
-    setSelectedLocations([])
-      setOpenService(false)
-      queryClient.invalidateQueries({
-        queryKey: ["companies"],
+        pickupOptionIds: [],
+        packageTypeIds: [],
+        locationCodeIds: [],
+        isNextDayDelivery: false,
       });
-
+      setSelectedPickupOptions([]);
+      setSelectedPackageTypes([]);
+      setSelectedLocations([]);
+      setOpenService(false);
+      queryClient.invalidateQueries({
+        queryKey: ["company_services"],
+      });
     },
     onError: (data) => {
       toast.error(data?.message);
     },
   });
 
+  const { mutate: updateServices, isPending: pendingUpdate } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateCompanyServices(id, data), // ✅ call with correct shape
+
+    onSuccess: () => {
+      toast.success("Successful");
+      setOpenService(false);
+      reset();
+      queryClient.invalidateQueries({
+        queryKey: ["company_services"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+
   const onSubmit = (data: z.infer<typeof schema>) => {
-    createServices({ ...data, companyId: companyId });
-    // mutate(data);
+    type === "create" && createServices({ ...data, companyId: companyId });
+
+    type === "edit" &&
+      updateServices({
+        id: info?.id,
+        data: {
+          ...data,
+          companyId: companyId,
+        },
+      });
   };
 
   return (
     <Dialog open={openService} onOpenChange={setOpenService}>
       <DialogContent className="gap-0">
         <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
-          Add a new service
+          {type === "create" ? "Add a new service" : "Edit a company service"}
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600">
-          Create a service option for this company by defining the service type
-          and other custom details.
+          {type === "create" ? "Create" : "Edit"} a service option for this
+          company by defining the service type and other custom details.
         </DialogDescription>
         <>
           <div className="py-4 text-sm mt-4">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-8"
+              className="flex flex-col md:gap-5 gap-4"
             >
               <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col lg:w-1/2 w-full">
@@ -157,10 +259,10 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                   >
                     Select service level
                   </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
+                  <div className="flex justify-between items-center gap-2 border-b mb-2">
                     <Select
                       onValueChange={(val) => setValue("serviceLevelId", val)}
-                      // value={field?.value}
+                      defaultValue={info?.companyServiceLevel?.id}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select option" />
@@ -177,7 +279,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                     </Select>
                   </div>
                   {errors.serviceLevelId && (
-                    <p className="error text-xs text-[#FF0000] px-4">
+                    <p className="error text-xs text-[#FF0000]">
                       {errors.serviceLevelId.message}
                     </p>
                   )}
@@ -189,7 +291,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                   >
                     Select pickup option
                   </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
+                  <div className="flex justify-between items-center gap-2 border-b mb-2">
                     <MultiSelect
                       options={pickupOptions}
                       value={selectedPickupOptions}
@@ -197,12 +299,15 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                       // value={selected || []}
                       onChange={(val) => {
                         setSelectedPickupOptions(val);
-                        setValue("pickupOptionIds", val);
+                        setValue(
+                          "pickupOptionIds",
+                          val as [string, ...string[]]
+                        );
                       }}
                     />
                   </div>
                   {errors.pickupOptionIds && (
-                    <p className="error text-xs text-[#FF0000] px-4">
+                    <p className="error text-xs text-[#FF0000]">
                       {errors.pickupOptionIds.message}
                     </p>
                   )}
@@ -217,7 +322,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                   >
                     Select package type
                   </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
+                  <div className="flex justify-between items-center gap-2 border-b mb-2">
                     <MultiSelect
                       options={packageOptions}
                       value={selectedPackageTypes}
@@ -225,12 +330,15 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                       // value={selected || []}
                       onChange={(val) => {
                         setSelectedPackageTypes(val);
-                        setValue("packageTypeIds", val);
+                        setValue(
+                          "packageTypeIds",
+                          val as [string, ...string[]]
+                        );
                       }}
                     />
                   </div>
                   {errors.packageTypeIds && (
-                    <p className="error text-xs text-[#FF0000] px-4">
+                    <p className="error text-xs text-[#FF0000]">
                       {errors.packageTypeIds.message}
                     </p>
                   )}
@@ -242,10 +350,10 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                   >
                     Select coverage area
                   </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
+                  <div className="flex justify-between items-center gap-2 border-b mb-2">
                     <Select
                       onValueChange={(val) => setValue("coverageAreaId", val)}
-                      // value={field?.value}
+                      defaultValue={info?.coverageArea?.id}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select option" />
@@ -262,7 +370,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                     </Select>
                   </div>
                   {errors.coverageAreaId && (
-                    <p className="error text-xs text-[#FF0000] px-4">
+                    <p className="error text-xs text-[#FF0000]">
                       {errors.coverageAreaId.message}
                     </p>
                   )}
@@ -282,7 +390,10 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                       // value={selected || []}
                       onChange={(val) => {
                         setSelectedLocations(val);
-                        setValue("locationCodeIds", val);
+                        setValue(
+                          "locationCodeIds",
+                          val as [string, ...string[]]
+                        );
                       }}
                     />
                   </div>
@@ -300,7 +411,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                     <input
                       type="text"
                       {...register("weightLimit")}
-                      // defaultValue={info?.weightLimit}
+                      defaultValue={info?.weightLimit}
                       placeholder="Enter weight limit"
                       className="w-full outline-0 border-b-0 py-2 "
                       onKeyDown={(event) => {
@@ -334,7 +445,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                     <input
                       type="text"
                       {...register("numberOfDaysForPickup")}
-                      // defaultValue={info?.numberOfDaysForPickup}
+                      defaultValue={info?.numberOfDaysForPickup}
                       placeholder="Enter number of days"
                       className="w-full outline-0 border-b-0 py-2"
                       onKeyDown={(event) => {
@@ -366,7 +477,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
                     <input
                       type="text"
                       {...register("numberOfDaysForDelivery")}
-                      // defaultValue={info?.numberOfDaysForDelivery}
+                      defaultValue={info?.numberOfDaysForDelivery}
                       placeholder="Enter number of days"
                       className="w-full outline-0 border-b-0 py-2"
                       onKeyDown={(event) => {
@@ -390,7 +501,7 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
 
               <div className="flex items-center gap-4">
                 <Switch
-                  // checked={field.value}
+                  defaultChecked={info?.isNextDayDelivery}
                   onCheckedChange={(val) => setValue("isNextDayDelivery", val)}
                 />
                 <label htmlFor="name" className="font-inter font-semibold">
@@ -401,9 +512,9 @@ export function AddServiceModal({ companyId, openService, setOpenService }: { co
               <Button
                 variant={"secondary"}
                 className=" w-fit"
-                loading={pendingCreate}
+                loading={type === "create" ? pendingCreate : pendingUpdate}
               >
-                Add service
+                {type === "create" ? "Add service" : "Edit service"}
               </Button>
             </form>
           </div>
