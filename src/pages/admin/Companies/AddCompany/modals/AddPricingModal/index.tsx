@@ -4,7 +4,6 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -13,17 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import { changePassword } from "@/services/auth";
 // import { toast } from "sonner";
 // import { useMutation } from "@tanstack/react-query";
-import { FiEdit } from "react-icons/fi";
 
-export function AddPricingModal() {
-  const [open, setOpen] = useState(false);
+export function AddPricingModal({ companyId, openPricing, setOpenPricing }: { companyId: string; openPricing: boolean; setOpenPricing:any }) {
 
   const schema = z
     .object({
@@ -32,7 +28,7 @@ export function AddPricingModal() {
         .min(1, { message: "Please select a level" }),
       
     })
-   
+   console.log(companyId)
 
   const {
     // register,
@@ -62,10 +58,7 @@ export function AddPricingModal() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={"secondary"}><FiEdit/> Add New Custom Pricing</Button>
-      </DialogTrigger>
+    <Dialog open={openPricing} onOpenChange={setOpenPricing}>
       <DialogContent className="gap-0">
         <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
           Set Up Delivery Pricing

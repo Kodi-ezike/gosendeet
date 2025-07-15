@@ -71,7 +71,7 @@ export function PackageTypeModal({
       // .string().optional(),
       .string({ required_error: "Description is required" })
       .min(1, { message: "Please enter a description" }),
-    isActive: z.boolean().optional(),
+    active: z.boolean().optional(),
   });
 
   const {
@@ -109,7 +109,7 @@ export function PackageTypeModal({
         dimensionUnit: "",
         code: "",
         description: "",
-        isActive: false,
+        active: false,
       });
     }
   }, [open, info, type, reset]);
@@ -414,7 +414,7 @@ export function PackageTypeModal({
                   <div className="py-2">
                     <Switch
                       // checked={field.value}
-                      onCheckedChange={(val) => setValue("isActive", val)}
+                      onCheckedChange={(val) => setValue("active", val)}
                     />
                   </div>
                 </div>

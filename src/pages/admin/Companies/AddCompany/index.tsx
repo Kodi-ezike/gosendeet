@@ -2,14 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { SelectInput } from "@/components/ui/selectInput";
-// import { countries } from "@/constants";
-// import { FiEdit } from "react-icons/fi";
-// import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -20,7 +15,7 @@ import {
 import { countries } from "@/constants";
 import { AddServiceModal } from "./modals/AddServiceModal";
 import { AddPricingModal } from "./modals/AddPricingModal";
-import { FiInfo } from "react-icons/fi";
+import { FiEdit, FiInfo } from "react-icons/fi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCompany } from "@/services/companies";
 import { toast } from "sonner";
@@ -28,6 +23,9 @@ import { toast } from "sonner";
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
+  const [companyId, setCompanyId] = useState("");
+  const [openService, setOpenService] = useState(false);
+  const [openPricing, setOpenPricing] = useState(false);
 
   const schema = z.object({
     name: z
@@ -73,11 +71,12 @@ const AddCompany = () => {
 
   const { mutate: create, isPending: pendingCreate } = useMutation({
     mutationFn: createCompany,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Successful");
       reset({
         country: "",
       });
+      setCompanyId(data?.data?.id);
       queryClient.invalidateQueries({
         queryKey: ["companies"],
       });
@@ -93,20 +92,19 @@ const AddCompany = () => {
 
   return (
     <div className="md:px-20 px-6 py-8 bg-neutral100">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex justify-between items-center">
+      <div className=" flex lg:flex-row flex-col gap-4 justify-between items-center mb-8">
+        <div className="flex justify-between items-center lg:w-1/2 w-full">
+          <Button variant={"ghost"} size={"ghost"} onClick={() => navigate(-1)}>
+            <FaArrowLeft />
+            Back
+          </Button>
 
-        <Button variant={"ghost"} size={"ghost"} onClick={() => navigate(-1)}>
-          <FaArrowLeft />
-          Back
-        </Button>
-
-        <h2 className="font-semibold text-[20px] font-inter">
-          Add New Company
-        </h2>
+          <h2 className="font-semibold md:text-[20px] text-md font-inter">
+            Add New Company
+          </h2>
         </div>
 
-        <div className="flex gap-4 items-center w-fit">
+        <div className="flex gap-4 items-center lg:w-1/2 w-full justify-end">
           <Button
             variant={"outline"}
             className="md:text-base text-sm bg-neutral200 border-neutral700"
@@ -137,7 +135,7 @@ const AddCompany = () => {
       </div>
 
       <div className="flex lg:flex-row flex-col gap-8 justify-between">
-        <div className="lg:w-1/2 border border-neutral700 rounded-2xl px-6 py-10">
+        <div className="lg:w-1/2 border border-neutral700 rounded-2xl md:px-6 px-4 py-10">
           <form
             // onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-8 text-sm"
@@ -424,8 +422,14 @@ const AddCompany = () => {
               Configure your delivery rates by setting up pricing rules for
               diverse package options and service types.
             </p>
-            <div>
-              <AddServiceModal />
+            <div className="">
+              <Button
+                variant={"secondary"}
+                onClick={() => setOpenService(true)}
+                disabled={companyId === ""}
+              >
+                <FiEdit /> Add New Service
+              </Button>
             </div>
           </div>
           <div className="w-full h-full  border border-neutral700 rounded-2xl px-6 py-10">
@@ -437,7 +441,13 @@ const AddCompany = () => {
               diverse service types.
             </p>
             <div className="mb-8">
-              <AddPricingModal />
+              <Button
+                variant={"secondary"}
+                onClick={() => setOpenPricing(true)}
+                disabled={companyId === ""}
+              >
+                <FiEdit /> Add New Custom Pricing
+              </Button>
             </div>
             <div className="bg-purple900 w-fit p-4 flex flex-wrap items-center gap-2 rounded-xl">
               <FiInfo />
@@ -449,6 +459,18 @@ const AddCompany = () => {
           </div>
         </div>
       </div>
+
+      <AddServiceModal
+        companyId={companyId}
+        openService={openService}
+        setOpenService={setOpenService}
+      />
+
+      <AddPricingModal
+        companyId={companyId}
+        openPricing={openPricing}
+        setOpenPricing={setOpenPricing}
+      />
     </div>
   );
 };

@@ -201,7 +201,7 @@ export const getAdminWeightUnits = async () => {
 
 export const getAdminDimensionUnits = async () => {
   try {
-    const res = await api.get(`/admin/package-types//dimension-units`);
+    const res = await api.get(`/admin/package-types/dimension-units`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

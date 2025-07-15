@@ -39,7 +39,8 @@ api.interceptors.response.use(
     if (status === 401 && !redirected) {   
       redirected = true // Prevent repeat redirects
       sessionStorage.clear(); // clear all session data
-      toast.error("User session expired");      
+      toast.error("User session expired");  
+       
     }
 
     return Promise.reject(error);
