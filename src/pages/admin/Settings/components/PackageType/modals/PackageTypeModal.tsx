@@ -36,11 +36,9 @@ export function PackageTypeModal({
   type: string;
   info: any;
 }) {
+  
   const { data: weightUnits } = useGetAdminWeightUnits();
   const { data: dimensionUnits } = useGetAdminDimensionUnits();
-
-  console.log(weightUnits);
-  console.log(dimensionUnits);
 
   const schema = z.object({
     name: z
@@ -97,6 +95,7 @@ export function PackageTypeModal({
         width: info.width?.toString() ?? "",
         height: info.height?.toString() ?? "",
         maxWeight: info.maxWeight?.toString() ?? "",
+        active: info.active ?? false,
       });
     } else if (open && type === "create") {
       reset({
@@ -325,8 +324,12 @@ export function PackageTypeModal({
                         <SelectValue placeholder="Select weight unit" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="kg">kg</SelectItem>
-                        <SelectItem value="g">g</SelectItem>
+                        {weightUnits &&
+                          weightUnits.map((item: string, index: number) => (
+                            <SelectItem key={index} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -352,8 +355,12 @@ export function PackageTypeModal({
                         <SelectValue placeholder="Select dimension unit" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cm">cm</SelectItem>
-                        <SelectItem value="m">m</SelectItem>
+                        {dimensionUnits &&
+                          dimensionUnits.map((item: string, index: number) => (
+                            <SelectItem key={index} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -413,7 +420,7 @@ export function PackageTypeModal({
                   </label>
                   <div className="py-2">
                     <Switch
-                      // checked={field.value}
+                      defaultChecked={info?.active}
                       onCheckedChange={(val) => setValue("active", val)}
                     />
                   </div>

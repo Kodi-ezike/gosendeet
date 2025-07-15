@@ -37,7 +37,6 @@ const PackageType = () => {
       toast.error(error?.message || "Something went wrong");
     },
   });
-  console.log(data?.data?.content)
 
   const handleDelete = (id: string) => deleteService(id);
   return (
