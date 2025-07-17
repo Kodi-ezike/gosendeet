@@ -30,10 +30,10 @@ import Pricing from "./Pricing";
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
-  // const [companyId, setCompanyId] = useState("");
-  const [companyId, setCompanyId] = useState(
-    "6a049497-aab0-4ce5-8c8d-d4254292097f"
-  );
+  const [companyId, setCompanyId] = useState("");
+  // const [companyId, setCompanyId] = useState(
+  //   "6a049497-aab0-4ce5-8c8d-d4254292097f"
+  // );
   const [openService, setOpenService] = useState(false);
   const [serviceInfo, setServiceInfo] = useState({});
   const [pricingInfo, setPricingInfo] = useState({});
