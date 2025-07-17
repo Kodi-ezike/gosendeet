@@ -2,14 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { BiEditAlt } from "react-icons/bi";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UpdateCompanyModal } from "../modals/UpdateCompanyModal";
 import purple from "@/assets/icons/purple-checkmark.png";
-import blue from "@/assets/icons/blue-checkmark.png";
-import orange from "@/assets/icons/orange-checkmark.png";
+// import blue from "@/assets/icons/blue-checkmark.png";
+// import orange from "@/assets/icons/orange-checkmark.png";
 import CoverSheet from "./components/CoverSheet";
 import Orders from "./components/Orders";
 import Ratings from "./components/Ratings";
+import { useGetSingleCompany } from "@/queries/admin/useGetAdminCompanies";
 
 const CompanyDetails = () => {
   const navigate = useNavigate();
@@ -19,6 +20,12 @@ const CompanyDetails = () => {
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const location = useLocation();
+  const companyId = location.state.id;
+
+  const { data, isLoading, isSuccess, isError } =
+    useGetSingleCompany(companyId);
 
   const tabs = [
     { key: "cover", label: "Cover Sheet" },
@@ -66,29 +73,48 @@ const CompanyDetails = () => {
         <div>
           <p className="text-neutral600 text-sm mb-2">COMPANY NAME</p>
           <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold mb-2">
-            DHL Logistics
+            {data?.data?.name ?? ""}
           </p>
         </div>
-        <div>
+        {/* <div>
           <p className="text-neutral600 text-sm mb-2">ACCOUNT CREATED</p>
           <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold break-all">
             11:37 PM, 27 May 2023
-            {/* (Adedoyin Ester)  */}
+\          </p>
+        </div> */}
+        <div>
+          <p className="text-neutral600 text-sm mb-2">STATUS</p>
+          <p className="text-neutral800 md:text-[20px] text-sm font-inter font-semibold break-all capitalize">
+            {data?.data?.status ?? ""}
           </p>
         </div>
         <div>
           <p className="text-neutral600 text-sm mb-2">SERVICES</p>
 
           <div className="flex-1 flex flex-col gap-2">
-            <div className="flex gap-2 items-center bg-purple200 w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
-              <img
-                src={purple}
-                alt="check"
-                className="w-[20px] h-[20px] rounded-full"
-              />
-              <p className="text-xs mr-1 text-purple500">Pickup</p>
-            </div>
-            <div className="flex gap-2 items-center bg-[#F1F8FF] w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
+            {data?.data &&
+              data?.data?.services?.length > 0 &&
+              data?.data?.services?.map((item: any, index: number) => (
+                <div
+                  key={index}
+                  className="flex gap-2 items-center bg-purple200 w-fit py-[6px] px-[8px] rounded-full md:justify-self-end"
+                >
+                  <img
+                    src={purple}
+                    alt="check"
+                    className="w-[20px] h-[20px] rounded-full"
+                  />
+                  <p className="text-xs mr-1 text-purple500">
+                    {item.companyServiceLevel.name}
+                  </p>
+                </div>
+              ))}
+
+            {data?.data && data?.data?.services?.length === 0 && (
+              <p className="">No services added</p>
+            )}
+
+            {/* <div className="flex gap-2 items-center bg-[#F1F8FF] w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
               <img
                 src={blue}
                 alt="check"
@@ -103,7 +129,7 @@ const CompanyDetails = () => {
                 className="w-[20px] h-[20px] rounded-full"
               />
               <p className="text-xs mr-1 text-[#FF8C1A]">Branch Drop off</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -120,11 +146,13 @@ const CompanyDetails = () => {
               className={`relative z-10 px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
                 activeTab === tab.key ? "text-purple500" : "text-black"
               }`}
-              onMouseEnter={() => {
-                updateUnderline(index);
-                setActiveTab(tab.key);
-              }}
+              // onMouseEnter={() => {
+              //   updateUnderline(index);
+              //   setActiveTab(tab.key);
+              //   sessionStorage.setItem("companyTab", tab.key);
+              // }}
               onClick={() => {
+                updateUnderline(index);
                 setActiveTab(tab.key);
                 sessionStorage.setItem("companyTab", tab.key);
               }}
@@ -145,7 +173,14 @@ const CompanyDetails = () => {
 
         {/* Tab Content */}
         <div className="mt-4">
-          {activeTab === "cover" && <CoverSheet />}
+          {activeTab === "cover" && (
+            <CoverSheet
+              data={data?.data}
+              isLoading={isLoading}
+              isSuccess={isSuccess}
+              isError={isError}
+            />
+          )}
           {activeTab === "orders" && <Orders />}
           {activeTab === "rating" && <Ratings />}
         </div>

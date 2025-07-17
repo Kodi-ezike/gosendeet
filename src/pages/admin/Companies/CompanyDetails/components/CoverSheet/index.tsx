@@ -1,7 +1,19 @@
 import { BsThreeDotsVertical } from "react-icons/bs";
 
-const CoverSheet = () => {
-      const results = [1, 2];
+const CoverSheet = ({
+  data,
+  isLoading,
+  isSuccess,
+  isError,
+}: {
+  data: any;
+  isLoading: boolean;
+  isSuccess: boolean;
+  isError: boolean;
+}) => {
+  const results = [1, 2];
+
+  console.log(isLoading, isSuccess, isError);
 
   return (
     <div className="py-4">
@@ -13,19 +25,17 @@ const CoverSheet = () => {
         <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
           <div>
             <p className="font-medium text-sm mb-2">Phone</p>
-            <p className="text-sm">+234 9123456789</p>
+            <p className="text-sm">{data?.phone ?? ""}</p>
           </div>
-          <div>
-            <p className="font-medium text-sm mb-2">Alt Phone</p>
-            <p className="text-sm">+234 9123456789</p>
-          </div>
+
           <div>
             <p className="font-medium text-sm mb-2">Email</p>
-            <p className="text-sm">company@delivery.com</p>
+            <p className="text-sm">{data?.email ?? ""}</p>
           </div>
+
           <div>
-            <p className="font-medium text-sm mb-2">Alt Email</p>
-            <p className="text-sm">-</p>
+            <p className="font-medium text-sm mb-2">Website</p>
+            <p className="text-sm">{data?.website ?? ""}</p>
           </div>
         </div>
 
@@ -33,22 +43,23 @@ const CoverSheet = () => {
 
         <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
           <div>
-            <p className="font-medium text-sm mb-2">Company Website</p>
-            <p className="text-sm">www.dhlogistics.com</p>
-          </div>
-          <div>
             <p className="font-medium text-sm mb-2">Branch Address</p>
-            <p className="text-sm">
-              2972 Westheimer Rd. Santa Ana, Illinois 85486{" "}
-            </p>
+            <p className="text-sm">{data?.address ?? ""}</p>
           </div>
-          <div>
-            <p className="font-medium text-sm mb-2">Services</p>
 
-            <div className="flex gap-4 items-center text-sm font-medium">
-              <p className="py-2 px-4 bg-purple200 w-fit">Express</p>
-              <p className="py-2 px-4 bg-purple200 w-fit">Standard</p>
-            </div>
+          <div>
+            <p className="font-medium text-sm mb-2">City</p>
+            <p className="text-sm">{data?.city ?? ""}</p>
+          </div>
+
+          <div>
+            <p className="font-medium text-sm mb-2">State</p>
+            <p className="text-sm">{data?.state ?? ""}</p>
+          </div>
+
+          <div>
+            <p className="font-medium text-sm mb-2">Country</p>
+            <p className="text-sm">{data?.country ?? ""}</p>
           </div>
         </div>
 
@@ -102,7 +113,7 @@ const CoverSheet = () => {
                     <BsThreeDotsVertical
                       size={20}
                       className="p-1 cursor-pointer"
-                    //   onClick={() => showModal(index)}
+                      //   onClick={() => showModal(index)}
                     />
                   </button>
                 </div>

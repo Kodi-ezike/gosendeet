@@ -18,6 +18,16 @@ export const getCompanyList = async (page: number, size: number, companyStatus: 
   }
 };
 
+
+export const getSingleCompany = async (id: string) => {
+  try {
+    const res = await api.get(`/companies/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
 export const createCompanyServices = async (data: any) => {
   try {
     const res = await api.post(`/company-services`, data);
