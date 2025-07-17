@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -12,11 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BiSolidTrashAlt } from "react-icons/bi";
 import { countries } from "@/constants";
 import { AddServiceModal } from "./modals/AddServiceModal";
 import { AddPricingModal } from "./modals/AddPricingModal";
-import { FiEdit, FiInfo } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCompany, deleteCompanyServices } from "@/services/companies";
 import { toast } from "sonner";
@@ -25,20 +24,27 @@ import {
   useGetCompanyServices,
 } from "@/queries/admin/useGetAdminCompanies";
 import DeleteModal from "@/components/modals/DeleteModal";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import Pricing from "./Pricing";
 
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
-  const [companyId, setCompanyId] = useState("");
+  // const [companyId, setCompanyId] = useState("");
+  const [companyId, setCompanyId] = useState(
+    "6a049497-aab0-4ce5-8c8d-d4254292097f"
+  );
   const [openService, setOpenService] = useState(false);
   const [serviceInfo, setServiceInfo] = useState({});
-  const [type, setType] = useState('');
+  const [pricingInfo, setPricingInfo] = useState({});
+  const [serviceId, setServiceId] = useState("");
+  const [type, setType] = useState("");
 
   const [openDeleteModal, setOpenDeleteModal] = useState<number | null>(null);
   const handleDeleteModal = () => setOpenDeleteModal(null);
 
   const [openPricing, setOpenPricing] = useState(false);
-  
+
   const { data: company_services } = useGetCompanyServices(companyId);
 
   // const page = 0;
@@ -55,10 +61,10 @@ const AddCompany = () => {
   //   search
   // );
 
-  // console.log(company_list?.data?.content)
+  // console.log(company_list?.data?.content);
 
   const companyServices = company_services?.data || [];
-  
+
   const schema = z.object({
     name: z
       .string({ required_error: "Company name is required" })
@@ -98,6 +104,31 @@ const AddCompany = () => {
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
+
+  const [activeModalId, setActiveModalId] = useState<number | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  // const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const showModal = (id: number) => {
+    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
+  };
+
+  // Close modal on outside click
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      // if (isDialogOpen) return; // Skip if dialog is open
+
+      const target = event.target as Node;
+      if (modalRef.current && !modalRef.current.contains(target)) {
+        setActiveModalId(null); // Close parent modal
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
 
   const queryClient = useQueryClient();
 
@@ -475,56 +506,83 @@ const AddCompany = () => {
             {companyServices && companyServices?.length > 0
               ? companyServices?.map((item: any, index: number) => {
                   const isDeleteModalOpen = openDeleteModal === index;
+
                   return (
-                    <div key={index} className="flex md:flex-row flex-col md:items-center md:gap-4 gap-2 justify-between mb-4">
-                      <p className="bg-purple100 py-2 px-4 font-medium w-fit">
-                        {item.companyServiceLevel.name}
-                      </p>
+                    <div key={index} className="mb-4">
+                      <div className="relative flex md:flex-row flex-col md:items-center md:gap-4 gap-2 justify-between">
+                        <p className="bg-purple100 py-2 px-4 font-medium w-fit">
+                          {item.companyServiceLevel.name}
+                        </p>
 
-                      <div className="flex gap-4 items-center">
-                        <Button
-                          variant={"ghost"}
-                          size={"ghost"}
-                          className="text-neutral600"
-                          onClick={() => {
-                            setServiceInfo(item);
-                            setOpenService(true);
-                            setType('edit')
-                          }}
-                          disabled={companyId === ""}
-                        >
-                          <FiEdit size={20} className="cursor-pointer" /> Edit
-                        </Button>
-
-                        <Button
-                          variant={"ghost"}
-                          size={"ghost"}
-                          className="text-[#F56630] hover:text-[#F56630]"
-                          onClick={() => {
-                            setOpenDeleteModal(index);
-                          }}
-                          disabled={companyId === ""}
-                        >
-                          <BiSolidTrashAlt
+                        <button className="border p-1 rounded-md border-neutral200">
+                          <BsThreeDotsVertical
                             size={20}
-                            className="cursor-pointer text-[#F56630]"
-                          />{" "}
-                          Delete
-                        </Button>
-                        <DeleteModal
-                          onOpenChange={(open) => {
-                            open
-                              ? setOpenDeleteModal(index)
-                              : setOpenDeleteModal(null);
-                          }}
-                          open={isDeleteModalOpen}
-                          title={"Delete company service"}
-                          data={item.companyServiceLevel.name ?? ""}
-                          id={item?.id ?? ""}
-                          handleDelete={handleDelete}
-                          loading={pendingDelete}
-                        />
+                            className="p-1 cursor-pointer"
+                            onClick={() => showModal(index)}
+                          />
+                        </button>
+
+                        {/* Modal */}
+                        {activeModalId === index && ( // Show modal only for the active event
+                          <>
+                            <div
+                              className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-10 right-0"
+                              ref={modalRef} // Attach ref to the modal
+                            >
+                              <p
+                                className="flex items-center gap-2 py-1 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                                onClick={() => {
+                                  setType("create");
+                                  setServiceId(item.id);
+                                  setOpenPricing(true);
+                                }}
+                              >
+                                Add pricing
+                              </p>
+                              <p
+                                className="flex items-center gap-2 py-1 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                                onClick={() => {
+                                  setServiceInfo(item);
+                                  setOpenService(true);
+                                  setType("edit");
+                                }}
+                              >
+                                Edit service
+                              </p>
+                              <p
+                                className="flex items-center gap-2 py-1 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                                onClick={() => {
+                                  setOpenDeleteModal(index);
+                                }}
+                              >
+                                Delete service
+                              </p>
+                            </div>
+                          </>
+                        )}
                       </div>
+                      <DeleteModal
+                        open={isDeleteModalOpen}
+                        onOpenChange={(open) => {
+                                open
+                                  ? setOpenDeleteModal(index)
+                                  : setOpenDeleteModal(null);
+                              }}
+                        title={"Delete company service"}
+                        data={item.companyServiceLevel.name ?? ""}
+                        id={item.id ?? ""}
+                        handleDelete={handleDelete}
+                        loading={pendingDelete}
+                      />
+
+                      <Pricing
+                        serviceId={item.id}
+                        setServiceId={setServiceId}
+                        setType={setType}
+                        setOpenPricing={setOpenPricing}
+                        setPricingInfo={setPricingInfo}
+                        info={pricingInfo}
+                      />
                     </div>
                   );
                 })
@@ -535,7 +593,10 @@ const AddCompany = () => {
                   variant={"ghost"}
                   size={"ghost"}
                   className="text-purple500"
-                  onClick={() => {setType('create'); setOpenService(true)}}
+                  onClick={() => {
+                    setType("create");
+                    setOpenService(true);
+                  }}
                   disabled={companyId === ""}
                 >
                   <FiEdit /> Add another service
@@ -543,7 +604,10 @@ const AddCompany = () => {
               ) : (
                 <Button
                   variant={"secondary"}
-                  onClick={() => {setType('create'); setOpenService(true)}}
+                  onClick={() => {
+                    setType("create");
+                    setOpenService(true);
+                  }}
                   disabled={companyId === ""}
                 >
                   <FiEdit /> Add New Service
@@ -551,7 +615,7 @@ const AddCompany = () => {
               )}
             </div>
           </div>
-          <div className="w-full h-full  border border-neutral700 rounded-2xl px-6 py-10">
+          {/* <div className="w-full h-full  border border-neutral700 rounded-2xl px-6 py-10">
             <p className="font-semibold font-inter">
               Set Your Delivery Pricing
             </p>
@@ -562,7 +626,10 @@ const AddCompany = () => {
             <div className="mb-8">
               <Button
                 variant={"secondary"}
-                onClick={() => setOpenPricing(true)}
+                onClick={() => {
+                  setType("create");
+                  setOpenPricing(true);
+                }}
                 disabled={companyId === ""}
               >
                 <FiEdit /> Add New Custom Pricing
@@ -575,7 +642,7 @@ const AddCompany = () => {
                 default.
               </p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -583,15 +650,18 @@ const AddCompany = () => {
         companyId={companyId}
         openService={openService}
         setOpenService={setOpenService}
-        info = {serviceInfo}
-        setInfo = {setServiceInfo}
-        type = {type}
+        info={serviceInfo}
+        setInfo={setServiceInfo}
+        type={type}
       />
 
       <AddPricingModal
-        companyId={companyId}
         openPricing={openPricing}
         setOpenPricing={setOpenPricing}
+        type={type}
+        info={pricingInfo}
+        setPricingInfo={setPricingInfo}
+        companyServiceId={serviceId}
       />
     </div>
   );

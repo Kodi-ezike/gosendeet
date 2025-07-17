@@ -1,4 +1,4 @@
-import { getCompanyList, getCompanyServices } from "@/services/companies";
+import { getCompanyList, getCompanyPricing, getCompanyServices } from "@/services/companies";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetCompanyServices = (id: string) => {
@@ -26,3 +26,17 @@ export const useGetCompanyList = (page: number, size: number, companyStatus: str
     data: query.data,
   };
 };
+
+export const useGetCompanyPricing = (id: string) => {
+  const query = useQuery({
+    queryKey: ["company_pricing", id],
+    queryFn: () => getCompanyPricing(id),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+

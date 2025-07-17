@@ -15,46 +15,149 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { changePassword } from "@/services/auth";
-// import { toast } from "sonner";
-// import { useMutation } from "@tanstack/react-query";
+import { useGetServiceLevel } from "@/queries/admin/useGetAdminSettings";
+import { useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  createCompanyPricing,
+  updateCompanyPricing,
+} from "@/services/companies";
+import { toast } from "sonner";
 
-export function AddPricingModal({ companyId, openPricing, setOpenPricing }: { companyId: string; openPricing: boolean; setOpenPricing:any }) {
+export function AddPricingModal({
+  companyServiceId,
+  openPricing,
+  setOpenPricing,
+  info,
+  type,
+  setPricingInfo,
+}: {
+  companyServiceId: string;
+  openPricing: boolean;
+  setOpenPricing: any;
+  info: any;
+  type: string;
+  setPricingInfo: any;
+}) {
+  const { data: service_level } = useGetServiceLevel();
 
-  const schema = z
-    .object({
-      name: z
-        .string({ required_error: "Name is required" })
-        .min(1, { message: "Please select a level" }),
-      
-    })
-   console.log(companyId)
+  const schema = z.object({
+    serviceLevelId: z
+      .string({ required_error: "Service level is required" })
+      .min(1, { message: "Please select an option" }),
+    basePrice: z
+      .string({ required_error: "Base price is required" })
+      .min(1, { message: "Please enter a base price" }),
+    weightMultiplier: z
+      .string({ required_error: "Weight multiplier is required" })
+      .min(1, { message: "Please enter a weight multiplier" }),
+    zoneMultiplier: z
+      .string({ required_error: "Zone multiplier is required" })
+      .min(1, { message: "Please enter a zone multiplier" }),
+    discountPercent: z
+      .string({ required_error: "Discount percent is required" })
+      .min(1, { message: "Please enter a discount percent" }),
+    notes: z.string().optional(),
+  });
 
   const {
-    // register,
+    register,
     handleSubmit,
-    // reset,
+    reset,
     setValue,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      serviceLevelId: "",
+    },
+  });
+  // ✅ Reset form with incoming info when modal opens
+  useEffect(() => {
+    if (openPricing && type === "edit" && info) {
+      reset({
+        serviceLevelId: info?.serviceLevel?.id,
+        basePrice: info.basePrice?.toString() ?? "",
+        weightMultiplier: info.weightMultiplier?.toString() ?? "",
+        zoneMultiplier: info.zoneMultiplier?.toString() ?? "",
+        discountPercent: info.discountPercent?.toString() ?? "",
+        notes: info?.notes,
+      });
+    } else if (openPricing && type === "create") {
+      setPricingInfo(null);
+      reset({
+        serviceLevelId: "",
+        basePrice: "",
+        weightMultiplier: "",
+        zoneMultiplier: "",
+        discountPercent: "",
+        notes: "",
+      });
+    }
+  }, [openPricing, info, type, reset]);
+  const queryClient = useQueryClient();
+
+  const { mutate: createPricing, isPending: pendingCreate } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      createCompanyPricing(id, data),
+    onSuccess: () => {
+      toast.success("Successful");
+      reset({
+        serviceLevelId: "",
+        basePrice: "",
+        weightMultiplier: "",
+        zoneMultiplier: "",
+        discountPercent: "",
+        notes: "",
+      });
+      setOpenPricing(false);
+      queryClient.invalidateQueries({
+        queryKey: ["company_pricing"],
+      });
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+    },
   });
 
-//   const { mutate, isPending } = useMutation({
-//     mutationFn: changePassword,
-//     onSuccess: () => {
-//       toast.success("Successful");
-//       setOpen(false);
-//       reset();
-//     },
-//     onError: (data) => {
-//       toast.error(data?.message);
-//     },
-//   });
+  const { mutate: updatePricing, isPending: pendingUpdate } = useMutation({
+    mutationFn: ({
+      id,
+      pricingId,
+      data,
+    }: {
+      id: string;
+      pricingId: string;
+      data: any;
+    }) => updateCompanyPricing(id, pricingId, data), // ✅ call with correct shape
+
+    onSuccess: () => {
+      toast.success("Successful");
+      setOpenPricing(false);
+      reset();
+      queryClient.invalidateQueries({
+        queryKey: ["company_pricing"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data)
-    // mutate(data);
+    type === "create" &&
+      createPricing({
+        id: companyServiceId,
+        data,
+      });
+
+    type === "edit" &&
+      updatePricing({
+        id: companyServiceId,
+        pricingId: info?.id,
+        data,
+      });
   };
 
   return (
@@ -64,46 +167,211 @@ export function AddPricingModal({ companyId, openPricing, setOpenPricing }: { co
           Set Up Delivery Pricing
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600">
-          Start by picking a package type, then enter the cost details per kg/km to tailor your delivery pricing.
+          Start by picking a package type, then enter the cost details per kg/km
+          to tailor your delivery pricing.
         </DialogDescription>
         <>
           <div className="py-4 text-sm mt-4">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-8"
+              className="flex flex-col md:gap-5 gap-4"
             >
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="name" className="font-inter font-semibold">
-                  Select service level
-                </label>
-                <div className="flex justify-between items-center gap-2 border-b">
-                  <Select
-                    onValueChange={(val) => setValue("name", val)}
-                    // value={field?.value}
+              <div className="flex md:flex-row flex-col gap-4 items-center">
+                <div className="flex flex-col w-full">
+                  <label
+                    htmlFor="serviceLevel"
+                    className="font-inter font-semibold"
                   >
-                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full py-4 mt-0">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Express">Express</SelectItem>
-                    </SelectContent>
-                  </Select>
-
+                    Select service level
+                  </label>
+                  <div className="flex justify-between items-center gap-2 border-b mb-2">
+                    <Select
+                      onValueChange={(val) => setValue("serviceLevelId", val)}
+                      defaultValue={info?.serviceLevel?.id}
+                    >
+                      <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
+                        <SelectValue placeholder="Select option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {service_level &&
+                          service_level?.data?.map(
+                            (item: any, index: number) => (
+                              <SelectItem value={item.id} key={index}>
+                                {item.name}
+                              </SelectItem>
+                            )
+                          )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {errors.serviceLevelId && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.serviceLevelId.message}
+                    </p>
+                  )}
                 </div>
-                {errors.name && (
-                  <p className="error text-xs text-[#FF0000] px-4">
-                    {errors.name.message}
-                  </p>
-                )}
               </div>
-             
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
+                <div className="flex flex-col lg:w-1/2 w-full">
+                  <label
+                    htmlFor="basePrice"
+                    className="font-inter font-semibold"
+                  >
+                    Base Price
+                  </label>
+                  <div className="border-b mb-2">
+                    <input
+                      type="text"
+                      {...register("basePrice")}
+                      defaultValue={info?.basePrice}
+                      placeholder="Enter base price"
+                      className="w-full outline-0 border-b-0 py-2"
+                      onKeyDown={(event) => {
+                        if (
+                          !/[0-9]/.test(event.key) &&
+                          event.key !== "Backspace" &&
+                          event.key !== "Tab"
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.basePrice && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.basePrice.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col lg:w-1/2 w-full">
+                  <label
+                    htmlFor="discountPercent"
+                    className="font-inter font-semibold"
+                  >
+                    Discount Percent
+                  </label>
+                  <div className="border-b mb-2">
+                    <input
+                      type="text"
+                      {...register("discountPercent")}
+                      defaultValue={info?.discountPercent}
+                      placeholder="Enter discount percentage"
+                      className="w-full outline-0 border-b-0 py-2"
+                      onKeyDown={(event) => {
+                        if (
+                          !/[0-9]/.test(event.key) &&
+                          event.key !== "Backspace" &&
+                          event.key !== "Tab"
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.discountPercent && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.discountPercent.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
+                <div className="flex flex-col lg:w-1/2 w-full">
+                  <label
+                    htmlFor="weightMultiplier"
+                    className="font-inter font-semibold"
+                  >
+                    Weight Multiplier
+                  </label>
+                  <div className="border-b mb-2">
+                    <input
+                      type="text"
+                      {...register("weightMultiplier")}
+                      defaultValue={info?.weightMultiplier}
+                      placeholder="Enter weight multiplier"
+                      className="w-full outline-0 border-b-0 py-2"
+                      onKeyDown={(event) => {
+                        if (
+                          !/[0-9]/.test(event.key) &&
+                          event.key !== "Backspace" &&
+                          event.key !== "Tab"
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.weightMultiplier && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.weightMultiplier.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col lg:w-1/2 w-full">
+                  <label
+                    htmlFor="zoneMultiplier"
+                    className="font-inter font-semibold"
+                  >
+                    Zone Multiplier
+                  </label>
+                  <div className="border-b mb-2">
+                    <input
+                      type="text"
+                      {...register("zoneMultiplier")}
+                      defaultValue={info?.zoneMultiplier}
+                      placeholder="Enter zone multiplier"
+                      className="w-full outline-0 border-b-0 py-2"
+                      onKeyDown={(event) => {
+                        if (
+                          !/[0-9]/.test(event.key) &&
+                          event.key !== "Backspace" &&
+                          event.key !== "Tab"
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.zoneMultiplier && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.zoneMultiplier.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
+                <div className="flex flex-col w-full">
+                  <label htmlFor="notes" className="font-inter font-semibold">
+                    Notes
+                  </label>
+                  <div className="border-b mb-2">
+                    <input
+                      type="text"
+                      {...register("notes")}
+                      defaultValue={info?.notes}
+                      placeholder="Enter notes"
+                      className="w-full outline-0 border-b-0 py-2"
+                    />
+                  </div>
+                  {errors.notes && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.notes.message}
+                    </p>
+                  )}
+                </div>
+              </div>
 
               <Button
                 variant={"secondary"}
                 className=" w-fit"
-                // loading={isPending}
+                loading={type === "create" ? pendingCreate : pendingUpdate}
               >
-                Add Pricing
+                {type === "create" ? "Add pricing" : "Edit pricing"}
               </Button>
             </form>
           </div>
