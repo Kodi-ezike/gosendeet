@@ -23,16 +23,17 @@ import {
   updateCompanyPricing,
 } from "@/services/companies";
 import { toast } from "sonner";
+import { useGetCompanyServices } from "@/queries/admin/useGetAdminCompanies";
 
 export function AddPricingModal({
-  companyServiceId,
+  companyId,
   openPricing,
   setOpenPricing,
   info,
   type,
   setPricingInfo,
 }: {
-  companyServiceId: string;
+  companyId: string;
   openPricing: boolean;
   setOpenPricing: any;
   info: any;
@@ -40,6 +41,7 @@ export function AddPricingModal({
   setPricingInfo: any;
 }) {
   const { data: service_level } = useGetServiceLevel();
+  const { data: company_services } = useGetCompanyServices(companyId);
 
   const schema = z.object({
     serviceLevelId: z
@@ -72,6 +74,7 @@ export function AddPricingModal({
       serviceLevelId: "",
     },
   });
+
   // ✅ Reset form with incoming info when modal opens
   useEffect(() => {
     if (openPricing && type === "edit" && info) {
@@ -98,8 +101,7 @@ export function AddPricingModal({
   const queryClient = useQueryClient();
 
   const { mutate: createPricing, isPending: pendingCreate } = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
-      createCompanyPricing(id, data),
+    mutationFn: createCompanyPricing,
     onSuccess: () => {
       toast.success("Successful");
       reset({
@@ -121,15 +123,8 @@ export function AddPricingModal({
   });
 
   const { mutate: updatePricing, isPending: pendingUpdate } = useMutation({
-    mutationFn: ({
-      id,
-      pricingId,
-      data,
-    }: {
-      id: string;
-      pricingId: string;
-      data: any;
-    }) => updateCompanyPricing(id, pricingId, data), // ✅ call with correct shape
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updateCompanyPricing(id, data), // ✅ call with correct shape
 
     onSuccess: () => {
       toast.success("Successful");
@@ -148,15 +143,17 @@ export function AddPricingModal({
   const onSubmit = (data: z.infer<typeof schema>) => {
     type === "create" &&
       createPricing({
-        id: companyServiceId,
-        data,
+        ...data,
+        companyId: companyId,
       });
 
     type === "edit" &&
       updatePricing({
-        id: companyServiceId,
-        pricingId: info?.id,
-        data,
+        id: info?.id,
+        data: {
+          ...data,
+          companyId: companyId,
+        },
       });
   };
 
@@ -188,12 +185,26 @@ export function AddPricingModal({
                     <Select
                       onValueChange={(val) => setValue("serviceLevelId", val)}
                       defaultValue={info?.serviceLevel?.id}
+                      disabled={type === "edit"}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select option" />
                       </SelectTrigger>
                       <SelectContent>
-                        {service_level &&
+                        {type === "create" &&
+                          company_services &&
+                          company_services?.data?.map(
+                            (item: any, index: number) => (
+                              <SelectItem
+                                value={item.companyServiceLevel.id}
+                                key={index}
+                              >
+                                {item.companyServiceLevel.name}
+                              </SelectItem>
+                            )
+                          )}
+                        {type === "edit" &&
+                          service_level &&
                           service_level?.data?.map(
                             (item: any, index: number) => (
                               <SelectItem value={item.id} key={index}>

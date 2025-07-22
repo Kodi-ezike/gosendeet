@@ -9,15 +9,22 @@ export const createCompany = async (data: any) => {
   }
 };
 
-export const getCompanyList = async (page: number, size: number, companyStatus: string, serviceLevelId: string, search:string) => {
+export const getCompanyList = async (
+  page: number,
+  size: number,
+  companyStatus: string,
+  serviceLevelId: string,
+  search: string
+) => {
   try {
-    const res = await api.get(`/companies?page=${page}&size=${size}&status=${companyStatus}&serviceLevelId=${serviceLevelId}&search=${search}`);
+    const res = await api.get(
+      `/companies?page=${page}&size=${size}&status=${companyStatus}&serviceLevelId=${serviceLevelId}&search=${search}`
+    );
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
-
 
 export const getSingleCompany = async (id: string) => {
   try {
@@ -48,7 +55,7 @@ export const getCompanyServices = async (id: string) => {
 
 export const deleteCompanyServices = async (id: string) => {
   try {
-    const res = await api.delete(`/company-services/${id}`,);
+    const res = await api.delete(`/company-services/${id}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -64,18 +71,18 @@ export const updateCompanyServices = async (id: string, data: any) => {
   }
 };
 
-export const createCompanyPricing = async (id: string, data: any) => {
+export const createCompanyPricing = async (data: any) => {
   try {
-    const res = await api.post(`/company-services/${id}/delivery-pricing`, data);
+    const res = await api.post(`/delivery-pricing`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
 
-export const updateCompanyPricing = async (id: string, pricingId: string, data: any) => {
+export const updateCompanyPricing = async (id: string, data: any) => {
   try {
-    const res = await api.put(`/company-services/${id}/delivery-pricing/${pricingId}`, data);
+    const res = await api.put(`delivery-pricing/${id}`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -84,16 +91,16 @@ export const updateCompanyPricing = async (id: string, pricingId: string, data: 
 
 export const getCompanyPricing = async (id: string) => {
   try {
-    const res = await api.get(`/company-services/${id}/delivery-pricing`);
+    const res = await api.get(`/delivery-pricing?companyId=${id}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
 
-export const deleteCompanyPricing = async (id: string, pricingId: string) => {
+export const deleteCompanyPricing = async (id: string) => {
   try {
-    const res = await api.delete(`/company-services/${id}/delivery-pricing/${pricingId}`);
+    const res = await api.delete(`delivery-pricing/${id}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

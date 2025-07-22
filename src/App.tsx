@@ -61,6 +61,7 @@ function App() {
             <Route path="user/:id" element={<UserProfiles />} />
             <Route path="order/:id" element={<OrderDetails />} />
             <Route path="companies/add-company" element={<AddCompany />} />
+            <Route path="companies/add-company/:id" element={<AddCompany />} />
             <Route path="company/:id" element={<CompanyDetails />} />
           </Route>
         </Route>

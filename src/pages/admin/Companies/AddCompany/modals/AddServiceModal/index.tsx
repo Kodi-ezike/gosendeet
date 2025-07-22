@@ -263,6 +263,7 @@ export function AddServiceModal({
                     <Select
                       onValueChange={(val) => setValue("serviceLevelId", val)}
                       defaultValue={info?.companyServiceLevel?.id}
+                      disabled={type === "edit"}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select option" />
