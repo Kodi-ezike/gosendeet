@@ -38,7 +38,10 @@ const AddCompany = () => {
   const companyId = searchParams.get("id") ?? ""; //?id=a3f93a6d-13b6-4684-bef4-171889b1cbc1
   const [openService, setOpenService] = useState(false);
   const [serviceInfo, setServiceInfo] = useState({});
+
+  const [openPricing, setOpenPricing] = useState(false);
   const [pricingInfo, setPricingInfo] = useState({});
+
   const [type, setType] = useState("");
 
   const [openDeleteModal, setOpenDeleteModal] = useState<number | null>(null);
@@ -48,8 +51,6 @@ const AddCompany = () => {
     number | null
   >(null);
   const handleDeletePricingModal = () => setOpenDeletePricingModal(null);
-
-  const [openPricing, setOpenPricing] = useState(false);
 
   const { data: company_services } = useGetCompanyServices(companyId);
   const { data: company_pricing } = useGetCompanyPricing(companyId);
@@ -72,7 +73,7 @@ const AddCompany = () => {
 
   const companyServices = company_services?.data || [];
   const companyPricing = company_pricing?.data || [];
-  console.log(companyPricing);
+
   const schema = z.object({
     name: z
       .string({ required_error: "Company name is required" })
@@ -115,7 +116,6 @@ const AddCompany = () => {
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-  // const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const showModal = (id: number) => {
     setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
@@ -179,7 +179,7 @@ const AddCompany = () => {
 
   const { mutate: deletePricing, isPending: pendingDeletePricing } =
     useMutation({
-      mutationFn: (id: string) => deleteCompanyPricing(id), // ✅ call with correct shape
+      mutationFn:  deleteCompanyPricing, // ✅ call with correct shape
 
       onSuccess: () => {
         toast.success("Successful");
@@ -194,7 +194,7 @@ const AddCompany = () => {
       },
     });
 
-  const handleDeletePricing = (id: string) => deletePricing(id);
+  const handleDeletePricing = (id: string) => deletePricing({ids:[id]});
 
   const onSubmit = (data: z.infer<typeof schema>, status: string) => {
     create({ ...data, status });

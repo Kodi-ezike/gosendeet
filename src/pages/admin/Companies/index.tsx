@@ -17,13 +17,18 @@ import { Plus } from "lucide-react";
 import ArchiveCompanyModal from "./modals/ArchiveCompanyModal";
 import { useGetCompanyList } from "@/queries/admin/useGetAdminCompanies";
 import { Spinner } from "@/components/Spinner";
+import { UpdateCompanyModal } from "./modals/UpdateCompanyModal";
 
 // import { UpdateProgressModal } from "./modals/UpdateProgressModal";
 
 const Companies = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
-  // const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [openArchive, setOpenArchive] = useState(false);
+
+  const [companyInfo, setCompanyInfo] = useState({});
+  const [companyName, setCompanyName] = useState("");
+  const [companyId, setCompanyId] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -288,39 +293,6 @@ const Companies = () => {
                   <div className="flex-1">
                     <p className="capitalize">{item.status}</p>
                   </div>
-
-                  {/* <div className="flex-1 flex flex-col gap-2">
-                  <div className="flex gap-2 items-center bg-purple300 w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
-                    <img
-                      src={purple}
-                      alt="check"
-                      className="w-[20px] h-[20px] rounded-full"
-                    />
-                    <p className="text-xs mr-1 text-purple500">Pickup</p>
-                  </div>
-                  <div className="flex gap-2 items-center bg-[#F1F8FF] w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
-                    <img
-                      src={blue}
-                      alt="check"
-                      className="w-[20px] h-[20px] rounded-full"
-                    />
-                    <p className="text-xs mr-1 text-[#0BA5EC]">Home/Work Delivery</p>
-                  </div>
-                  <div className="flex gap-2 items-center bg-[#FFF3E8] w-fit py-[6px] px-[8px] rounded-full md:justify-self-end">
-                    <img
-                      src={orange}
-                      alt="check"
-                      className="w-[20px] h-[20px] rounded-full"
-                    />
-                    <p className="text-xs mr-1 text-[#FF8C1A]">Branch Drop off</p>
-                  </div>
-               
-                </div>
-                <div className="flex-1">
-                  <p>Same day</p>
-                </div>
-                <div className="flex-1">1-2 business days</div> */}
-
                   <div className="w-[2%]">
                     <button className="border p-1 rounded-md border-neutral200">
                       <BsThreeDotsVertical
@@ -337,20 +309,30 @@ const Companies = () => {
                       className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
                       ref={modalRef} // Attach ref to the modal
                     >
-                      <Link to={`/admin-dashboard/company/${index}`} state={{id: item.id}}>
+                      <Link
+                        to={`/admin-dashboard/company/${index + 1}`}
+                        state={{ id: item.id }}
+                      >
                         <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
                           View full details
                         </p>
                       </Link>
                       <p
                         className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                        // onClick={() => setOpen(true)}
+                        onClick={() => {
+                          setCompanyInfo(item);
+                          setOpen(true);
+                        }}
                       >
                         Update info
                       </p>
                       <p
                         className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                        onClick={() => setOpenArchive(true)}
+                        onClick={() => {
+                          setCompanyName(item.name);
+                          setCompanyId(item.id);
+                          setOpenArchive(true);
+                        }}
                       >
                         Archive
                       </p>
@@ -358,6 +340,11 @@ const Companies = () => {
                       setActiveModalId={setActiveModalId}
                       setIsDialogOpen={setIsDialogOpen}
                     /> */}
+                      {/* <UpdateCompanyModal
+                        open={open}
+                        setOpen={setOpen}
+                        data={item}
+                      /> */}
                     </div>
                   )}
                 </div>
@@ -374,10 +361,13 @@ const Companies = () => {
           </p>
         </div>
       )}
-      {/* <UpdateProgressModal open={open} setOpen={setOpen} /> */}
+      <UpdateCompanyModal open={open} setOpen={setOpen} data={companyInfo}/>
+
       <ArchiveCompanyModal
         openArchive={openArchive}
         setOpenArchive={setOpenArchive}
+        companyName={companyName}
+        companyId={companyId}
       />
     </div>
   );

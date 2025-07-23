@@ -3,11 +3,11 @@ import { LayoutProps } from "@/lib/types";
 
 const AuthLayout = ({ children }: LayoutProps) => {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <header>
         <Navbar />
       </header>
-      <main>{children}</main>
+      <main className="flex-grow">{children}</main>
     </div>
   );
 };

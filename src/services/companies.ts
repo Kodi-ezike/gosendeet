@@ -35,6 +35,15 @@ export const getSingleCompany = async (id: string) => {
   }
 };
 
+export const updateSingleCompany = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`companies/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
 export const createCompanyServices = async (data: any) => {
   try {
     const res = await api.post(`/company-services`, data);
@@ -98,9 +107,9 @@ export const getCompanyPricing = async (id: string) => {
   }
 };
 
-export const deleteCompanyPricing = async (id: string) => {
+export const deleteCompanyPricing = async (data: any) => {
   try {
-    const res = await api.delete(`delivery-pricing/${id}`);
+    const res = await api.delete(`delivery-pricing`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
