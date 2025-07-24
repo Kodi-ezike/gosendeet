@@ -45,6 +45,7 @@ const Login = () => {
       sessionStorage.setItem("authToken", data.data.token);
       sessionStorage.setItem("userId", data.data.user.id);
       sessionStorage.setItem("role", data.data.user.role);
+      sessionStorage.setItem("sessionExpired", "false");
       toast.success("Login Successful");
       data.data.user.role === "user" && navigate("/dashboard");
       data.data.user.role === "super_admin" && navigate("/admin-dashboard");

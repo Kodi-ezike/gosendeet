@@ -4,6 +4,7 @@ import Orders from "./Orders";
 import Companies from "./Companies";
 import Reports from "./Reports";
 import Settings from "./Settings";
+import { toast } from "sonner";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const AdminDashboard = () => {
@@ -33,6 +34,13 @@ const AdminDashboard = () => {
     const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
     updateUnderline(currentIndex);
   }, [activeTab]);
+
+  const sessionExpired = sessionStorage.getItem("sessionExpired");
+  useEffect(() => {
+    if (sessionExpired === "true") {
+      toast.error("User session expired");
+    }
+  }, [sessionExpired]);
   return (
     <div className="md:px-20 px-6 py-10 bg-neutral100">
       <div className="flex xl:flex-row flex-col gap-2 justify-between xl:items-center">

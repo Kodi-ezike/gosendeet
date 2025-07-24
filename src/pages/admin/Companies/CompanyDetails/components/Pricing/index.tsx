@@ -55,8 +55,7 @@ const Pricing = ({
 
   const { mutate: deletePricing, isPending: pendingDeletePricing } =
     useMutation({
-      mutationFn:(data:any)=> deleteCompanyPricing(data), // ✅ call with correct shape
-
+      mutationFn: deleteCompanyPricing,
       onSuccess: () => {
         toast.success("Successful");
         handleDeletePricingModal();
@@ -70,7 +69,10 @@ const Pricing = ({
       },
     });
 
-  const handleDeletePricing = (id: string) => deletePricing({ ids: [id] });
+  const handleDeletePricing = (id: string) =>
+    deletePricing({
+      ids: [id],
+    });
 
   return (
     <div className="py-4">

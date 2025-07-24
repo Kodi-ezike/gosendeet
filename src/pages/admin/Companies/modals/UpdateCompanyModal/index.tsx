@@ -25,7 +25,6 @@ export function UpdateCompanyModal({
   open,
   setOpen,
   data,
-
 }: {
   open: boolean;
   setOpen: any;
@@ -56,9 +55,6 @@ export function UpdateCompanyModal({
     state: z
       .string({ required_error: "State is required" })
       .min(1, { message: "Please enter state" }),
-    // status: z
-    //   .string({ required_error: "Status is required" })
-    //   .min(1, { message: "Please enter status" }),
     country: z
       .string({ required_error: "Country is required" })
       .min(1, { message: "Please enter country" }),
@@ -76,20 +72,19 @@ export function UpdateCompanyModal({
   });
 
   useEffect(() => {
-  if (data && open) {
-    reset({
-      name: data.name ?? "",
-      website: data.website ?? "",
-      email: data.email ?? "",
-      phone: data.phone ?? "",
-      address: data.address ?? "",
-      city: data.city ?? "",
-      state: data.state ?? "",
-      country: data.country ?? "",
-      // status: data.status ?? "",
-    });
-  }
-}, [data, open, reset]);
+    if (data && open) {
+      reset({
+        name: data.name ?? "",
+        website: data.website ?? "",
+        email: data.email ?? "",
+        phone: data.phone ?? "",
+        address: data.address ?? "",
+        city: data.city ?? "",
+        state: data.state ?? "",
+        country: data.country ?? "",
+      });
+    }
+  }, [data, open, reset]);
 
   const queryClient = useQueryClient();
 
@@ -104,6 +99,9 @@ export function UpdateCompanyModal({
       queryClient.invalidateQueries({
         queryKey: ["single_company"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["companies"],
+      });
     },
 
     onError: (error: any) => {
@@ -114,7 +112,7 @@ export function UpdateCompanyModal({
   const onSubmit = (data: z.infer<typeof schema>) => {
     updateCompany({
       id: companyId,
-       data,
+      data,
     });
   };
 
@@ -314,33 +312,6 @@ export function UpdateCompanyModal({
                   )}
                 </div>
               </div>
-
-              {/* <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="status" className="font-inter font-semibold">
-                  Status
-                </label>
-                <div className="flex justify-between items-center gap-2 border-b">
-                  <Select
-                    onValueChange={(val) => setValue("status", val)}
-                    value={watch("status")}
-                    // defaultValue={data?.status}
-                  >
-                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full py-2 px-0 mt-0">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {errors.status && (
-                  <p className="error text-xs text-[#FF0000]">
-                    {errors.status.message}
-                  </p>
-                )}
-              </div> */}
 
               <Button
                 variant={"secondary"}

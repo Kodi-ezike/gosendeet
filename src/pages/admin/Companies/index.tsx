@@ -1,10 +1,10 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { useEffect, useRef, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
@@ -14,21 +14,23 @@ import { Plus } from "lucide-react";
 // import purple from "@/assets/icons/purple-checkmark.png";
 // import blue from "@/assets/icons/blue-checkmark.png";
 // import orange from "@/assets/icons/orange-checkmark.png";
-import ArchiveCompanyModal from "./modals/ArchiveCompanyModal";
-import { useGetCompanyList } from "@/queries/admin/useGetAdminCompanies";
+import {
+  useGetCompanyList,
+  useGetCompanyStats,
+} from "@/queries/admin/useGetAdminCompanies";
 import { Spinner } from "@/components/Spinner";
 import { UpdateCompanyModal } from "./modals/UpdateCompanyModal";
-
-// import { UpdateProgressModal } from "./modals/UpdateProgressModal";
+import UpdateCompanyStatusModal from "./modals/UpdateCompanyStatusModal";
 
 const Companies = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
-  const [openArchive, setOpenArchive] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
 
   const [companyInfo, setCompanyInfo] = useState({});
   const [companyName, setCompanyName] = useState("");
   const [companyId, setCompanyId] = useState("");
+  const [singleCompanyStatus, setSingleCompanyStatus] = useState("");
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -38,6 +40,9 @@ const Companies = () => {
   const size = 10;
   const status = "";
   const serviceLevelId = "";
+
+  const { data: stats } = useGetCompanyStats();
+  const companyStats = stats?.data ?? {};
 
   const { data, isLoading, isSuccess, isError } = useGetCompanyList(
     page,
@@ -86,22 +91,27 @@ const Companies = () => {
     };
   }, []);
 
-  const publishedCompanies = data?.data?.content?.filter(
-    (item: any) => item?.status === "published"
-  );
-  const draftCompanies = data?.data?.content?.filter(
-    (item: any) => item?.status === "draft"
-  );
-
   const statusTabs = [
-    { label: "All", status: "", count: data?.data?.content?.length ?? 0 },
+    {
+      label: "All",
+      status: "",
+      count: companyStats?.totalCompanies ?? 0,
+    },
     {
       label: "Active",
       status: "published",
-      count: publishedCompanies?.length ?? 0,
+      count: companyStats?.activeCompanies ?? 0,
     },
-    { label: "Draft", status: "draft", count: draftCompanies?.length ?? 0 },
-    // { label: "Archived", status: "archived", count: 990 },
+    {
+      label: "Draft",
+      status: "draft",
+      count: companyStats?.inactiveCompanies ?? 0,
+    },
+    {
+      label: "Archived",
+      status: "archived",
+      count: companyStats?.archivedCompanies,
+    },
   ];
 
   return (
@@ -113,15 +123,14 @@ const Companies = () => {
         </p>
       </div>
 
-      <div className="w-full bg-neutral200 p-4 md:flex items-center rounded-2xl mb-8">
-        <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-neutral500 text-sm">Active Companies</p>
-          </div>
-          <p className="text-[20px] font-inter font-semibold my-2">
-            {publishedCompanies?.length ?? 0}
+      <div className="w-full h-full bg-neutral200 p-4 md:flex rounded-2xl mb-8">
+        <div className="w-full flex flex-col gap-4 justify-between py-2">
+          <p className="text-neutral500 text-sm">Active Companies</p>
+
+          <p className="text-[20px] font-inter font-semibold md:mb-6">
+            {companyStats?.activeCompanies ?? 0}
           </p>
-          <hr className="border-neutral700" />
+          {/* <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
               <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs mr-1 text-grey500 w-[120px] p-0">
@@ -133,19 +142,17 @@ const Companies = () => {
               </SelectContent>
             </Select>
             <p className="font-inter font-semibold text-green400">9.12%</p>
-          </div>
+          </div> */}
         </div>
 
         <p className="h-[0.7px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
 
-        <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-neutral500 text-sm ">Draft Companies</p>
-          </div>
-          <p className="text-[20px] font-inter font-semibold my-2">
-            {draftCompanies?.length ?? 0}
+        <div className="w-full flex flex-col gap-4 justify-between py-2">
+          <p className="text-neutral500 text-sm ">Draft Companies</p>
+          <p className="text-[20px] font-inter font-semibold md:mb-6">
+            {companyStats?.inactiveCompanies ?? 0}
           </p>
-          <hr className="border-neutral700" />
+          {/* <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
               <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
@@ -157,17 +164,17 @@ const Companies = () => {
               </SelectContent>
             </Select>
             <p className="font-inter font-semibold text-neutral500">0%</p>
-          </div>
+          </div> */}
         </div>
 
         <p className="h-[1px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
 
-        <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-neutral500 text-sm ">Archived Companies</p>
-          </div>
-          <p className="text-[20px] font-inter font-semibold my-2">0</p>
-          <hr className="border-neutral700" />
+        <div className="w-full flex flex-col gap-4 justify-between py-2">
+          <p className="text-neutral500 text-sm ">Archived Companies</p>
+          <p className="text-[20px] font-inter font-semibold md:mb-6">
+            {companyStats?.archivedCompanies ?? 0}
+          </p>
+          {/* <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
             <Select>
               <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
@@ -179,7 +186,7 @@ const Companies = () => {
               </SelectContent>
             </Select>
             <p className="font-inter font-semibold text-neutral500">0%</p>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -331,20 +338,12 @@ const Companies = () => {
                         onClick={() => {
                           setCompanyName(item.name);
                           setCompanyId(item.id);
-                          setOpenArchive(true);
+                          setOpenStatus(true);
+                          setSingleCompanyStatus(item.status);
                         }}
                       >
-                        Archive
+                        Update status
                       </p>
-                      {/* <AccountStatusModal
-                      setActiveModalId={setActiveModalId}
-                      setIsDialogOpen={setIsDialogOpen}
-                    /> */}
-                      {/* <UpdateCompanyModal
-                        open={open}
-                        setOpen={setOpen}
-                        data={item}
-                      /> */}
                     </div>
                   )}
                 </div>
@@ -361,13 +360,14 @@ const Companies = () => {
           </p>
         </div>
       )}
-      <UpdateCompanyModal open={open} setOpen={setOpen} data={companyInfo}/>
+      <UpdateCompanyModal open={open} setOpen={setOpen} data={companyInfo} />
 
-      <ArchiveCompanyModal
-        openArchive={openArchive}
-        setOpenArchive={setOpenArchive}
+      <UpdateCompanyStatusModal
+        openStatus={openStatus}
+        setOpenStatus={setOpenStatus}
         companyName={companyName}
         companyId={companyId}
+        companyStatus={singleCompanyStatus}
       />
     </div>
   );

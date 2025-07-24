@@ -16,9 +16,13 @@ import {
 import Services from "./components/Services";
 import Pricing from "./components/Pricing";
 import { Spinner } from "@/components/Spinner";
+import { BiEditAlt } from "react-icons/bi";
+import UpdateCompanyStatusModal from "../modals/UpdateCompanyStatusModal";
 
 const CompanyDetails = () => {
   const navigate = useNavigate();
+  const [openStatus, setOpenStatus] = useState(false);
+
   const initialTab = sessionStorage.getItem("companyTab");
   const [activeTab, setActiveTab] = useState(initialTab || "cover");
   const [underlineLeft, setUnderlineLeft] = useState(0);
@@ -86,6 +90,23 @@ const CompanyDetails = () => {
               <FaArrowLeft />
               Back
             </Button>
+
+            <Button
+              variant={"secondary"}
+              className="md:text-base text-sm"
+              onClick={() => setOpenStatus(true)}
+            >
+              <BiEditAlt />
+              Update Status
+            </Button>
+
+            <UpdateCompanyStatusModal
+              openStatus={openStatus}
+              setOpenStatus={setOpenStatus}
+              companyName={data?.data?.name}
+              companyId={companyId}
+              companyStatus={data?.data?.status}
+            />
           </div>
 
           <div className="grid lg:grid-cols-3 md:grid-cols-2 md:gap-6 gap-6 mb-4">
@@ -165,9 +186,9 @@ const CompanyDetails = () => {
                   //   sessionStorage.setItem("companyTab", tab.key);
                   // }}
                   onClick={() => {
-                    updateUnderline(index);
-                    setActiveTab(tab.key);
                     sessionStorage.setItem("companyTab", tab.key);
+                    setActiveTab(tab.key);
+                    updateUnderline(index);
                   }}
                 >
                   {tab.label}
@@ -204,8 +225,6 @@ const CompanyDetails = () => {
               )}
             </div>
           </div>
-
-          
         </div>
       )}
     </>

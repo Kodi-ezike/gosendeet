@@ -1,4 +1,10 @@
-import { getCompanyList, getCompanyPricing, getCompanyServices, getSingleCompany } from "@/services/companies";
+import {
+  getCompanyList,
+  getCompanyPricing,
+  getCompanyServices,
+  getCompanyStats,
+  getSingleCompany,
+} from "@/services/companies";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetCompanyServices = (id: string) => {
@@ -14,10 +20,17 @@ export const useGetCompanyServices = (id: string) => {
   };
 };
 
-export const useGetCompanyList = (page: number, size: number, companyStatus: string, serviceLevelId: string, search:string) => {
+export const useGetCompanyList = (
+  page: number,
+  size: number,
+  companyStatus: string,
+  serviceLevelId: string,
+  search: string
+) => {
   const query = useQuery({
     queryKey: ["companies", page, size, companyStatus, serviceLevelId, search],
-    queryFn: () => getCompanyList(page, size, companyStatus, serviceLevelId, search ),
+    queryFn: () =>
+      getCompanyList(page, size, companyStatus, serviceLevelId, search),
   });
   return {
     isLoading: query.isPending,
@@ -53,3 +66,15 @@ export const useGetSingleCompany = (id: string) => {
   };
 };
 
+export const useGetCompanyStats = () => {
+  const query = useQuery({
+    queryKey: ["companies"],
+    queryFn: () => getCompanyStats(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};

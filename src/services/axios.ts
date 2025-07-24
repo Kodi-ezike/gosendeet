@@ -1,5 +1,4 @@
 import axios from "axios";
-import { toast } from "sonner";
 
 export const authApi = axios.create({
   baseURL: "https://gosendeet-backend.onrender.com/api/v1",
@@ -30,17 +29,16 @@ api.interceptors.request.use(
   }
 );
 
-let redirected = false
+let redirected = false;
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    
-    if (status === 401 && !redirected) {   
-      redirected = true // Prevent repeat redirects
+
+    if (status === 401 && !redirected) {
+      redirected = true; // Prevent repeat redirects
       sessionStorage.clear(); // clear all session data
-      toast.error("User session expired");  
-       
+      sessionStorage.setItem("sessionExpired", "true");
     }
 
     return Promise.reject(error);

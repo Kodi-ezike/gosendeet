@@ -44,6 +44,18 @@ export const updateSingleCompany = async (id: string, data: any) => {
   }
 };
 
+export const updateCompanyStatus = async (status: string, data: any) => {
+  try {
+    const res = await api.put(
+      `/companies/status/update?status=${status}`,
+      data
+    );
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
 export const createCompanyServices = async (data: any) => {
   try {
     const res = await api.post(`/company-services`, data);
@@ -107,9 +119,20 @@ export const getCompanyPricing = async (id: string) => {
   }
 };
 
-export const deleteCompanyPricing = async (data: any) => {
+export const deleteCompanyPricing = async (data: { ids: string[] }) => {
   try {
-    const res = await api.delete(`delivery-pricing`, data);
+    const res = await api.delete(`delivery-pricing`, {
+      data, // Axios requires the payload to be inside a `data` key
+    });
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getCompanyStats = async () => {
+  try {
+    const res = await api.get(`/companies/stats/data`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
