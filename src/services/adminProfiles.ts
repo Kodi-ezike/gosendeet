@@ -25,3 +25,13 @@ export const getSingleProfile = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const updateProfileStatus = async (userId: string, status: string) => {
+  try {
+    const res = await api.post(`users/status?userId=${userId}&status=${status}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+

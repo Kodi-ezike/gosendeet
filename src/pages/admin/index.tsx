@@ -35,12 +35,12 @@ const AdminDashboard = () => {
     updateUnderline(currentIndex);
   }, [activeTab]);
 
-  const sessionExpired = sessionStorage.getItem("sessionExpired");
   useEffect(() => {
+    const sessionExpired = sessionStorage.getItem("sessionExpired");
     if (sessionExpired === "true") {
       toast.error("User session expired");
     }
-  }, [sessionExpired]);
+  }, []);
   return (
     <div className="md:px-20 px-6 py-10 bg-neutral100">
       <div className="flex xl:flex-row flex-col gap-2 justify-between xl:items-center">
