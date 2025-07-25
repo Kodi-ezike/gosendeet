@@ -21,6 +21,7 @@ import {
   createCompany,
   deleteCompanyPricing,
   deleteCompanyServices,
+  updateCompanyStatus,
 } from "@/services/companies";
 import { toast } from "sonner";
 import {
@@ -34,6 +35,7 @@ import { BiSolidTrashAlt } from "react-icons/bi";
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
+  console.log(status);
   const [searchParams] = useSearchParams();
   const companyId = searchParams.get("id") ?? ""; //?id=a3f93a6d-13b6-4684-bef4-171889b1cbc1
   const [openService, setOpenService] = useState(false);
@@ -140,14 +142,43 @@ const AddCompany = () => {
 
   const queryClient = useQueryClient();
 
+  const { mutate: updateCompany } = useMutation({
+    mutationFn: ({ status, data }: { status: string; data: any }) =>
+      updateCompanyStatus(status, data), // ✅ call with correct shape
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["companies"],
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
+
   const { mutate: create, isPending: pendingCreate } = useMutation({
     mutationFn: createCompany,
     onSuccess: (data) => {
       toast.success("Successful");
-      reset({
-        country: "",
-      });
-      const params = new URLSearchParams({ id: data?.data?.id });
+
+      const id = data?.data?.id;
+      if (!id) {
+        toast("Failed to get company ID.");
+        return;
+      }
+      if (status === "PUBLISHED") {
+        setTimeout(() => {
+          updateCompany({
+            status: "PUBLISHED",
+            data: {
+              ids: [id],
+            },
+          });
+        }, 3000);
+      }
+      reset(data?.data);
+      const params = new URLSearchParams({ id: id });
+
       navigate(`?${params.toString()}`);
       queryClient.invalidateQueries({
         queryKey: ["companies"],
@@ -179,7 +210,7 @@ const AddCompany = () => {
 
   const { mutate: deletePricing, isPending: pendingDeletePricing } =
     useMutation({
-      mutationFn:  deleteCompanyPricing, // ✅ call with correct shape
+      mutationFn: deleteCompanyPricing, // ✅ call with correct shape
 
       onSuccess: () => {
         toast.success("Successful");
@@ -194,10 +225,10 @@ const AddCompany = () => {
       },
     });
 
-  const handleDeletePricing = (id: string) => deletePricing({ids:[id]});
+  const handleDeletePricing = (id: string) => deletePricing({ ids: [id] });
 
-  const onSubmit = (data: z.infer<typeof schema>, status: string) => {
-    create({ ...data, status });
+  const onSubmit = (data: z.infer<typeof schema>) => {
+    create(data);
   };
 
   return (
@@ -225,7 +256,7 @@ const AddCompany = () => {
               onClick={() => {
                 handleSubmit((data) => {
                   setStatus("DRAFT");
-                  onSubmit(data, "DRAFT");
+                  onSubmit(data);
                 })();
               }}
               loading={pendingCreate && status === "DRAFT"}
@@ -238,7 +269,7 @@ const AddCompany = () => {
               onClick={() => {
                 handleSubmit((data) => {
                   setStatus("PUBLISHED");
-                  onSubmit(data, "PUBLISHED");
+                  onSubmit(data);
                 })();
               }}
               loading={pendingCreate && status === "PUBLISHED"}
