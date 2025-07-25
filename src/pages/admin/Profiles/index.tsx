@@ -11,7 +11,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 import UpdateUserStatusModal from "./modals/UpdateUserStatusModal";
 import { Link } from "react-router-dom";
-import { useGetProfiles } from "@/queries/admin/useGetAdminProfiles";
+import { useGetProfiles, useGetProfileStats } from "@/queries/admin/useGetAdminProfiles";
 import { Spinner } from "@/components/Spinner";
 
 const Profiles = () => {
@@ -31,6 +31,8 @@ const Profiles = () => {
   const role = "";
   const status = "";
 
+  const { data : profileStats } = useGetProfileStats()
+  
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
     page,
     size,
@@ -50,34 +52,26 @@ const Profiles = () => {
   }, [searchTerm]);
 
   const profiles = data?.data.content;
-  console.log(profiles);
 
   const filteredData = profiles?.filter((item: any) =>
     userStatus ? item.status === userStatus : true
-  );
-
-  const activeProfiles = profiles?.filter(
-    (item: any) => item.status === "active"
-  );
-  const inactiveProfiles = profiles?.filter(
-    (item: any) => item.status === "inactive"
   );
 
   const statusTabs = [
     {
       label: "All",
       status: "",
-      count: profiles?.length ?? 0,
+      count: profileStats?.data?.totalUsers ?? 0,
     },
     {
       label: "Active",
       status: "active",
-      count: activeProfiles?.length ?? 0,
+      count: profileStats?.data?.activeUsers ?? 0,
     },
     {
       label: "Inactive",
       status: "inactive",
-      count: inactiveProfiles?.length ?? 0,
+      count: profileStats?.data?.inactiveUsers ?? 0,
     },
   ];
 
@@ -117,7 +111,7 @@ const Profiles = () => {
         <div className="w-full flex flex-col gap-4 justify-between py-2">
           <p className="text-neutral500 text-sm">Active Profiles</p>
           <p className="text-[20px] font-inter font-semibold md:mb-6">
-            {activeProfiles?.length ?? 0}
+            {profileStats?.data?.activeUsers ?? 0}
           </p>
           {/* <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">
@@ -139,7 +133,7 @@ const Profiles = () => {
         <div className="w-full flex flex-col gap-4 justify-between py-2">
           <p className="text-neutral500 text-sm">Inactive Profiles</p>
           <p className="text-[20px] font-inter font-semibold md:mb-6">
-            {inactiveProfiles?.length ?? 0}
+            {profileStats?.data?.inactiveUsers ?? 0}
           </p>
           {/* <hr className="border-neutral700" />
           <div className="flex justify-between items-center py-2">

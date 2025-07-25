@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useLocation, useNavigate } from "react-router-dom";
 import Orders from "./Orders";
 import LoginHistory from "./LoginHistory";
-import { useGetSingleProfile } from "@/queries/admin/useGetAdminProfiles";
+import { useGetLoginHistory, useGetSingleProfile } from "@/queries/admin/useGetAdminProfiles";
 import { cn, formatTimestampToReadable, timeAgo } from "@/lib/utils";
 import { Spinner } from "@/components/Spinner";
 import { BiEditAlt } from "react-icons/bi";
@@ -17,10 +17,12 @@ const UserProfiles = () => {
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
 
   const { data, isLoading, isSuccess, isError } = useGetSingleProfile(userId);
+  const { data: login } = useGetLoginHistory(userId);
 
   const userData = data?.data ?? {};
 
-  const [activeTab, setActiveTab] = useState("orders");
+  const initialTab = sessionStorage.getItem("profileTab");
+    const [activeTab, setActiveTab] = useState(initialTab || "orders");
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -153,8 +155,13 @@ const UserProfiles = () => {
                     onMouseEnter={() => {
                       updateUnderline(index);
                       setActiveTab(tab.key);
+                      sessionStorage.setItem("profileTab", tab.key);
                     }}
-                    onClick={() => setActiveTab(tab.key)}
+                    onClick={() =>  {
+                      updateUnderline(index);
+                      setActiveTab(tab.key);
+                      sessionStorage.setItem("profileTab", tab.key);
+                    }}
                   >
                     {/* <ViewIcon/> */}
                     {tab.label}
@@ -176,7 +183,7 @@ const UserProfiles = () => {
           {/* Tab Content */}
           <div className="mt-6">
             {activeTab === "orders" && <Orders />}
-            {activeTab === "login" && <LoginHistory />}
+            {activeTab === "login" && <LoginHistory data={login}/>}
             {/* {activeTab === "settings" && <Settings />} */}
           </div>
         </div>
