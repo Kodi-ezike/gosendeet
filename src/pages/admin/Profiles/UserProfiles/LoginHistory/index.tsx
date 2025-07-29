@@ -1,3 +1,4 @@
+import { formatTimestampToReadable } from "@/lib/utils";
 import { IoSearchOutline } from "react-icons/io5";
 
 const LoginHistory = ({ data }: { data: any }) => {
@@ -41,7 +42,7 @@ const LoginHistory = ({ data }: { data: any }) => {
                     <p>{item.browser}</p>
                   </div>
                   <div className="flex-1">
-                    <p>11:37 PM, 27 May 2023 </p>
+                    <p>{formatTimestampToReadable(item.createdAt)}</p>
                   </div>
                 </div>
               );

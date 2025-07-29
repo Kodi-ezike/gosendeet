@@ -11,8 +11,13 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 import UpdateUserStatusModal from "./modals/UpdateUserStatusModal";
 import { Link } from "react-router-dom";
-import { useGetProfiles, useGetProfileStats } from "@/queries/admin/useGetAdminProfiles";
+import {
+  useGetProfiles,
+  useGetProfileStats,
+} from "@/queries/admin/useGetAdminProfiles";
 import { Spinner } from "@/components/Spinner";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
+import { PaginationComponent } from "@/components/Pagination";
 
 const Profiles = () => {
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
@@ -26,20 +31,25 @@ const Profiles = () => {
   const [debouncedProfileSearchTerm, setDebouncedProfileSearchTerm] =
     useState("");
 
-  const page = 0;
   const size = 10;
   const role = "";
-  const status = "";
 
-  const { data : profileStats } = useGetProfileStats()
-  
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
+
+  const { data: profileStats } = useGetProfileStats();
+
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
-    page,
+    currentPage,
     size,
-    status,
+    userStatus,
     role,
     debouncedProfileSearchTerm
   );
+
+  useEffect(() => {
+    setLastPage(data?.data?.page?.totalPages);
+  }, [data]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -53,9 +63,9 @@ const Profiles = () => {
 
   const profiles = data?.data.content;
 
-  const filteredData = profiles?.filter((item: any) =>
-    userStatus ? item.status === userStatus : true
-  );
+  // const filteredData = profiles?.filter((item: any) =>
+  //   userStatus ? item.status === userStatus : true
+  // );
 
   const statusTabs = [
     {
@@ -211,98 +221,107 @@ const Profiles = () => {
       )}
 
       {!isLoading && isSuccess && data && profiles?.length > 0 && (
-        <div className="overflow-x-auto">
-          <div className="min-w-[1100px] w-full relative">
-            <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
-              <span className="w-[1%] mr-4">
-                <input type="checkbox" name="" id="" className="mt-[2px]" />
-              </span>
-              <span className="flex-1">Customer</span>
-              <span className="flex-1">Email</span>
-              <span className="flex-1">Date Created</span>
-              <span className="flex-1">Last Login time</span>
-              <span className="flex-1">Status</span>
-              <span className="w-[2%]"></span>
-            </div>
+        <>
+          <div className="overflow-x-auto">
+            <div className="min-w-[1100px] w-full relative">
+              <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
+                <span className="w-[1%] mr-4">
+                  <input type="checkbox" name="" id="" className="mt-[2px]" />
+                </span>
+                <span className="flex-1">Customer</span>
+                <span className="flex-1">Email</span>
+                <span className="flex-1">Date Created</span>
+                <span className="flex-1">Last Login time</span>
+                <span className="flex-1">Status</span>
+                <span className="w-[2%]"></span>
+              </div>
 
-            {filteredData?.map((item: any, index: number) => {
-              return (
-                <div
-                  key={index}
-                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                  } hover:bg-purple300`}
-                >
-                  <span className="w-[1%] mr-4">
-                    <input type="checkbox" name="" id="" className="mt-1" />
-                  </span>
-                  <div className="flex-1">
-                    <p className="font-medium">{item.username}</p>
-                  </div>
-                  <div className="flex-1">
-                    <p>{item.email}</p>
-                  </div>
-                  <div className="flex-1">
-                    <p>{formatTimestampToReadable(item.createdAt)}</p>
-                  </div>
-                  <div className="flex-1">
-                    {item.lastLogin ? timeAgo(item.lastLogin) : "N/A"}
-                  </div>
+              {profiles?.map((item: any, index: number) => {
+                return (
+                  <div
+                    key={index}
+                    className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
+                      index === 0
+                        ? "border-b-0"
+                        : "border-b border-b-neutral300"
+                    } hover:bg-purple300`}
+                  >
+                    <span className="w-[1%] mr-4">
+                      <input type="checkbox" name="" id="" className="mt-1" />
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-medium">{item.username}</p>
+                    </div>
+                    <div className="flex-1">
+                      <p>{item.email}</p>
+                    </div>
+                    <div className="flex-1">
+                      <p>{formatTimestampToReadable(item.createdAt)}</p>
+                    </div>
+                    <div className="flex-1">
+                      {item.lastLogin ? timeAgo(item.lastLogin) : "N/A"}
+                    </div>
 
-                  <div className="flex-1">
-                    <p
-                      className={cn(
-                        item.status === "active"
-                          ? "bg-green100 text-green500"
-                          : "bg-[#FEF2F2] text-[#EC2D30]",
-                        "px-4 py-1 w-fit font-medium rounded-2xl capitalize"
-                      )}
-                    >
-                      {item.status}
-                    </p>
-                  </div>
-                  <div className="w-[2%]">
-                    <button className="border p-1 rounded-md border-neutral200">
-                      <BsThreeDotsVertical
-                        size={20}
-                        className="p-1 cursor-pointer"
-                        onClick={() => showModal(index)}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Modal */}
-                  {activeModalId === index && ( // Show modal only for the active event
-                    <div
-                      className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                      ref={modalRef} // Attach ref to the modal
-                    >
-                      <Link
-                        to={`/admin-dashboard/user/${index + 1}`}
-                        state={{ id: item.id }}
-                      >
-                        <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                          View Profile
-                        </p>
-                      </Link>
+                    <div className="flex-1">
                       <p
-                        className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                        onClick={() => {
-                          setUsername(item.username);
-                          setUserId(item.id);
-                          setOpenUpdateStatus(true);
-                          setSingleUserStatus(item.status);
-                        }}
+                        className={cn(
+                          item.status === "active"
+                            ? "bg-green100 text-green500"
+                            : "bg-[#FEF2F2] text-[#EC2D30]",
+                          "px-4 py-1 w-fit font-medium rounded-2xl capitalize"
+                        )}
                       >
-                        Update status
+                        {item.status}
                       </p>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                    <div className="w-[2%]">
+                      <button className="border p-1 rounded-md border-neutral200">
+                        <BsThreeDotsVertical
+                          size={20}
+                          className="p-1 cursor-pointer"
+                          onClick={() => showModal(index)}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Modal */}
+                    {activeModalId === index && ( // Show modal only for the active event
+                      <div
+                        className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
+                        ref={modalRef} // Attach ref to the modal
+                      >
+                        <Link
+                          to={`/admin-dashboard/user/${index + 1}`}
+                          state={{ id: item.id }}
+                        >
+                          <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                            View Profile
+                          </p>
+                        </Link>
+                        <p
+                          className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                          onClick={() => {
+                            setUsername(item.username);
+                            setUserId(item.id);
+                            setOpenUpdateStatus(true);
+                            setSingleUserStatus(item.status);
+                          }}
+                        >
+                          Update status
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+          <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
+        </>
       )}
       {data && profiles?.length === 0 && !isLoading && isSuccess && (
         <div className="h-[50vh] w-full flex justify-center flex-col items-center">

@@ -21,6 +21,8 @@ import {
 import { Spinner } from "@/components/Spinner";
 import { UpdateCompanyModal } from "./modals/UpdateCompanyModal";
 import UpdateCompanyStatusModal from "./modals/UpdateCompanyStatusModal";
+import { PaginationComponent } from "@/components/Pagination";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
 
 const Companies = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
@@ -36,21 +38,26 @@ const Companies = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [companyStatus, setCompanyStatus] = useState("");
 
-  const page = 0;
   const size = 10;
-  const status = "";
   const serviceLevelId = "";
+
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
 
   const { data: stats } = useGetCompanyStats();
   const companyStats = stats?.data ?? {};
 
   const { data, isLoading, isSuccess, isError } = useGetCompanyList(
-    page,
+    currentPage,
     size,
-    status,
+    companyStatus,
     serviceLevelId,
     debouncedSearchTerm
   );
+
+  useEffect(() => {
+    setLastPage(data?.data?.page?.totalPages);
+  }, [data]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -62,9 +69,9 @@ const Companies = () => {
     };
   }, [searchTerm]);
 
-  const filteredData = data?.data?.content?.filter((item: any) =>
-    companyStatus ? item.status === companyStatus : true
-  );
+  // const filteredData = data?.data?.content?.filter((item: any) =>
+  //   companyStatus ? item.status === companyStatus : true
+  // );
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -261,6 +268,7 @@ const Companies = () => {
       )}
 
       {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
+        <>
         <div className="overflow-x-auto">
           <div className="min-w-[1200px] w-full relative">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
@@ -277,7 +285,7 @@ const Companies = () => {
               <span className="w-[2%]"></span>
             </div>
 
-            {filteredData?.map((item: any, index: number) => {
+            {data?.data?.content?.map((item: any, index: number) => {
               return (
                 <div
                   key={index}
@@ -351,6 +359,12 @@ const Companies = () => {
             })}
           </div>
         </div>
+        <PaginationComponent
+              lastPage={data?.data?.page?.totalPages}
+              currentPage={currentPage}
+              handlePageChange={updatePage}
+            />
+        </>
       )}
 
       {data && data?.data?.content?.length === 0 && !isLoading && isSuccess && (
