@@ -1,14 +1,10 @@
-import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 import { ChangePassword } from "./modals/ChangePassword";
 import { DeactivateAccount } from "./modals/DeactivateAccount";
 import { DeleteAccount } from "./modals/DeleteAccount";
 import { ReactivateAccount } from "./modals/ReactivateAccount";
 
-const Security = () => {
-  const userId = localStorage.getItem("userId") || "";
-
-  const { data: userData } = useGetUserDetails(userId);
-  const userStatus = userData?.data?.status ?? "";
+const Security = ({ data }: { data: any }) => {
+  const userStatus = data?.data?.status ?? "";
   return (
     <div className="md:px-4">
       <div className="mb-8">

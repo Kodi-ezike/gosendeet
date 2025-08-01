@@ -1,7 +1,11 @@
-import { FaCircleCheck } from "react-icons/fa6";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { FiEdit } from "react-icons/fi";
+import { UpdateProfileModal } from "./UpdateProfileModal";
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ data }: { data: any }) => {
+  const userData = data?.data;
+  const [open, setOpen] = useState(false);
   return (
     <div className="flex lg:flex-row flex-col gap-8 mb-8">
       <div className="lg:w-[40%] md:px-4">
@@ -13,35 +17,63 @@ const PersonalDetails = () => {
       <div className="lg:w-[60%] md:px-4">
         <div className="flex mt-2">
           <div className="w-1/2 mb-8">
-            <h2 className="font-clash font-semibold text-sm mb-2">
-              First Name
-            </h2>
-            <p className="text-neutral800 text-sm">Victor</p>
+            <h2 className="font-clash font-semibold text-sm mb-2">Username</h2>
+            <p className="text-neutral800 text-sm">
+              {userData?.username ?? "--"}
+            </p>
           </div>
           <div className="w-1/2 mb-8">
-            <h2 className="font-clash font-semibold text-sm mb-2">Last Name</h2>
-            <p className="text-neutral800 text-sm">Agbeniga</p>
+            <h2 className="font-clash font-semibold text-sm mb-2">
+              Email Address
+            </h2>
+            <p className="text-neutral800 text-sm">{userData?.email ?? "--"}</p>
+          </div>
+        </div>
+        <div className="flex mt-2">
+          <div className="w-1/2 mb-8">
+            <h2 className="font-clash font-semibold text-sm mb-2">
+              Phone number
+            </h2>
+            <p className="text-neutral800 text-sm">{userData?.phone ?? "--"}</p>
+          </div>
+          <div className="w-1/2 mb-8">
+            <h2 className="font-clash font-semibold text-sm mb-2">
+              Postal code
+            </h2>
+            <p className="text-neutral800 text-sm">
+              {userData?.postalCode ?? "--"}
+            </p>
+          </div>
+        </div>
+        <div className="flex mt-2">
+          <div className="w-1/2 mb-8">
+            <h2 className="font-clash font-semibold text-sm mb-2">State</h2>
+            <p className="text-neutral800 text-sm">{userData?.state ?? "--"}</p>
+          </div>
+          <div className="w-1/2 mb-8">
+            <h2 className="font-clash font-semibold text-sm mb-2">Country</h2>
+            <p className="text-neutral800 text-sm">
+              {userData?.country ?? "--"}
+            </p>
           </div>
         </div>
         <div className="mb-8">
-          <h2 className="font-clash font-semibold text-sm mb-2">
-            Email Address
-          </h2>
-          <p className="text-neutral500 text-sm">thevictoragbeniga@gmail.com</p>
+          <h2 className="font-clash font-semibold text-sm mb-2">Address</h2>
+          <p className="text-neutral500 text-sm">{userData?.address ?? "--"}</p>
         </div>
-        <div className="mb-5">
-          <h2 className="font-clash font-semibold text-sm mb-2">User ID</h2>
-          <p className="text-neutral500 text-sm">3948774</p>
-        </div>
-        <p className="flex items-center gap-2 bg-[#E7F6EC] text-[#0F973D] rounded-xl text-xs font-medium w-fit px-3 py-1 mb-5">
-          <FaCircleCheck className="text-[#0F973D]" />
-          This user ID is active
-        </p>
-        <p className="flex items-center gap-2  text-purple500 font-medium">
+
+        <Button
+          className="text-purple500 hover:text-purple700"
+          variant={"ghost"}
+          size={"ghost"}
+          onClick={() => setOpen(true)}
+        >
           <FiEdit />
           Edit
-        </p>
+        </Button>
       </div>
+
+      <UpdateProfileModal open={open} setOpen={setOpen} data={userData} />
     </div>
   );
 };

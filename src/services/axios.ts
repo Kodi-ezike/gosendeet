@@ -44,6 +44,10 @@ api.interceptors.response.use(
       const isDashboard = window.location.pathname.includes("dashboard");
       if (isDashboard) {
         toast.error("User session expired");
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          window.location.href = "/signin";
+        }, 2000);
       }
     }
 

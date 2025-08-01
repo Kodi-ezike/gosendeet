@@ -5,7 +5,7 @@ const usePaginationSync = (lastPage: number) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);

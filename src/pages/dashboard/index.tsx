@@ -4,6 +4,7 @@ import Notifications from "./Notifications";
 import Bookings from "./Bookings";
 import ProfileSettings from "./ProfileSettings";
 import Security from "./Security";
+import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const Dashboard = () => {
@@ -33,6 +34,17 @@ const Dashboard = () => {
     const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
     updateUnderline(currentIndex);
   }, [activeTab]);
+
+  const userId = sessionStorage.getItem("userId") || "";
+
+  const { data: userData, refetchUserData } = useGetUserDetails(userId);
+
+  useEffect(() => {
+      if (userId) {
+        refetchUserData();
+      }
+    }, [userId]);
+
   return (
     <div className="md:px-20 px-6 py-10 bg-neutral100">
       <div className="flex xl:flex-row flex-col gap-2 justify-between xl:items-center">
@@ -84,13 +96,13 @@ const Dashboard = () => {
 
       {/* Tab Content */}
       <div className="mt-6">
-        {activeTab === "overview" && <Overview />}
+        {activeTab === "overview" && <Overview data={userData}/>}
         {activeTab === "notifications" && (
           <Notifications setActiveTab={setActiveTab} />
         )}
         {activeTab === "bookings" && <Bookings />}
-        {activeTab === "settings" && <ProfileSettings />}
-        {activeTab === "security" && <Security />}
+        {activeTab === "settings" && <ProfileSettings data={userData}/>}
+        {activeTab === "security" && <Security data={userData}/>}
       </div>
     </div>
   );

@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/select";
 import { countries } from "@/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateSingleCompany } from "@/services/companies";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { updateUserProfile } from "@/services/user";
 
-export function UpdateCompanyModal({
+export function UpdateProfileModal({
   open,
   setOpen,
   data,
@@ -30,28 +30,24 @@ export function UpdateCompanyModal({
   setOpen: any;
   data: any;
 }) {
-  const companyId = data?.id ?? "";
+  const userId = data?.id ?? "";
   const schema = z.object({
-    name: z
-      .string({ required_error: "Company name is required" })
-      .min(1, { message: "Please enter company name" }),
-    website: z
-      .string({ required_error: "Company website is required" })
-      .url({ message: "Please enter valid url with https://" })
-      .min(1, { message: "Please enter company website" }),
+    username: z
+      .string({ required_error: "Username is required" })
+      .min(1, { message: "Please enter username" }),
     email: z
-      .string({ required_error: "Company email is required" })
+      .string({ required_error: "Email is required" })
       .email({ message: "Please enter valid email" })
-      .min(1, { message: "Please enter company email" }),
+      .min(1, { message: "Please enter email" }),
     phone: z
-      .string({ required_error: "Company number is required" })
+      .string({ required_error: "Phone number is required" })
       .min(11, { message: "Please enter valid phone number" }),
     address: z
-      .string({ required_error: "Company address is required" })
-      .min(1, { message: "Please enter company address" }),
-    city: z
-      .string({ required_error: "City is required" })
-      .min(1, { message: "Please enter city" }),
+      .string({ required_error: "Address is required" })
+      .min(1, { message: "Please enter address" }),
+    postalCode: z
+      .string({ required_error: "Postal code is required" })
+      .min(1, { message: "Please enter postal code" }),
     state: z
       .string({ required_error: "State is required" })
       .min(1, { message: "Please enter state" }),
@@ -74,12 +70,11 @@ export function UpdateCompanyModal({
   useEffect(() => {
     if (data && open) {
       reset({
-        name: data.name ?? "",
-        website: data.website ?? "",
+        username: data.username ?? "",
+        postalCode: data.postalCode ?? "",
         email: data.email ?? "",
         phone: data.phone ?? "",
         address: data.address ?? "",
-        city: data.city ?? "",
         state: data.state ?? "",
         country: data.country ?? "",
       });
@@ -88,19 +83,16 @@ export function UpdateCompanyModal({
 
   const queryClient = useQueryClient();
 
-  const { mutate: updateCompany, isPending: pendingUpdate } = useMutation({
+  const { mutate: updateProfile, isPending: pendingUpdate } = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
-      updateSingleCompany(id, data), // ✅ call with correct shape
+      updateUserProfile(id, data), // ✅ call with correct shape
 
     onSuccess: () => {
       toast.success("Successful");
       setOpen(false);
       reset();
       queryClient.invalidateQueries({
-        queryKey: ["single_company"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["companies"],
+        queryKey: ["user"],
       });
     },
 
@@ -110,8 +102,8 @@ export function UpdateCompanyModal({
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    updateCompany({
-      id: companyId,
+    updateProfile({
+      id: userId,
       data,
     });
   };
@@ -120,69 +112,47 @@ export function UpdateCompanyModal({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="gap-0">
         <DialogTitle className="text-[20px] font-semibold font-inter mb-2">
-          Update Company Info
+          Update Profile
         </DialogTitle>
         <DialogDescription className="font-medium text-sm text-neutral600">
-          Edit basic details about the company
+          Edit basic details about your profile
         </DialogDescription>
         <>
           <div className="py-4 text-sm mt-4">
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-8"
+              className="flex flex-col md:gap-8 gap-4"
             >
               <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="name" className="font-inter font-semibold">
-                    Company Name
+                    Username
                   </label>
                   <div className="flex justify-between items-center gap-2 border-b">
                     <input
                       type="text"
-                      {...register("name")}
+                      {...register("username")}
                       // defaultValue={data?.name}
-                      placeholder="Enter company name"
+                      placeholder="Enter username"
                       className="w-full outline-0 border-b-0 py-2 "
                     />
                   </div>
-                  {errors.name && (
+                  {errors.username && (
                     <p className="error text-xs text-[#FF0000]">
-                      {errors.name.message}
+                      {errors.username.message}
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="website" className="font-inter font-semibold">
-                    Company Website
-                  </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
-                    <input
-                      type="text"
-                      {...register("website")}
-                      // defaultValue={data?.website}
-                      placeholder="Enter company website"
-                      className="w-full outline-0 border-b-0 py-2 "
-                    />
-                  </div>
-                  {errors.website && (
-                    <p className="error text-xs text-[#FF0000]">
-                      {errors.website.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="email" className="font-inter font-semibold">
-                    Company Email
+                    Email Address
                   </label>
                   <div className="flex justify-between items-center gap-2 border-b">
                     <input
                       type="text"
                       {...register("email")}
                       // defaultValue={data?.email}
-                      placeholder="Enter company email"
+                      placeholder="Enter your email"
                       className="w-full outline-0 border-b-0 py-2 "
                     />
                   </div>
@@ -192,16 +162,19 @@ export function UpdateCompanyModal({
                     </p>
                   )}
                 </div>
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="phone" className="font-inter font-semibold">
-                    Company Contact Number
+                    Phone Number
                   </label>
                   <div className="flex justify-between items-center gap-2 border-b">
                     <input
                       type="text"
                       {...register("phone")}
                       // defaultValue={data?.phone}
-                      placeholder="Enter company number"
+                      placeholder="Enter phone number"
                       className="w-full outline-0 border-b-0 py-2"
                       onKeyDown={(event) => {
                         if (
@@ -220,19 +193,48 @@ export function UpdateCompanyModal({
                     </p>
                   )}
                 </div>
+
+                <div className="flex flex-col gap-2 w-full">
+                  <label htmlFor="email" className="font-inter font-semibold">
+                    Postal Code
+                  </label>
+                  <div className="flex justify-between items-center gap-2 border-b">
+                    <input
+                      type="text"
+                      {...register("postalCode")}
+                      // defaultValue={data?.email}
+                      placeholder="Enter postal code"
+                      className="w-full outline-0 border-b-0 py-2 "
+                      onKeyDown={(event) => {
+                        if (
+                          !/[0-9]/.test(event.key) &&
+                          event.key !== "Backspace" &&
+                          event.key !== "Tab"
+                        ) {
+                          event.preventDefault();
+                        }
+                      }}
+                    />
+                  </div>
+                  {errors.postalCode && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.postalCode.message}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="address" className="font-inter font-semibold">
-                    Company Address
+                    Address
                   </label>
                   <div className="flex justify-between items-center gap-2 border-b">
                     <input
                       type="text"
                       {...register("address")}
                       // defaultValue={data?.address}
-                      placeholder="Enter company address"
+                      placeholder="Enter your address"
                       className="w-full outline-0 border-b-0 py-2"
                     />
                   </div>
@@ -242,28 +244,7 @@ export function UpdateCompanyModal({
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="city" className="font-inter font-semibold">
-                    City
-                  </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
-                    <input
-                      type="text"
-                      {...register("city")}
-                      // defaultValue={data?.city}
-                      placeholder="Enter city"
-                      className="w-full outline-0 border-b-0 py-2 "
-                    />
-                  </div>
-                  {errors.city && (
-                    <p className="error text-xs text-[#FF0000]">
-                      {errors.city.message}
-                    </p>
-                  )}
-                </div>
-              </div>
 
-              <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="state" className="font-inter font-semibold">
                     State
@@ -283,6 +264,9 @@ export function UpdateCompanyModal({
                     </p>
                   )}
                 </div>
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="country" className="font-inter font-semibold">
                     Country
