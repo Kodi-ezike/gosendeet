@@ -127,8 +127,8 @@ const CompanyDetails = () => {
 
               <div className="flex-1 flex flex-col gap-2">
                 {companyServices &&
-                  companyServices?.length > 0 &&
-                  companyServices?.map((item: any, index: number) => (
+                  companyServices?.content?.length > 0 &&
+                  companyServices?.content?.map((item: any, index: number) => (
                     <div
                       key={index}
                       className="flex gap-2 items-center bg-purple200 w-fit py-[6px] px-[8px] rounded-full md:justify-self-end"
@@ -144,7 +144,7 @@ const CompanyDetails = () => {
                     </div>
                   ))}
 
-                {companyServices && companyServices?.length === 0 && (
+                {companyServices && companyServices?.content?.length === 0 && (
                   <p className="">No services added</p>
                 )}
 

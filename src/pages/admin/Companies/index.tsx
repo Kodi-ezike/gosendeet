@@ -40,35 +40,35 @@ const Companies = () => {
 
   const size = 10;
   const serviceLevelId = "";
-  const resetPageRef = useRef(false);
+  // const resetPageRef = useRef(false);
 
   const [lastPage, setLastPage] = useState(1);
-  const { currentPage, setCurrentPage, updatePage } =
+  const { currentPage, updatePage } =
     usePaginationSync(lastPage);
 
   const { data: stats } = useGetCompanyStats();
   const companyStats = stats?.data ?? {};
 
-  useEffect(() => {
-    resetPageRef.current = true;
-    setCurrentPage(1); // Triggers a rerender
-  }, [companyStatus]);
+  // useEffect(() => {
+  //   resetPageRef.current = true;
+  //   setCurrentPage(1); // Triggers a rerender
+  // }, [companyStatus]);
 
   const { data, isLoading, isSuccess, isError } = useGetCompanyList(
-    resetPageRef.current ? 1 : currentPage, // 👈 Always fetch page 1 during status change
+    currentPage, // 👈 Always fetch page 1 during status change
     size,
     companyStatus,
     serviceLevelId,
     debouncedSearchTerm,
-    {
-      enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
-      queryKey: [
-        "companies",
-        resetPageRef.current ? 1 : currentPage,
-        companyStatus,
-        debouncedSearchTerm,
-      ],
-    }
+    // {
+    //   enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
+    //   queryKey: [
+    //     "companies",
+    //     resetPageRef.current ? 1 : currentPage,
+    //     companyStatus,
+    //     debouncedSearchTerm,
+    //   ],
+    // }
   );
 
   useEffect(() => {

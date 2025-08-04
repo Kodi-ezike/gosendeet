@@ -17,19 +17,22 @@ import {
 } from "@/components/ui/select";
 import { getQuotes } from "@/services/user";
 import { toast } from "sonner";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Overview = ({data}: {data: any}) => {
-  
+const Overview = ({ data }: { data: any }) => {
+  const navigate = useNavigate();
   const username = data?.data?.username;
   const userStatus = data?.data?.status;
 
-  const { data: packageTypes } =useGetPackageType({ minimize: false });;
+  const [inputData, setInputData] = useState({});
+
+  const { data: packageTypes } = useGetPackageType({ minimize: false });
 
   const packages = packageTypes?.data?.content;
-  console.log(packages)
 
   const schema = z.object({
     pickupLocation: z
@@ -56,22 +59,19 @@ const Overview = ({data}: {data: any}) => {
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
-  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
     mutationFn: getQuotes,
     onSuccess: (data: any) => {
-      toast.success("Successful");
-      console.log(data);
-
-      // reset(data?.data);
-      // const params = new URLSearchParams({ id: id });
-
-      // navigate(`?${params.toString()}`);
-
-      queryClient.invalidateQueries({
-        queryKey: ["companies"],
-      });
+      if (data?.data?.length > 0) {
+        toast.success("Successful");
+        navigate("/cost-calculator", {
+          state: {
+            inputData: inputData,
+            results: data,
+          },
+        });
+      }
     },
     onError: (data: any) => {
       toast.error(data?.message);
@@ -79,12 +79,8 @@ const Overview = ({data}: {data: any}) => {
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    // updateCompany({
-    //   id: companyId,
-    //   data,
-    // });
+    setInputData(data);
     mutate([data]);
-    console.log(data);
   };
 
   return (
@@ -157,7 +153,7 @@ const Overview = ({data}: {data: any}) => {
               <img src={size} alt="size" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label htmlFor="location" className="font-clash font-semibold">
-                  Packaging & Weight
+                  Package Type
                 </label>
 
                 <Select
