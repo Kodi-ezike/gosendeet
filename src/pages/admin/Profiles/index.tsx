@@ -33,23 +33,42 @@ const Profiles = () => {
 
   const size = 10;
   const role = "";
+  const resetPageRef = useRef(false);
 
   const [lastPage, setLastPage] = useState(1);
-  const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const { currentPage, setCurrentPage, updatePage } =
+    usePaginationSync(lastPage);
 
   const { data: profileStats } = useGetProfileStats();
 
+  useEffect(() => {
+      resetPageRef.current = true;
+      setCurrentPage(1); // Triggers a rerender
+    }, [userStatus]);
+
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
-    currentPage,
+    resetPageRef.current ? 1 : currentPage, // 👈 Always fetch page 1 during status change
     size,
     userStatus,
     role,
-    debouncedProfileSearchTerm
+    debouncedProfileSearchTerm,
+    {
+      enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
+      queryKey: [
+        "profiles",
+        resetPageRef.current ? 1 : currentPage,
+        userStatus,
+        debouncedProfileSearchTerm,
+      ],
+    }
   );
 
-  useEffect(() => {
-    setLastPage(data?.data?.page?.totalPages);
-  }, [data]);
+ useEffect(() => {
+     const totalPages = data?.data?.page?.totalPages;
+     if (totalPages && totalPages !== lastPage) {
+       setLastPage(totalPages);
+     }
+   }, [data?.data?.page?.totalPages]);
 
   useEffect(() => {
     const handler = setTimeout(() => {

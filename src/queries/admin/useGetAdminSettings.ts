@@ -1,10 +1,10 @@
 import { getAdminDimensionUnits, getAdminWeightUnits, getCoverageArea, getLocationCode, getPackageType, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetServiceLevel = () => {
+export const useGetServiceLevel = (options?: { page?: number; minimize?: boolean }) => {
   const query = useQuery({
-    queryKey: ["service_level"],
-    queryFn: () => getServiceLevel(),
+    queryKey: ["service_level", options],
+    queryFn: () => getServiceLevel(options),
   });
   return {
     isLoading: query.isPending,
@@ -14,10 +14,10 @@ export const useGetServiceLevel = () => {
   };
 };
 
-export const useGetPickupOptions = () => {
+export const useGetPickupOptions = (options?: { page?: number; minimize?: boolean }) => {
   const query = useQuery({
-    queryKey: ["pickup_options"],
-    queryFn: () => getPickupOptions(),
+    queryKey: ["pickup_options", options],
+    queryFn: () => getPickupOptions(options),
   });
   return {
     isLoading: query.isPending,
@@ -27,10 +27,10 @@ export const useGetPickupOptions = () => {
   };
 };
 
-export const useGetCoverageArea = () => {
+export const useGetCoverageArea = (options?: { page?: number; minimize?: boolean }) => {
   const query = useQuery({
-    queryKey: ["coverage_areas"],
-    queryFn: () => getCoverageArea(),
+    queryKey: ["coverage_areas", options],
+    queryFn: () => getCoverageArea(options),
   });
   return {
     isLoading: query.isPending,
@@ -40,10 +40,10 @@ export const useGetCoverageArea = () => {
   };
 };
 
-export const useGetLocationCode = () => {
+export const useGetLocationCode = (options?: { page?: number; minimize?: boolean }) => {
   const query = useQuery({
-    queryKey: ["location_codes"],
-    queryFn: () => getLocationCode(),
+    queryKey: ["location_codes", options],
+    queryFn: () => getLocationCode(options),
   });
   return {
     isLoading: query.isPending,
@@ -53,11 +53,13 @@ export const useGetLocationCode = () => {
   };
 };
 
-export const useGetPackageType = () => {
+export const useGetPackageType = (options?: { page?: number; minimize?: boolean }) => {
   const query = useQuery({
-    queryKey: ["package_types"],
-    queryFn: () => getPackageType(),
+    queryKey: ["package_types", options],
+    queryFn: () => getPackageType(options),
+    enabled: !!options, // avoid running if no param is passed
   });
+
   return {
     isLoading: query.isPending,
     isSuccess: query.isSuccess,

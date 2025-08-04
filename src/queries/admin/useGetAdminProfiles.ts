@@ -1,10 +1,23 @@
-import { getLoginHistory, getProfiles, getProfileStats, getSingleProfile } from "@/services/adminProfiles";
-import { useQuery } from "@tanstack/react-query";
+import {
+  getLoginHistory,
+  getProfiles,
+  getProfileStats,
+  getSingleProfile,
+} from "@/services/adminProfiles";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
-export const useGetProfiles = (page: number, size: number, userStatus: string, role: string, search:string) => {
+export const useGetProfiles = (
+  page: number,
+  size: number,
+  userStatus: string,
+  role: string,
+  search: string,
+  options?: UseQueryOptions<any>
+) => {
   const query = useQuery({
     queryKey: ["profiles", page, size, userStatus, role, search],
-    queryFn: () => getProfiles(page, size, userStatus, role, search ),
+    queryFn: () => getProfiles(page, size, userStatus, role, search),
+    ...options, // spread options last to allow overriding defaults
   });
   return {
     isLoading: query.isPending,

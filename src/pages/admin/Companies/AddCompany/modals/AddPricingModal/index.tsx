@@ -193,7 +193,7 @@ export function AddPricingModal({
                       <SelectContent>
                         {type === "create" &&
                           company_services &&
-                          company_services?.data?.map(
+                          company_services?.data?.content?.map(
                             (item: any, index: number) => (
                               <SelectItem
                                 value={item.companyServiceLevel.id}
@@ -205,7 +205,7 @@ export function AddPricingModal({
                           )}
                         {type === "edit" &&
                           service_level &&
-                          service_level?.data?.map(
+                          service_level?.data?.content?.map(
                             (item: any, index: number) => (
                               <SelectItem value={item.id} key={index}>
                                 {item.name}

@@ -56,11 +56,12 @@ export function AddServiceModal({
   );
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
-  const { data: service_level } = useGetServiceLevel();
-  const { data: pickup_options } = useGetPickupOptions();
-  const { data: package_types } = useGetPackageType();
-  const { data: location_codes } = useGetLocationCode();
-  const { data: coverage_areas } = useGetCoverageArea();
+  const { data: service_level } = useGetServiceLevel({ minimize: true });
+  console.log(service_level)
+  const { data: pickup_options } = useGetPickupOptions({ minimize: true });
+  const { data: package_types } = useGetPackageType({ minimize: true });
+  const { data: location_codes } = useGetLocationCode({ minimize: true });
+  const { data: coverage_areas } = useGetCoverageArea({ minimize: true });
 
   const pickupOptions = pickup_options?.data?.map((item: any) => {
     return {
@@ -68,7 +69,7 @@ export function AddServiceModal({
       value: item.id,
     };
   });
-  const packageOptions = package_types?.data?.content?.map((item: any) => {
+  const packageOptions = package_types?.data?.map((item: any) => {
     return {
       label: item.name,
       value: item.id,

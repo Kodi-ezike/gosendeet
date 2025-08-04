@@ -5,7 +5,7 @@ import {
   getCompanyStats,
   getSingleCompany,
 } from "@/services/companies";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export const useGetCompanyServices = (id: string) => {
   const query = useQuery({
@@ -25,12 +25,14 @@ export const useGetCompanyList = (
   size: number,
   companyStatus: string,
   serviceLevelId: string,
-  search: string
+  search: string,
+  options?: UseQueryOptions<any> // from react-query
 ) => {
   const query = useQuery({
     queryKey: ["companies", page, size, companyStatus, serviceLevelId, search],
     queryFn: () =>
       getCompanyList(page, size, companyStatus, serviceLevelId, search),
+    ...options, // spread options last to allow overriding defaults
   });
   return {
     isLoading: query.isPending,

@@ -84,7 +84,7 @@ const Services = ({
           <FiEdit /> Add <span className="md:block hidden">New</span> Service
         </Button>
       </div>
-      {companyServices && companyServices?.length > 0 && (
+      {companyServices && companyServices?.content?.length > 0 && (
         <div className="overflow-auto mb-8">
           <div className="min-w-[1000px] w-full">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 lg:text-md font-inter font-semibold bg-purple300 w-full">
@@ -99,7 +99,7 @@ const Services = ({
               <span className="w-[2%]"></span>
             </div>
 
-            {companyServices?.map((item: any, index: number) => {
+            {companyServices?.content?.map((item: any, index: number) => {
               const isDeleteModalOpen = openDeleteModal === index;
               return (
                 <div
@@ -187,7 +187,7 @@ const Services = ({
         </div>
       )}
 
-      {companyServices && companyServices?.length === 0 && (
+      {companyServices && companyServices?.content?.length === 0 && (
         <div className="h-[50vh] w-full flex justify-center flex-col items-center">
           <p className="font-semibold font-inter text-xl text-center">
             There are no results

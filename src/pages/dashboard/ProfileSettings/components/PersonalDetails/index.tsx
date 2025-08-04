@@ -15,7 +15,7 @@ const PersonalDetails = ({ data }: { data: any }) => {
         <p className="text-neutral600 text-sm">Information about yourself</p>
       </div>
       <div className="lg:w-[60%] md:px-4">
-        <div className="flex mt-2">
+        <div className="flex mt-2 gap-4">
           <div className="w-1/2 mb-8">
             <h2 className="font-clash font-semibold text-sm mb-2">Username</h2>
             <p className="text-neutral800 text-sm">
@@ -29,7 +29,7 @@ const PersonalDetails = ({ data }: { data: any }) => {
             <p className="text-neutral800 text-sm">{userData?.email ?? "--"}</p>
           </div>
         </div>
-        <div className="flex mt-2">
+        <div className="flex mt-2 gap-4">
           <div className="w-1/2 mb-8">
             <h2 className="font-clash font-semibold text-sm mb-2">
               Phone number
@@ -45,7 +45,7 @@ const PersonalDetails = ({ data }: { data: any }) => {
             </p>
           </div>
         </div>
-        <div className="flex mt-2">
+        <div className="flex mt-2 gap-4">
           <div className="w-1/2 mb-8">
             <h2 className="font-clash font-semibold text-sm mb-2">State</h2>
             <p className="text-neutral800 text-sm">{userData?.state ?? "--"}</p>
@@ -57,9 +57,9 @@ const PersonalDetails = ({ data }: { data: any }) => {
             </p>
           </div>
         </div>
-        <div className="mb-8">
+        <div className="mb-8 w-1/2">
           <h2 className="font-clash font-semibold text-sm mb-2">Address</h2>
-          <p className="text-neutral500 text-sm">{userData?.address ?? "--"}</p>
+          <p className="text-neutral800 text-sm">{userData?.address ?? "--"}</p>
         </div>
 
         <Button

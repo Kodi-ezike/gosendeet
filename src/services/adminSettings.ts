@@ -9,9 +9,17 @@ export const createServiceLevel = async (data: any) => {
   }
 };
 
-export const getServiceLevel = async () => {
+export const getServiceLevel = async (options?: { page?: number; minimize?: boolean }) => {
   try {
-    const res = await api.get(`/service-levels`);
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/service-levels?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -47,9 +55,17 @@ export const createPickupOptions = async (data: any) => {
   }
 };
 
-export const getPickupOptions = async () => {
+export const getPickupOptions = async (options?: { page?: number; minimize?: boolean }) => {
   try {
-    const res = await api.get(`/pickup-options`);
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/pickup-options?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -85,9 +101,17 @@ export const createCoverageArea = async (data: any) => {
   }
 };
 
-export const getCoverageArea = async () => {
+export const getCoverageArea = async (options?: { page?: number; minimize?: boolean }) => {
   try {
-    const res = await api.get(`/coverage-areas`);
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/coverage-areas?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -123,9 +147,17 @@ export const createLocationCode = async (data: any) => {
   }
 };
 
-export const getLocationCode = async () => {
+export const getLocationCode = async (options?: { page?: number; minimize?: boolean }) => {
   try {
-    const res = await api.get(`/location-codes`);
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/location-codes?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -161,9 +193,17 @@ export const createPackageType = async (data: any) => {
   }
 };
 
-export const getPackageType = async () => {
+export const getPackageType = async (options?: { page?: number; minimize?: boolean }) => {
   try {
-    const res = await api.get(`/admin/package-types`);
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/admin/package-types?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

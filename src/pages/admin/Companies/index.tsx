@@ -40,24 +40,43 @@ const Companies = () => {
 
   const size = 10;
   const serviceLevelId = "";
+  const resetPageRef = useRef(false);
 
   const [lastPage, setLastPage] = useState(1);
-  const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const { currentPage, setCurrentPage, updatePage } =
+    usePaginationSync(lastPage);
 
   const { data: stats } = useGetCompanyStats();
   const companyStats = stats?.data ?? {};
 
+  useEffect(() => {
+    resetPageRef.current = true;
+    setCurrentPage(1); // Triggers a rerender
+  }, [companyStatus]);
+
   const { data, isLoading, isSuccess, isError } = useGetCompanyList(
-    currentPage,
+    resetPageRef.current ? 1 : currentPage, // 👈 Always fetch page 1 during status change
     size,
     companyStatus,
     serviceLevelId,
-    debouncedSearchTerm
+    debouncedSearchTerm,
+    {
+      enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
+      queryKey: [
+        "companies",
+        resetPageRef.current ? 1 : currentPage,
+        companyStatus,
+        debouncedSearchTerm,
+      ],
+    }
   );
 
   useEffect(() => {
-    setLastPage(data?.data?.page?.totalPages);
-  }, [data]);
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -269,101 +288,103 @@ const Companies = () => {
 
       {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
         <>
-        <div className="overflow-x-auto">
-          <div className="min-w-[1200px] w-full relative">
-            <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
-              <span className="w-[1%] mr-4">
-                <input type="checkbox" name="" id="" className="mt-[2px]" />
-              </span>
-              <span className="flex-1">Company Name</span>
-              <span className="flex-1">Email</span>
-              <span className="flex-1">Contact</span>
-              <span className="flex-1">Status</span>
-              {/* <span className="flex-1">Services</span>
+          <div className="overflow-x-auto">
+            <div className="min-w-[1200px] w-full relative">
+              <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
+                <span className="w-[1%] mr-4">
+                  <input type="checkbox" name="" id="" className="mt-[2px]" />
+                </span>
+                <span className="flex-1">Company Name</span>
+                <span className="flex-1">Email</span>
+                <span className="flex-1">Contact</span>
+                <span className="flex-1">Status</span>
+                {/* <span className="flex-1">Services</span>
             <span className="flex-1">Pickup</span>
             <span className="flex-1">Delivery</span> */}
-              <span className="w-[2%]"></span>
-            </div>
+                <span className="w-[2%]"></span>
+              </div>
 
-            {data?.data?.content?.map((item: any, index: number) => {
-              return (
-                <div
-                  key={index}
-                  className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                  } hover:bg-purple300`}
-                >
-                  <span className="w-[1%] mr-4">
-                    <input type="checkbox" name="" id="" className="mt-1" />
-                  </span>
-                  <div className="flex-1">
-                    <p>{item.name}</p>
-                  </div>
-                  <div className="flex-1">
-                    <p>{item.email}</p>
-                  </div>
-                  <div className="flex-1">
-                    <p>{item.phone}</p>
-                  </div>
-                  <div className="flex-1">
-                    <p className="capitalize">{item.status}</p>
-                  </div>
-                  <div className="w-[2%]">
-                    <button className="border p-1 rounded-md border-neutral200">
-                      <BsThreeDotsVertical
-                        size={20}
-                        className="p-1 cursor-pointer"
-                        onClick={() => showModal(index)}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Modal */}
-                  {activeModalId === index && ( // Show modal only for the active event
-                    <div
-                      className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                      ref={modalRef} // Attach ref to the modal
-                    >
-                      <Link
-                        to={`/admin-dashboard/company/${index + 1}`}
-                        state={{ id: item.id }}
-                      >
-                        <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                          View full details
-                        </p>
-                      </Link>
-                      <p
-                        className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                        onClick={() => {
-                          setCompanyInfo(item);
-                          setOpen(true);
-                        }}
-                      >
-                        Update info
-                      </p>
-                      <p
-                        className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                        onClick={() => {
-                          setCompanyName(item.name);
-                          setCompanyId(item.id);
-                          setOpenStatus(true);
-                          setSingleCompanyStatus(item.status);
-                        }}
-                      >
-                        Update status
-                      </p>
+              {data?.data?.content?.map((item: any, index: number) => {
+                return (
+                  <div
+                    key={index}
+                    className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
+                      index === 0
+                        ? "border-b-0"
+                        : "border-b border-b-neutral300"
+                    } hover:bg-purple300`}
+                  >
+                    <span className="w-[1%] mr-4">
+                      <input type="checkbox" name="" id="" className="mt-1" />
+                    </span>
+                    <div className="flex-1">
+                      <p>{item.name}</p>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                    <div className="flex-1">
+                      <p>{item.email}</p>
+                    </div>
+                    <div className="flex-1">
+                      <p>{item.phone}</p>
+                    </div>
+                    <div className="flex-1">
+                      <p className="capitalize">{item.status}</p>
+                    </div>
+                    <div className="w-[2%]">
+                      <button className="border p-1 rounded-md border-neutral200">
+                        <BsThreeDotsVertical
+                          size={20}
+                          className="p-1 cursor-pointer"
+                          onClick={() => showModal(index)}
+                        />
+                      </button>
+                    </div>
+
+                    {/* Modal */}
+                    {activeModalId === index && ( // Show modal only for the active event
+                      <div
+                        className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
+                        ref={modalRef} // Attach ref to the modal
+                      >
+                        <Link
+                          to={`/admin-dashboard/company/${index + 1}`}
+                          state={{ id: item.id }}
+                        >
+                          <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                            View full details
+                          </p>
+                        </Link>
+                        <p
+                          className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                          onClick={() => {
+                            setCompanyInfo(item);
+                            setOpen(true);
+                          }}
+                        >
+                          Update info
+                        </p>
+                        <p
+                          className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                          onClick={() => {
+                            setCompanyName(item.name);
+                            setCompanyId(item.id);
+                            setOpenStatus(true);
+                            setSingleCompanyStatus(item.status);
+                          }}
+                        >
+                          Update status
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <PaginationComponent
-              lastPage={data?.data?.page?.totalPages}
-              currentPage={currentPage}
-              handlePageChange={updatePage}
-            />
+          <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
         </>
       )}
 

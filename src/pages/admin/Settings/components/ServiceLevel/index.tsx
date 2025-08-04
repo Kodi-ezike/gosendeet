@@ -13,7 +13,7 @@ import { deleteServiceLevel } from "@/services/adminSettings";
 import { toast } from "sonner";
 
 const ServiceLevel = () => {
-  const { data, isLoading, isSuccess, isError } = useGetServiceLevel();
+  const { data, isLoading, isSuccess, isError } = useGetServiceLevel({minimize: false});
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [type, setType] = useState("");
@@ -76,7 +76,7 @@ const ServiceLevel = () => {
         </div>
       )}
 
-      {!isLoading && isSuccess && data && data?.data?.length > 0 && (
+      {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
         <div className="overflow-x-auto">
           <div className="min-w-[700px] w-full relative">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
@@ -84,7 +84,7 @@ const ServiceLevel = () => {
               <span className="w-[5%]"></span>
             </div>
 
-            {data?.data?.map((item: any, index: number) => {
+            {data?.data?.content?.map((item: any, index: number) => {
               return (
                 <div
                   key={index}
@@ -123,7 +123,7 @@ const ServiceLevel = () => {
         </div>
       )}
 
-      {data && data?.data?.length === 0 && !isLoading && isSuccess && (
+      {data && data?.data?.content?.length === 0 && !isLoading && isSuccess && (
         <div className="h-[50vh] w-full flex justify-center flex-col items-center">
           <p className="font-semibold font-inter text-xl text-center">
             There are no results

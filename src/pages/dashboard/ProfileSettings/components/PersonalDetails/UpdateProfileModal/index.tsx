@@ -35,10 +35,6 @@ export function UpdateProfileModal({
     username: z
       .string({ required_error: "Username is required" })
       .min(1, { message: "Please enter username" }),
-    email: z
-      .string({ required_error: "Email is required" })
-      .email({ message: "Please enter valid email" })
-      .min(1, { message: "Please enter email" }),
     phone: z
       .string({ required_error: "Phone number is required" })
       .min(11, { message: "Please enter valid phone number" }),
@@ -72,7 +68,6 @@ export function UpdateProfileModal({
       reset({
         username: data.username ?? "",
         postalCode: data.postalCode ?? "",
-        email: data.email ?? "",
         phone: data.phone ?? "",
         address: data.address ?? "",
         state: data.state ?? "",
@@ -140,25 +135,6 @@ export function UpdateProfileModal({
                   {errors.username && (
                     <p className="error text-xs text-[#FF0000]">
                       {errors.username.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="email" className="font-inter font-semibold">
-                    Email Address
-                  </label>
-                  <div className="flex justify-between items-center gap-2 border-b">
-                    <input
-                      type="text"
-                      {...register("email")}
-                      // defaultValue={data?.email}
-                      placeholder="Enter your email"
-                      className="w-full outline-0 border-b-0 py-2 "
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="error text-xs text-[#FF0000]">
-                      {errors.email.message}
                     </p>
                   )}
                 </div>

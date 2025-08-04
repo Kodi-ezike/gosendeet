@@ -26,9 +26,10 @@ const Overview = ({data}: {data: any}) => {
   const username = data?.data?.username;
   const userStatus = data?.data?.status;
 
-  const { data: packageTypes } = useGetPackageType();
+  const { data: packageTypes } =useGetPackageType({ minimize: false });;
 
   const packages = packageTypes?.data?.content;
+  console.log(packages)
 
   const schema = z.object({
     pickupLocation: z

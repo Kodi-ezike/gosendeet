@@ -94,7 +94,7 @@ const Pricing = ({
           Pricing
         </Button>
       </div>
-      {companyPricing && companyPricing?.length > 0 && (
+      {companyPricing && companyPricing?.content?.length > 0 && (
         <div className="overflow-auto mb">
           <div className="min-w-[1000px] w-full">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 lg:text-md font-inter font-semibold bg-purple300 w-full">
@@ -109,7 +109,7 @@ const Pricing = ({
               <span className="w-[2%]"></span>
             </div>
 
-            {companyPricing?.map((item: any, index: number) => {
+            {companyPricing?.content?.map((item: any, index: number) => {
               const isDeleteModalOpen = openDeletePricingModal === index;
               return (
                 <div
@@ -196,7 +196,7 @@ const Pricing = ({
         </div>
       )}
 
-      {companyPricing && companyPricing?.length === 0 && (
+      {companyPricing && companyPricing?.content?.length === 0 && (
         <div className="h-[50vh] w-full flex justify-center flex-col items-center">
           <p className="font-semibold font-inter text-xl text-center">
             There are no results

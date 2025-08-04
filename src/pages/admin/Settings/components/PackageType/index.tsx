@@ -12,9 +12,15 @@ import { Spinner } from "@/components/Spinner";
 import { deletePackageType } from "@/services/adminSettings";
 import { toast } from "sonner";
 import DeleteModal from "@/components/modals/DeleteModal";
+// import { usePaginationSync } from "@/hooks/usePaginationSync";
 
 const PackageType = () => {
-  const { data, isLoading, isSuccess, isError } = useGetPackageType();
+  // const [lastPage, setLastPage] = useState(1);
+  // const { currentPage, setCurrentPage, updatePage } =
+  //   usePaginationSync(lastPage);
+
+  const { data, isLoading, isSuccess, isError } = useGetPackageType({ minimize: false });
+  console.log(data)
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);

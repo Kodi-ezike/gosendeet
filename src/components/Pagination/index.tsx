@@ -52,7 +52,7 @@ const PaginationComponent = ({
           </PaginationItem>
 
           {/* Ellipsis if necessary */}
-          {lastPage > 5 && currentPage > 3 && (
+          {lastPage > 3 && currentPage > 3 && (
             <PaginationItem>
               <PaginationEllipsis className=" hidden md:flex" />
             </PaginationItem>
@@ -84,7 +84,7 @@ const PaginationComponent = ({
             ))}
 
           {/* Ellipsis if necessary */}
-          {lastPage > 5 && currentPage < lastPage - 2 && (
+          {lastPage > 3 && currentPage < lastPage - 2 && (
             <PaginationItem>
               <PaginationEllipsis className=" hidden md:flex" />
             </PaginationItem>

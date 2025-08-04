@@ -47,7 +47,7 @@ api.interceptors.response.use(
         // Redirect after 2 seconds
         setTimeout(() => {
           window.location.href = "/signin";
-        }, 2000);
+        }, 1000);
       }
     }
 

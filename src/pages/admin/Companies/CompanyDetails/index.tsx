@@ -37,7 +37,7 @@ const CompanyDetails = () => {
 
   const { data: company_services } = useGetCompanyServices(companyId);
   const companyServices = company_services?.data || [];
-
+  
   const { data: company_pricing } = useGetCompanyPricing(companyId);
   const companyPricing = company_pricing?.data || [];
 
