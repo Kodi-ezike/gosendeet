@@ -101,7 +101,7 @@ export const activateAccount = async (status: string) => {
 
 export const googleLogin = async () => {
   try {
-    const res = await api.post(`/auth/google-login`);
+    const res = await api.get(`/auth/google-login`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

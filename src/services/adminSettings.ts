@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, authApi } from "./axios";
 
 export const createServiceLevel = async (data: any) => {
   try {
@@ -203,7 +203,7 @@ export const getPackageType = async (options?: { page?: number; minimize?: boole
       params.append("minimize", options.minimize.toString());
     }
 
-    const res = await api.get(`/admin/package-types?${params.toString()}`);
+    const res = await authApi.get(`/package-types?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

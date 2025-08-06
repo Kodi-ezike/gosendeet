@@ -30,9 +30,9 @@ const Overview = ({ data }: { data: any }) => {
 
   const [inputData, setInputData] = useState({});
 
-  const { data: packageTypes } = useGetPackageType({ minimize: false });
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
 
-  const packages = packageTypes?.data?.content;
+  const packages = packageTypes?.data;
 
   const schema = z.object({
     pickupLocation: z
@@ -108,7 +108,7 @@ const Overview = ({ data }: { data: any }) => {
             Add New Shipment
           </h3>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex gap-3 items-center py-2 px-4 border-b">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b">
               <img src={location} alt="location" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label htmlFor="pickup" className="font-clash font-semibold">
@@ -127,7 +127,7 @@ const Overview = ({ data }: { data: any }) => {
                 {errors.pickupLocation.message}
               </p>
             )}
-            <div className="flex gap-3 items-center py-2 px-4 border-b">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b">
               <img src={location} alt="location" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label
@@ -149,7 +149,7 @@ const Overview = ({ data }: { data: any }) => {
                 {errors.dropOffLocation.message}
               </p>
             )}
-            <div className="flex gap-3 items-center py-2 px-4 border-b">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b">
               <img src={size} alt="size" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label htmlFor="location" className="font-clash font-semibold">
@@ -178,7 +178,7 @@ const Overview = ({ data }: { data: any }) => {
                 {errors.packageTypeId.message}
               </p>
             )}
-            <div className="flex gap-3 items-center py-2 px-4 border-b">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b">
               <img src={size} alt="size" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label htmlFor="location" className="font-clash font-semibold">

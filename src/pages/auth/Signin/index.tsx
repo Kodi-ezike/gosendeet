@@ -9,6 +9,7 @@ import { MdOutlineMailOutline } from "react-icons/md";
 import { useMutation } from "@tanstack/react-query";
 import { validateEmail } from "@/services/auth";
 import { toast } from "sonner";
+import { BASE_URL } from "@/services/axios";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -50,6 +51,10 @@ const Signin = () => {
     mutate(data.email);
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${BASE_URL}/auth/google-login`;
+  };
+
   return (
     <AuthLayout>
       <div className="md:px-20 px-6 md:py-20 py-8">
@@ -64,6 +69,7 @@ const Signin = () => {
           <Button
             variant={"outline"}
             className="border-neutral500 bg-transparent w-full mt-8 mb-4 hover:bg-purple200"
+            onClick={handleGoogleLogin}
           >
             <img src={google} alt="google" className="w-[20px]" />
             <span>Continue with Google</span>

@@ -35,9 +35,9 @@ const Calculator = () => {
 
   const [data, setData] = useState(results || {});
 
-  const { data: packageTypes } = useGetPackageType({ minimize: false });
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
 
-  const packages = packageTypes?.data?.content;
+  const packages = packageTypes?.data;
 
   const schema = z.object({
     pickupLocation: z
@@ -97,113 +97,118 @@ const Calculator = () => {
         className="flex lg:flex-row lg:items-center flex-col gap-4 w-full"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="w-full">
-          <div className="flex gap-3 items-center py-2 px-4 border-b w-full">
-            <img src={place} alt="location" className="w-[18px]" />
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="pickup" className="font-clash font-semibold">
-                Pickup Location
-              </label>
-              <input
-                type="text"
-                {...register("pickupLocation")}
-                placeholder="Where from?"
-                className="w-full outline-0"
-              />
+        <div className="grid lg:grid-cols-4 gap-4 w-full">
+          <div className="w-full">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <img src={place} alt="location" className="w-[18px]" />
+              <div className="flex flex-col gap-2 w-full">
+                <label htmlFor="pickup" className="font-clash font-semibold">
+                  Pickup Location
+                </label>
+                <input
+                  type="text"
+                  {...register("pickupLocation")}
+                  placeholder="Where from?"
+                  className="w-full outline-0"
+                />
+              </div>
             </div>
+            {errors.pickupLocation && (
+              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                {errors.pickupLocation.message}
+              </p>
+            )}
           </div>
-          {errors.pickupLocation && (
-            <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-              {errors.pickupLocation.message}
-            </p>
-          )}
-        </div>
 
-        <div className="w-full">
-          <div className="flex gap-3 items-center py-2 px-4 border-b w-full">
-            <img src={place} alt="location" className="w-[18px]" />
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="destination" className="font-clash font-semibold">
-                Destination
-              </label>
-              <input
-                type="text"
-                {...register("dropOffLocation")}
-                placeholder="Where to?"
-                className="w-full outline-0"
-              />
+          <div className="w-full">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <img src={place} alt="location" className="w-[18px]" />
+              <div className="flex flex-col gap-2 w-full">
+                <label
+                  htmlFor="destination"
+                  className="font-clash font-semibold"
+                >
+                  Destination
+                </label>
+                <input
+                  type="text"
+                  {...register("dropOffLocation")}
+                  placeholder="Where to?"
+                  className="w-full outline-0"
+                />
+              </div>
             </div>
+            {errors.dropOffLocation && (
+              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                {errors.dropOffLocation.message}
+              </p>
+            )}
           </div>
-          {errors.dropOffLocation && (
-            <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-              {errors.dropOffLocation.message}
-            </p>
-          )}
-        </div>
 
-        <div className="w-full">
-          <div className="flex gap-3 items-center py-2 px-4 border-b w-full">
-            <img src={size} alt="size" className="w-[18px]" />
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="location" className="font-clash font-semibold">
-                Package Type
-              </label>
+          <div className="w-full">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <img src={size} alt="size" className="w-[18px]" />
+              <div className="flex flex-col gap-2 w-full">
+                <label htmlFor="location" className="font-clash font-semibold">
+                  Package Type
+                </label>
 
-              <Select
-                onValueChange={(val) => setValue("packageTypeId", val)}
-                value={watch("packageTypeId")}
-                defaultValue={inputData?.packageTypeId ?? ""}
-              >
-                <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full h-7 py-2 px-0 mt-0">
-                  <SelectValue placeholder="Select package type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {packages?.map((item: any) => (
-                    <SelectItem value={item.id} key={item.id}>
-                      {item?.name} ({item?.maxWeight} {item?.weightUnit})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <Select
+                  onValueChange={(val) => setValue("packageTypeId", val)}
+                  value={watch("packageTypeId")}
+                  defaultValue={inputData?.packageTypeId ?? ""}
+                >
+                  <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent text-base border-0 w-full h-6 py-2 px-0 mt-0">
+                    <SelectValue placeholder="Select package type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {packages?.map((item: any) => (
+                      <SelectItem value={item.id} key={item.id}>
+                        {item?.name} ({item?.maxWeight} {item?.weightUnit})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            {errors.packageTypeId && (
+              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                {errors.packageTypeId.message}
+              </p>
+            )}
           </div>
-          {errors.packageTypeId && (
-            <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-              {errors.packageTypeId.message}
-            </p>
-          )}
-        </div>
 
-        <div className="w-full">
-          <div className="flex gap-3 items-center py-2 px-4 border-b w-full">
-            <img src={size} alt="size" className="w-[18px]" />
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="location" className="font-clash font-semibold">
-                Quantity
-              </label>
+          <div className="w-full">
+            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <img src={size} alt="size" className="w-[18px]" />
+              <div className="flex flex-col gap-2 w-full">
+                <label htmlFor="location" className="font-clash font-semibold">
+                  Quantity
+                </label>
 
-              <input
-                type="text"
-                {...register("quantity")}
-                placeholder="How many?"
-                className="w-full outline-0"
-                onKeyDown={(event) => {
-                  if (
-                    !/[0-9]/.test(event.key) &&
-                    event.key !== "Backspace" &&
-                    event.key !== "Tab"
-                  ) {
-                    event.preventDefault();
-                  }
-                }}
-              />
+                <input
+                  type="text"
+                  {...register("quantity")}
+                  placeholder="How many?"
+                  className="w-full outline-0"
+                  onKeyDown={(event) => {
+                    if (
+                      !/[0-9]/.test(event.key) &&
+                      event.key !== "Backspace" &&
+                      event.key !== "Tab"
+                    ) {
+                      event.preventDefault();
+                    }
+                  }}
+                />
+              </div>
             </div>
+            {errors.quantity && (
+              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                {errors.quantity.message}
+              </p>
+            )}
           </div>
-          {errors.quantity && (
-            <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-              {errors.quantity.message}
-            </p>
-          )}
         </div>
 
         <Button
@@ -292,7 +297,7 @@ const Calculator = () => {
               )}
               <div>
                 <p className="font-clash md:text-[18px] font-semibold">
-                  Starting from {item.price.replace(/^NGN/, 'NGN ')}
+                  Starting from {item.price.replace(/^NGN/, "NGN ")}
                 </p>
               </div>
               <div className="md:justify-self-end">

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "sonner";
-
+export const BASE_URL= "https://gosendeet-backend.onrender.com/api/v1"
 export const authApi = axios.create({
   baseURL: "https://gosendeet-backend.onrender.com/api/v1",
   timeout: 60000,

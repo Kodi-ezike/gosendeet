@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, authApi } from "./axios";
 
 export const userDetails = async (id: string) => {
   try {
@@ -11,7 +11,7 @@ export const userDetails = async (id: string) => {
 
 export const getQuotes = async (data: any) => {
   try {
-    const res = await api.post(`/quotes`, data);
+    const res = await authApi.post(`/quotes`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
