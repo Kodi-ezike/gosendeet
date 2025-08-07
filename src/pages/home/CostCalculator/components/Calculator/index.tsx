@@ -245,7 +245,7 @@ const Calculator = () => {
             className="border border-purple500 bg-purple300 rounded-md p-4"
             key={index}
           >
-            <div className="flex lg:flex-row lg:justify-between lg:items-center gap-4 flex-col py-4 border-b border-b-neutral700">
+            <div className="grid lg:grid-cols-3 lg:justify-between lg:items-center gap-4 flex-col py-4 border-b border-b-neutral700">
               <div className="flex gap-2 md:items-center">
                 <img
                   src={avatar1}
@@ -263,9 +263,24 @@ const Calculator = () => {
                   </p>
                 </div>
               </div>
-              <div className="px-[10px] flex flex-col gap-4">
+              {item?.nextDayDelivery ? (
+                <div className="flex gap-2 items-center lg:mx-auto bg-green100 w-fit py-2 px-[10px] rounded-full">
+                  <img
+                    src={green}
+                    alt="check"
+                    className="w-[20px] h-[20px] rounded-full"
+                  />
+                  <p className="text-xs text-green500">Next Day Delivery</p>
+                </div>
+              ) : (
+                <div></div>
+              )}
+              <div className="px-[10px] flex flex-col gap-4 ">
                 {item?.pickupOptions?.map((option: string, index: number) => (
-                  <div className="flex gap-2 items-center" key={index}>
+                  <div
+                    className="flex gap-2 items-center lg:justify-end"
+                    key={index}
+                  >
                     <img
                       src={purple}
                       alt="check"
@@ -276,7 +291,7 @@ const Calculator = () => {
                 ))}
               </div>
             </div>
-            <div className="lg:flex grid md:grid-cols-2 md:gap-4 gap-2 justify-between items-center py-4">
+            <div className="grid lg:grid-cols-3 lg:justify-between lg:items-center md:gap-4 gap-2 justify-between items-center py-4">
               <div>
                 <p className="text-purple800 font-clash md:text-[18px] font-semibold">
                   Estimated Delivery:
@@ -285,22 +300,13 @@ const Calculator = () => {
                   {item?.estimatedDeliveryDate}
                 </p>
               </div>
-              {item?.nextDayDelivery && (
-                <div className="flex gap-2 items-center bg-green100 w-fit py-2 px-4 rounded-full md:justify-self-end">
-                  <img
-                    src={green}
-                    alt="check"
-                    className="w-[20px] h-[20px] rounded-full"
-                  />
-                  <p className="text-xs text-green500">Next Day Delivery</p>
-                </div>
-              )}
-              <div>
+
+              <div className="lg:mx-auto">
                 <p className="font-clash md:text-[18px] font-semibold">
                   Starting from {item.price.replace(/^NGN/, "NGN ")}
                 </p>
               </div>
-              <div className="md:justify-self-end">
+              <div className="lg:justify-self-end">
                 <Link to="/delivery">
                   <Button className="px-12 py-3 rounded-full bg-purple400 hover:bg-purple500 text-white text-sm font-medium outline-purple400">
                     Book Now
