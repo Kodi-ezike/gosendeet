@@ -1,8 +1,21 @@
 import Layout from "@/layouts/HomePageLayout";
 import purple from "@/assets/icons/big-purple-checkmark.png";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 const Confirmation = () => {
+  const userId = sessionStorage.getItem("userId") || "";
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userId) {
+      toast.error("Please sign in to continue");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1000);
+    }
+  }, [userId]);
   return (
     <Layout>
       <div className="py-10 xl:w-[70%] md:w-[80%] w-full mx-auto px-6 ">
@@ -31,9 +44,7 @@ const Confirmation = () => {
 
               <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-20">
                 <p className="font-medium">Need help with delivery</p>
-                <Button variant="secondary">
-                  Contact Support
-                </Button>
+                <Button variant="secondary">Contact Support</Button>
               </div>
             </div>
           </div>

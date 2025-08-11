@@ -26,3 +26,12 @@ export const updateUserProfile = async (id: string, data: any) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const createBooking = async (data: any) => {
+  try {
+    const res = await api.post(`/bookings`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

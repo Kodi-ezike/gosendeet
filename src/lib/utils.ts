@@ -1,9 +1,9 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { TWClassNames } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export function arrayToString(data: string[], separator: string) {
@@ -24,18 +24,17 @@ export function formatTimestampToReadable(dateString: string): string {
 
   // Extract parts
   let hours = date.getHours();
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
 
   hours = hours % 12 || 12; // Convert to 12-hour format
 
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = date.toLocaleString('en-US', { month: 'short' });
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = date.toLocaleString("en-US", { month: "short" });
   const year = date.getFullYear();
 
   return `${hours}:${minutes} ${ampm}, ${day} ${month} ${year}`;
 }
-
 
 export function timeAgo(timestamp: string): string {
   const now = new Date();
@@ -60,3 +59,64 @@ export function timeAgo(timestamp: string): string {
   if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
   return `${years} year${years !== 1 ? "s" : ""} ago`;
 }
+
+// Month mapping in one place
+const monthMap: Record<
+  | "Jan"
+  | "Feb"
+  | "Mar"
+  | "Apr"
+  | "May"
+  | "Jun"
+  | "Jul"
+  | "Aug"
+  | "Sep"
+  | "Oct"
+  | "Nov"
+  | "Dec",
+  number
+> = {
+  Jan: 0,
+  Feb: 1,
+  Mar: 2,
+  Apr: 3,
+  May: 4,
+  Jun: 5,
+  Jul: 6,
+  Aug: 7,
+  Sep: 8,
+  Oct: 9,
+  Nov: 10,
+  Dec: 11,
+};
+
+// Helper to format a single date string
+function formatDateWithYear(dateStr: string): string {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  const monthAbbr = dateStr.split(" ")[2] as keyof typeof monthMap;
+
+  const dateYear =
+    monthMap[monthAbbr] < currentMonth ? currentYear + 1 : currentYear;
+
+  return new Date(`${dateStr} ${dateYear}`).toISOString().split("T")[0];
+}
+
+// Universal parser
+export function parseDateInput(input: string) {
+  if (input.includes(" - ")) {
+    const startStr = input.split(" - ")[0];
+    return formatDateWithYear(startStr);
+  } else {
+    return formatDateWithYear(input);
+  }
+}
+
+// Example usage:
+// console.log(parseDateInput("Tue, 19 Aug"));
+//"2025-08-19"
+
+// console.log(parseDateInput("Tue, 19 Aug - Fri, 23 Aug"));
+//"2025-08-19"

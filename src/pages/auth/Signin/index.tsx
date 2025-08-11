@@ -17,7 +17,8 @@ const Signin = () => {
   const schema = z.object({
     email: z
       .string({ required_error: "Email Address is required" })
-      .min(1, { message: "Email Address cannot be empty" }),
+      .min(1, { message: "Email Address cannot be empty" })
+      .email({ message: "Invalid email address" })
   });
 
   const {

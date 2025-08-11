@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { DetailsModal } from "./modals/details";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -29,16 +29,24 @@ const Calculator = () => {
   //   { value: "price", title: "Price (cheapest first)" },
   //   { value: "time", title: "Delivery time (fastest)" },
   // ];
+  const navigate = useNavigate();
+  const userId = sessionStorage.getItem("userId") || "";
 
   const location = useLocation();
   const { inputData, results } = location?.state || {};
-
+  const [bookingRequest, setBookingRequest] = useState(inputData  || {});
   const [data, setData] = useState(results || {});
 
   const { data: packageTypes } = useGetPackageType({ minimize: true });
 
   const packages = packageTypes?.data;
 
+useEffect(() => {
+  if (bookingRequest && Object.keys(bookingRequest).length > 0) {
+   setBookingRequest(bookingRequest)
+  }
+}, [bookingRequest]);
+  
   const schema = z.object({
     pickupLocation: z
       .string({ required_error: "Pickup location is required" })
@@ -66,15 +74,15 @@ const Calculator = () => {
   });
 
   useEffect(() => {
-    if (inputData) {
+    if (bookingRequest) {
       reset({
-        pickupLocation: inputData.pickupLocation ?? "",
-        dropOffLocation: inputData.dropOffLocation ?? "",
-        packageTypeId: inputData.packageTypeId ?? "",
-        quantity: inputData.quantity ?? "",
+        pickupLocation: bookingRequest.pickupLocation ?? "",
+        dropOffLocation: bookingRequest.dropOffLocation ?? "",
+        packageTypeId: bookingRequest.packageTypeId ?? "",
+        quantity: bookingRequest.quantity ?? "",
       });
     }
-  }, [inputData, reset]);
+  }, [bookingRequest, reset]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: getQuotes,
@@ -88,7 +96,19 @@ const Calculator = () => {
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
+    setBookingRequest(data)
     mutate([data]);
+  };
+
+  const handleClick = (data: any) => {
+    if (!userId) {
+      toast.error("Please sign in to continue");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1000);
+    } else {
+      navigate("/delivery", { state: { bookingDetails: data, bookingRequest: bookingRequest } });
+    }
   };
 
   return (
@@ -307,11 +327,15 @@ const Calculator = () => {
                 </p>
               </div>
               <div className="lg:justify-self-end">
-                <Link to="/delivery">
-                  <Button className="px-12 py-3 rounded-full bg-purple400 hover:bg-purple500 text-white text-sm font-medium outline-purple400">
-                    Book Now
-                  </Button>
-                </Link>
+                <Button
+                  onClick={() => {
+                    // setBookingDetails(item);
+                    handleClick(item);
+                  }}
+                  className="px-12 py-3 rounded-full bg-purple400 hover:bg-purple500 text-white text-sm font-medium outline-purple400"
+                >
+                  Book Now
+                </Button>
               </div>
             </div>
           </div>

@@ -1,14 +1,35 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
 import Layout from "@/layouts/HomePageLayout";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/InputField";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { createBooking } from "@/services/user";
+import { parseDateInput } from "@/lib/utils";
 
 const Delivery = () => {
-  const navigate = useNavigate()
+  const location = useLocation();
+  const { bookingRequest, bookingDetails } = location?.state || {};
+  const userId = sessionStorage.getItem("userId") || "";
+  const [bookingData, setBookingData] = useState({});
+
+  const [_, currency, amount] =
+    bookingDetails?.price?.match(/^([A-Za-z]+)([\d.]+)$/) || [];
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!userId) {
+      toast.error("Please sign in to continue");
+      setTimeout(() => {
+        navigate("/signin");
+      }, 1000);
+    }
+  }, [userId]);
+
   const schema = z.object({
     sender_name: z
       .string({ required_error: "Sender’s name is required" })
@@ -16,19 +37,24 @@ const Delivery = () => {
     sender_phone: z
       .string({ required_error: "Sender’s number is required" })
       .min(1, { message: "Phone number cannot be empty" }),
-    sender_address: z
-      .string({ required_error: "Sender’s address is required" })
-      .min(1, { message: "Address cannot be empty" }),
+    sender_email: z
+      .string()
+      .email({ message: "Invalid email address" })
+      .or(z.literal("")) // allow empty string
+      .optional(),
     receiver_name: z
       .string({ required_error: "Receiver’s name is required" })
       .min(1, { message: "Name cannot be empty" }),
     receiver_phone: z
       .string({ required_error: "Receiver’s number is required" })
       .min(1, { message: "Phone number cannot be empty" }),
-    receiver_address: z
-      .string({ required_error: "Receiver’s address is required" })
-      .min(1, { message: "Address cannot be empty" }),
+    receiver_email: z
+      .string()
+      .email({ message: "Invalid email address" })
+      .or(z.literal("")) // allow empty string
+      .optional(),
   });
+
   const {
     register,
     handleSubmit,
@@ -37,11 +63,46 @@ const Delivery = () => {
     resolver: zodResolver(schema),
   });
 
-
+  const { mutate, isPending } = useMutation({
+    mutationFn: createBooking,
+    onSuccess: (data: any) => {
+      toast.success("Successful");
+      // setData(data);
+      navigate("/checkout", {
+        state: { bookingId: data?.data?.id, bookingData: bookingData },
+      });
+    },
+    onError: (data: any) => {
+      toast.error(data?.message);
+    },
+  });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data);
-    navigate('/checkout')
+    const payload = {
+      senderId: userId,
+      packageTypeId: bookingRequest?.packageTypeId,
+      receiverName: data.receiver_name,
+      receiverPhone: data.receiver_phone,
+      receiverEmail: data.receiver_email, // NUllable
+      pickupLocation: bookingRequest?.pickupLocation,
+      destination: bookingRequest?.dropOffLocation,
+      courierCost: amount,
+      tax: 0,
+      currency: currency,
+      pickupDate: parseDateInput(bookingDetails?.pickUpdateDate),
+      companyId: bookingDetails?.courier?.id,
+      estimatedDeliveryDate: parseDateInput(
+        bookingDetails?.estimatedDeliveryDate
+      ),
+    };
+    setBookingData({
+      courierName: bookingDetails?.courier?.name,
+      senderName: data.sender_name,
+      senderPhone: data.sender_phone,
+      senderEmail: data.sender_email,
+      ...payload,
+    });
+    mutate(payload);
   };
 
   return (
@@ -84,7 +145,7 @@ const Delivery = () => {
                 pattern="[0-9]{11}"
                 inputMode="numeric"
               />
-        
+
               {errors.sender_phone && (
                 <p className="error text-xs text-[#FF0000]">
                   {errors.sender_phone.message}
@@ -93,67 +154,67 @@ const Delivery = () => {
             </div>
           </div>
 
-          {/* Sender’s Address */}
+          {/* Sender’s Email */}
           <div className="form-group">
             <Input
-              label="Sender’s Address"
-              name="sender_address"
+              label="Sender’s Email"
+              name="sender_email"
               type="text"
-              placeholder="Enter your address"
+              placeholder="Enter your email"
               register={register}
             />
-            {errors.sender_address && (
+            {errors.sender_email && (
               <p className="error text-xs text-[#FF0000]">
-                {errors.sender_address.message}
+                {errors.sender_email.message}
               </p>
             )}
           </div>
 
           <div className="flex md:flex-row flex-col gap-8 justify-between">
-          {/* Receiver’s  Name */}
-          <div className="form-group w-full">
-            <Input
-              label="Receiver’s  Name"
-              name="receiver_name"
-              type="text"
-              placeholder="Enter your name"
-              register={register}
-            />
-            {errors.receiver_name && (
-              <p className="error text-xs text-[#FF0000]">
-                {errors.receiver_name.message}
-              </p>
-            )}
-          </div>
-          {/* Receiver’s  Phone Number */}
-          <div className="form-group w-full">
-            <Input
-              label="Receiver’s  Phone Number"
-              name="receiver_phone"
-              type="text"
-              placeholder="Enter your phone number"
-              register={register}
-            />
-            {errors.receiver_phone && (
-              <p className="error text-xs text-[#FF0000]">
-                {errors.receiver_phone.message}
-              </p>
-            )}
-          </div>
+            {/* Receiver’s  Name */}
+            <div className="form-group w-full">
+              <Input
+                label="Receiver’s  Name"
+                name="receiver_name"
+                type="text"
+                placeholder="Enter receiver's name"
+                register={register}
+              />
+              {errors.receiver_name && (
+                <p className="error text-xs text-[#FF0000]">
+                  {errors.receiver_name.message}
+                </p>
+              )}
+            </div>
+            {/* Receiver’s  Phone Number */}
+            <div className="form-group w-full">
+              <Input
+                label="Receiver’s  Phone Number"
+                name="receiver_phone"
+                type="text"
+                placeholder="Enter receiver's phone number"
+                register={register}
+              />
+              {errors.receiver_phone && (
+                <p className="error text-xs text-[#FF0000]">
+                  {errors.receiver_phone.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Receiver’s Address */}
+          {/* Receiver’s Email */}
           <div className="form-group">
             <Input
-              label="Receiver’s Address"
-              name="receiver_address"
+              label="Receiver’s Email"
+              name="receiver_email"
               type="text"
-              placeholder="Enter your address"
+              placeholder="Enter receiver's email"
               register={register}
             />
-            {errors.receiver_address && (
+            {errors.receiver_email && (
               <p className="error text-xs text-[#FF0000]">
-                {errors.receiver_address.message}
+                {errors.receiver_email.message}
               </p>
             )}
           </div>
@@ -163,6 +224,7 @@ const Delivery = () => {
             <Button
               type="submit"
               className="bg-purple400 rounded-full py-3 px-8 text-white"
+              loading={isPending}
             >
               {/* {isPending && <Loader2 className="h-6 w-6 animate-spin" />}  */}
               Proceed to Checkout
