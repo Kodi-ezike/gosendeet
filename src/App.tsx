@@ -25,6 +25,7 @@ import CompanyDetails from "./pages/admin/Companies/CompanyDetails";
 import PrivateRoutes from "./lib/PrivateRoutes";
 import PublicRoutes from "./lib/PublicRoutes";
 import AdminRoutes from "./lib/AdminRoutes";
+import ErrorPage from "./pages/home/CostCalculator/components/Calculator/Booking/ErrorPage";
 
 function App() {
   return (
@@ -37,7 +38,8 @@ function App() {
           <Route path="/track" element={<Track />} />
           <Route path="/delivery" element={<Delivery />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/success-page" element={<Confirmation />} />
+          <Route path="/error-page" element={<ErrorPage />} />
           <Route path="/track/:id" element={<Tracking />} />
 
         <Route element={<PublicRoutes />}>

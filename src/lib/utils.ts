@@ -120,3 +120,14 @@ export function parseDateInput(input: string) {
 
 // console.log(parseDateInput("Tue, 19 Aug - Fri, 23 Aug"));
 //"2025-08-19"
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear();
+  return `${day} ${month} ${year}`;
+}
+
+// Example:
+// console.log(formatDate("2025-08-19")); // "19 Aug 2025"

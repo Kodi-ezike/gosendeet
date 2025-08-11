@@ -3,12 +3,20 @@ import Layout from "@/layouts/HomePageLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { payForBooking } from "@/services/user";
+import { LIVE_URL } from "@/services/axios";
 const Checkout = () => {
   const userId = sessionStorage.getItem("userId") || "";
   const location = useLocation();
+
   const { bookingId, bookingData } = location?.state || {};
-  console.log(bookingId);
+  const successUrl = `${LIVE_URL}/success-page`;
+  const errorUrl = `${LIVE_URL}/error-page`;
+
   const [isChecked, setIsChecked] = useState(false);
+
   const navigate = useNavigate();
   useEffect(() => {
     if (!userId) {
@@ -19,7 +27,32 @@ const Checkout = () => {
     }
   }, [userId]);
 
-  // navigate("/confirmation");
+  const total = Number(bookingData?.tax) + Number(bookingData?.courierCost);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      bookingId,
+      successUrl,
+      errorUrl,
+    }: {
+      bookingId: string;
+      successUrl: string;
+      errorUrl: string;
+    }) => payForBooking(bookingId, successUrl, errorUrl),
+    onSuccess: (data: any) => {
+      toast.success("Successful");
+      // setData(data);
+      console.log(data);
+      navigate(data?.data?.authorizationUrl);
+    },
+    onError: (data: any) => {
+      toast.error(data?.message);
+    },
+  });
+
+  const submit = () => {
+    mutate({ bookingId, successUrl, errorUrl });
+  };
 
   return (
     <Layout>
@@ -32,11 +65,11 @@ const Checkout = () => {
           Your booking is on pending until payment is made here
         </p>
 
-        <div className="flex md:flex-row flex-col gap-6 justify-between ">
+        <div className="flex md:flex-row flex-col gap-6 justify-between">
           <div className="lg:w-[65%] flex flex-col gap-6">
             <div className="p-4 relative bg-neutral100 border border-neutral200 rounded-xl">
               <h2 className="font-clash font-semibold text-md mt-1">
-                Booking info
+                Sender Details
               </h2>
               <hr className="border-b border-b-neutral200 my-4" />
 
@@ -87,7 +120,13 @@ const Checkout = () => {
                 <div className="flex gap-2 items-start mb-4">
                   <input
                     type="checkbox"
-                    className="mt-1"
+                    className="mt-1 h-4 w-4 rounded
+                      appearance-none cursor-pointer
+                      border border-purple400
+                      checked:bg-purple400 checked:border-purple400
+                      checked:before:content-['✔']
+                      checked:before:text-white checked:before:text-xs
+                      checked:before:flex checked:before:items-center checked:before:justify-center"
                     onChange={(e) => setIsChecked(e.target.checked)}
                   />
                   <p className="text-sm">
@@ -101,6 +140,8 @@ const Checkout = () => {
                   type="submit"
                   className="bg-purple400 hover:bg-purple500 rounded-full py-3 px-8 text-white"
                   disabled={!isChecked}
+                  onClick={submit}
+                  loading={isPending}
                 >
                   {/* {isPending && <Loader2 className="h-6 w-6 animate-spin" />}  */}
                   Proceed to Payment
@@ -108,35 +149,37 @@ const Checkout = () => {
               </div>
             </div>
           </div>
-          <div className="lg:w-[35%]">
-            <div className="p-4 relative bg-neutral100 border border-neutral200 rounded-xl">
+          <div className="lg:w-[35%] flex">
+            <div className="p-4 relative bg-neutral100 border border-neutral200 rounded-xl flex-1">
               <h2 className="font-clash font-semibold text-md mt-1">Summary</h2>
               <hr className="border-b border-b-neutral200 my-4" />
 
-              <div className="flex flex-col gap-6">
-                <p className="flex justify-between items-center font-medium text-sm">
-                  <span className="text-neutral600">To</span>
-                  <span>Johanne Effiong</span>
+              <div className="flex flex-col gap-4">
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
+                  <span className="text-neutral600">Pickup</span>
+                  <span className="text-right">
+                    {bookingData?.pickupLocation}
+                  </span>
                 </p>
-                <p className="flex justify-between items-center font-medium text-sm">
-                  <span className="text-neutral600">Phone Number</span>
-                  <span>2345678909876</span>
-                </p>
-                <p className="flex justify-between items-center font-medium text-sm">
-                  <span className="text-neutral600">Address</span>
-                  <span>17, Marina, VI, Lagos</span>
-                </p>
-                <p className="flex justify-between items-center font-medium text-sm">
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
                   <span className="text-neutral600">Pickup Date</span>
-                  <span> 27 May 2025 </span>
+                  <span className="text-right">
+                    {formatDate(bookingData?.pickupDate)}
+                  </span>
                 </p>
-                <p className="flex justify-between items-center font-medium text-sm">
-                  <span className="text-neutral600">Logistics</span>
-                  <span>DHL Ibadan</span>
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
+                  <span className="text-neutral600">Delivery</span>
+                  <span className="text-right">{bookingData?.destination}</span>
                 </p>
-                <p className="flex justify-between items-center font-medium text-sm">
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
                   <span className="text-neutral600">Delivery Date</span>
-                  <span> 30 May 2025 </span>
+                  <span className="text-right">
+                    {formatDate(bookingData?.estimatedDeliveryDate)}
+                  </span>
+                </p>
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
+                  <span className="text-neutral600">Logistics</span>
+                  <span className="text-right">{bookingData?.courierName}</span>
                 </p>
               </div>
 
@@ -147,26 +190,24 @@ const Checkout = () => {
               </h2>
               <hr className="border-b border-b-neutral200 my-4" />
 
-              <div className="flex flex-col gap-6">
-                <p className="flex justify-between items-center font-medium text-sm">
+              <div className="flex flex-col gap-4">
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
                   <span className="text-neutral600">Subtotal</span>
-                  <span>$40.00</span>
+                  <span className="text-right">
+                    ₦ {bookingData?.courierCost}
+                  </span>
                 </p>
-                <p className="flex justify-between items-center font-medium text-sm">
-                  <span className="text-neutral600">Shipping Fee</span>
-                  <span>FREE</span>
-                </p>
-                <p className="flex justify-between items-center font-medium text-sm">
+                <p className="flex justify-between items-start gap-4 font-medium text-sm">
                   <span className="text-neutral600">Tax</span>
-                  <span>$4.00</span>
+                  <span className="text-right">₦ {bookingData?.tax}</span>
                 </p>
               </div>
 
               <hr className="border-b border-b-neutral200 my-6" />
 
-              <p className="flex justify-between items-center font-semibold">
+              <p className="flex justify-between items-start gap-4 font-semibold">
                 <span className="text-neutral600">Total</span>
-                <span>$44.00</span>
+                <span className="text-right">₦ {total}</span>
               </p>
             </div>
           </div>

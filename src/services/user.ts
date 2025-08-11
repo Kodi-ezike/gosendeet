@@ -35,3 +35,12 @@ export const createBooking = async (data: any) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const payForBooking = async (bookingId: string, successUrl: string, errorUrl: string) => {
+  try {
+    const res = await api.post(`/booking/payments/initialize?bookingId=${bookingId}&successUrl=${successUrl}&errorUrl=${errorUrl}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
