@@ -56,7 +56,9 @@ const CreateBooking = ({
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { packageTypeId: "" },
+    defaultValues: {
+      packageTypeId: bookingRequest ? bookingRequest.packageTypeId : "",
+    },
   });
 
   useEffect(() => {
@@ -69,8 +71,6 @@ const CreateBooking = ({
       });
     }
   }, [bookingRequest, reset]);
-
-  console.log(bookingRequest);
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     setInputData(data);
@@ -149,10 +149,9 @@ const CreateBooking = ({
                   onValueChange={(val) => {
                     setValue("packageTypeId", val, {
                       shouldValidate: true,
-                      shouldDirty: true,
                     });
                   }}
-                  defaultValue={packageTypeId} // ✅ force sync with RHF
+                  value={packageTypeId} // ✅ force sync with RHF
                 >
                   <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full h-6 py-2 px-0 mt-0">
                     <SelectValue placeholder="Select package type" />

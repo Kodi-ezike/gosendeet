@@ -21,12 +21,12 @@ export function SpecsModal({
   open,
   setOpen,
   inputData,
-  setData
+  setData,
 }: {
   open: boolean;
   setOpen: any;
   inputData: any;
-  setData: any
+  setData: any;
 }) {
   // const [inputData, setInputData] = useState({});
 
@@ -41,6 +41,7 @@ export function SpecsModal({
 
   const schema = z.object({
     itemValue: z.string().min(1, "Item value is required"),
+    itemWeight: z.string().optional(),
     isFragile: z.boolean(),
     isPerishable: z.boolean(),
     isExclusive: z.boolean(),
@@ -57,6 +58,7 @@ export function SpecsModal({
     resolver: zodResolver(schema),
     defaultValues: {
       itemValue: "",
+      itemWeight: "",
       isFragile: false,
       isPerishable: false,
       isExclusive: false,
@@ -79,14 +81,13 @@ export function SpecsModal({
           },
         });
 
-        if (window.location.pathname === "/cost-calculator" && typeof setData === "function") {
-  setData(data);
-}
-
-
-        console.log(data);
+        if (
+          window.location.pathname === "/cost-calculator" &&
+          typeof setData === "function"
+        ) {
+          setData(data);
+        }
       }
-
     },
     onError: (data: any) => {
       toast.error(data?.message);
@@ -98,6 +99,7 @@ export function SpecsModal({
       {
         ...inputData,
         itemValue: data.itemValue,
+        weight: data.itemWeight,
         packageDescription: {
           isFragile: data?.isFragile,
           isPerishable: data?.isPerishable,
@@ -172,10 +174,10 @@ export function SpecsModal({
           <div className="grid gap-8 py-4">
             <div className="flex flex-col gap-2">
               <label
-                htmlFor="weight"
+                htmlFor="itemValue"
                 className="font-clash font-semibold text-sm"
               >
-                Item Value
+                Item Value <span className="text-red-500 ml-1 text-md">*</span>
               </label>
               <div className="border border-neutral200  rounded-xl h-[40px] flex items-center justify-between w-full">
                 <p className="p-4">₦</p>
@@ -192,6 +194,24 @@ export function SpecsModal({
                   {errors.itemValue.message}
                 </p>
               )}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="itemWeight"
+                className="font-clash font-semibold text-sm"
+              >
+                Item Weight
+              </label>
+              <div className="border border-neutral200  rounded-xl h-[40px] flex items-center justify-between w-full">
+                <p className="p-4">kg</p>
+                <input
+                  type="text"
+                  {...register("itemWeight")}
+                  onKeyDown={allowOnlyNumbers}
+                  className="w-[90%] outline-0 text-sm px-4 py-2 border-l-2 border-l-neutral200"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
