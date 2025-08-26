@@ -32,6 +32,7 @@ import {
   createCompanyServices,
   updateCompanyServices,
 } from "@/services/companies";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 export function AddServiceModal({
   companyId,
@@ -416,15 +417,7 @@ export function AddServiceModal({
                       defaultValue={info?.weightLimit}
                       placeholder="Enter weight limit"
                       className="w-full outline-0 border-b-0 py-2 "
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.weightLimit && (
@@ -450,15 +443,7 @@ export function AddServiceModal({
                       defaultValue={info?.numberOfDaysForPickup}
                       placeholder="Enter number of days"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.numberOfDaysForPickup && (
@@ -482,15 +467,7 @@ export function AddServiceModal({
                       defaultValue={info?.numberOfDaysForDelivery}
                       placeholder="Enter number of days"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.numberOfDaysForDelivery && (

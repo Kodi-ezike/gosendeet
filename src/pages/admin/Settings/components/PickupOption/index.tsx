@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { IoSearchOutline } from "react-icons/io5";
 import { PickupOptionModal } from "./modals/PickupOptionModal";
@@ -11,9 +11,21 @@ import { FiEdit } from "react-icons/fi";
 import { deletePickupOptions } from "@/services/adminSettings";
 import { toast } from "sonner";
 import DeleteModal from "@/components/modals/DeleteModal";
+import { PaginationComponent } from "@/components/Pagination";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
 
 const PickupOption = () => {
-  const { data, isLoading, isSuccess, isError } = useGetPickupOptions({minimize: false});
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const { data, isLoading, isSuccess, isError } = useGetPickupOptions({
+    page: currentPage,
+  });
+  useEffect(() => {
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -79,6 +91,7 @@ const PickupOption = () => {
       )}
 
       {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
+        <>
         <div className="overflow-x-auto">
           <div className="min-w-[700px] w-full relative">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
@@ -123,6 +136,12 @@ const PickupOption = () => {
             })}
           </div>
         </div>
+        <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
+        </>
       )}
 
       {data && data?.data?.content?.length === 0 && !isLoading && isSuccess && (

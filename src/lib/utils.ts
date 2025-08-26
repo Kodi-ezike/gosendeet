@@ -131,3 +131,17 @@ export function formatDate(dateString: string): string {
 
 // Example:
 // console.log(formatDate("2025-08-19")); // "19 Aug 2025"
+
+// utils/inputValidators.ts
+export const allowOnlyNumbers = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  if (
+    !/[0-9]/.test(event.key) &&
+    event.key !== "Backspace" &&
+    event.key !== "Tab" &&
+    event.key !== "ArrowLeft" &&
+    event.key !== "ArrowRight"
+  ) {
+    event.preventDefault();
+  }
+};
+

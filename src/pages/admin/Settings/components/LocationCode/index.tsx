@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiSolidTrashAlt } from "react-icons/bi";
 import { IoSearchOutline } from "react-icons/io5";
 import { LocationCodeModal } from "./modals/LocationCodeModal";
@@ -11,9 +11,21 @@ import { FiEdit } from "react-icons/fi";
 import { deleteLocationCode } from "@/services/adminSettings";
 import { toast } from "sonner";
 import DeleteModal from "@/components/modals/DeleteModal";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
+import { PaginationComponent } from "@/components/Pagination";
 
 const LocationCode = () => {
-  const { data, isLoading, isSuccess, isError } = useGetLocationCode({minimize: false});
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const { data, isLoading, isSuccess, isError } = useGetLocationCode({
+    page: currentPage,
+  });
+  useEffect(() => {
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -78,50 +90,59 @@ const LocationCode = () => {
       )}
 
       {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
-        <div className="overflow-x-auto">
-          <div className="min-w-[700px] w-full relative">
-            <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
-              <span className="flex-1">Location Codes</span>
-              <span className="w-[5%]"></span>
+        <>
+          <div className="overflow-x-auto">
+            <div className="min-w-[700px] w-full relative">
+              <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
+                <span className="flex-1">Location Codes</span>
+                <span className="w-[5%]"></span>
+              </div>
+
+              {data?.data?.content?.map((item: any, index: number) => {
+                return (
+                  <div
+                    key={index}
+                    className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
+                      index === 0
+                        ? "border-t-0"
+                        : "border-t border-t-neutral300"
+                    } hover:bg-purple300`}
+                  >
+                    <div className="flex-1">
+                      <p>{item?.name}</p>
+                    </div>
+
+                    <div className="w-[5%] flex items-center gap-4">
+                      <FiEdit
+                        size={20}
+                        className="cursor-pointer text-purple500"
+                        onClick={() => {
+                          setOpen(true);
+                          setType("edit");
+                          setInfo(item);
+                        }}
+                      />
+
+                      <BiSolidTrashAlt
+                        size={20}
+                        className="cursor-pointer text-[#F56630]"
+                        onClick={() => {
+                          setOpenDelete(true);
+                          setInfo(item);
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            {data?.data?.content?.map((item: any, index: number) => {
-              return (
-                <div
-                  key={index}
-                  className={`relative min-h-[60px] bg-white py-2 px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-t-0" : "border-t border-t-neutral300"
-                  } hover:bg-purple300`}
-                >
-                  <div className="flex-1">
-                    <p>{item?.name}</p>
-                  </div>
-
-                  <div className="w-[5%] flex items-center gap-4">
-                    <FiEdit
-                      size={20}
-                      className="cursor-pointer text-purple500"
-                      onClick={() => {
-                        setOpen(true);
-                        setType("edit");
-                        setInfo(item);
-                      }}
-                    />
-
-                    <BiSolidTrashAlt
-                      size={20}
-                      className="cursor-pointer text-[#F56630]"
-                      onClick={() => {
-                        setOpenDelete(true);
-                        setInfo(item);
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
           </div>
-        </div>
+          <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
+        </>
       )}
 
       {data && data?.data?.content?.length === 0 && !isLoading && isSuccess && (

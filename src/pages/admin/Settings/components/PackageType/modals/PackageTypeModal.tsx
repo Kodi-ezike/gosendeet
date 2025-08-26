@@ -24,6 +24,7 @@ import {
   useGetAdminDimensionUnits,
   useGetAdminWeightUnits,
 } from "@/queries/admin/useGetAdminSettings";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 export function PackageTypeModal({
   open,
@@ -204,15 +205,7 @@ export function PackageTypeModal({
                       defaultValue={info?.length}
                       placeholder="Enter length"
                       className="w-full outline-0 border-b-0 py-2 "
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.length && (
@@ -235,15 +228,7 @@ export function PackageTypeModal({
                       defaultValue={info?.width}
                       placeholder="Enter width"
                       className="w-full outline-0 border-b-0 py-2 "
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.width && (
@@ -263,15 +248,7 @@ export function PackageTypeModal({
                       defaultValue={info?.height}
                       placeholder="Enter height"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.height && (
@@ -294,15 +271,7 @@ export function PackageTypeModal({
                       defaultValue={info?.maxWeight}
                       placeholder="Enter max weight"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.maxWeight && (

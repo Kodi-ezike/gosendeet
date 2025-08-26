@@ -41,9 +41,7 @@ const Checkout = () => {
     }) => payForBooking(bookingId, successUrl, errorUrl),
     onSuccess: (data: any) => {
       toast.success("Successful");
-      // setData(data);
-      console.log(data);
-      navigate(data?.data?.authorizationUrl);
+      window.location.href = data?.data?.authorizationUrl;
     },
     onError: (data: any) => {
       toast.error(data?.message);

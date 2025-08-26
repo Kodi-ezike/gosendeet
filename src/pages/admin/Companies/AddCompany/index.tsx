@@ -31,6 +31,7 @@ import {
 import DeleteModal from "@/components/modals/DeleteModal";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { BiSolidTrashAlt } from "react-icons/bi";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 const AddCompany = () => {
   const navigate = useNavigate();
@@ -357,15 +358,7 @@ const AddCompany = () => {
                   disabled={companyId !== ""}
                   placeholder="Enter company number"
                   className="w-full outline-0 border-b-0 py-2 px-4"
-                  onKeyDown={(event) => {
-                    if (
-                      !/[0-9]/.test(event.key) &&
-                      event.key !== "Backspace" &&
-                      event.key !== "Tab"
-                    ) {
-                      event.preventDefault();
-                    }
-                  }}
+                  onKeyDown={allowOnlyNumbers}
                 />
               </div>
               {errors.phone && (

@@ -1,29 +1,12 @@
-// import { SpecsModal } from "@/pages/home/landing/Header/modals/specs";
-import { FiSearch } from "react-icons/fi";
-import place from "@/assets/icons/location.png";
-import size from "@/assets/icons/size.png";
 import purple from "@/assets/icons/purple-checkmark.png";
 import green from "@/assets/icons/green-checkmark.png";
 import avatar1 from "@/assets/images/avatar1.png";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { DetailsModal } from "./modals/details";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { getQuotes } from "@/services/user";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-
+import CreateBooking from "@/components/CreateBooking";
 const Calculator = () => {
   // const options = [
   //   { value: "price", title: "Price (cheapest first)" },
@@ -34,71 +17,14 @@ const Calculator = () => {
 
   const location = useLocation();
   const { inputData, results } = location?.state || {};
-  const [bookingRequest, setBookingRequest] = useState(inputData  || {});
+  const [bookingRequest] = useState(inputData || {});
   const [data, setData] = useState(results || {});
 
-  const { data: packageTypes } = useGetPackageType({ minimize: true });
-
-  const packages = packageTypes?.data;
-
-useEffect(() => {
-  if (bookingRequest && Object.keys(bookingRequest).length > 0) {
-   setBookingRequest(bookingRequest)
-  }
-}, [bookingRequest]);
-  
-  const schema = z.object({
-    pickupLocation: z
-      .string({ required_error: "Pickup location is required" })
-      .min(1, { message: "Please enter pickup location" }),
-    dropOffLocation: z
-      .string({ required_error: "Drop off location is required" })
-      .min(1, { message: "Please enter drop off location" }),
-    packageTypeId: z
-      .string({ required_error: "Package type is required" })
-      .min(1, { message: "Please enter package type" }),
-    quantity: z
-      .string({ required_error: "Quantity is required" })
-      .min(1, { message: "Please enter quantity" }),
-  });
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-  });
-
   useEffect(() => {
-    if (bookingRequest) {
-      reset({
-        pickupLocation: bookingRequest.pickupLocation ?? "",
-        dropOffLocation: bookingRequest.dropOffLocation ?? "",
-        packageTypeId: bookingRequest.packageTypeId ?? "",
-        quantity: bookingRequest.quantity ?? "",
-      });
+    if (results) {
+      setData(results);
     }
-  }, [bookingRequest, reset]);
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: getQuotes,
-    onSuccess: (data: any) => {
-      toast.success("Successful");
-      setData(data);
-    },
-    onError: (data: any) => {
-      toast.error(data?.message);
-    },
-  });
-
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    setBookingRequest(data)
-    mutate([data]);
-  };
+  }, [results]);
 
   const handleClick = (data: any) => {
     if (!userId) {
@@ -107,139 +33,15 @@ useEffect(() => {
         navigate("/signin");
       }, 1000);
     } else {
-      navigate("/delivery", { state: { bookingDetails: data, bookingRequest: bookingRequest } });
+      navigate("/delivery", {
+        state: { bookingDetails: data, bookingRequest: bookingRequest },
+      });
     }
   };
 
   return (
     <div className="md:px-20 px-6 py-16">
-      <form
-        className="flex lg:flex-row lg:items-center flex-col gap-4 w-full"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="grid lg:grid-cols-4 gap-4 w-full">
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={place} alt="location" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="pickup" className="font-clash font-semibold">
-                  Pickup Location
-                </label>
-                <input
-                  type="text"
-                  {...register("pickupLocation")}
-                  placeholder="Where from?"
-                  className="w-full outline-0"
-                />
-              </div>
-            </div>
-            {errors.pickupLocation && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.pickupLocation.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={place} alt="location" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label
-                  htmlFor="destination"
-                  className="font-clash font-semibold"
-                >
-                  Destination
-                </label>
-                <input
-                  type="text"
-                  {...register("dropOffLocation")}
-                  placeholder="Where to?"
-                  className="w-full outline-0"
-                />
-              </div>
-            </div>
-            {errors.dropOffLocation && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.dropOffLocation.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={size} alt="size" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="location" className="font-clash font-semibold">
-                  Package Type
-                </label>
-
-                <Select
-                  onValueChange={(val) => setValue("packageTypeId", val)}
-                  value={watch("packageTypeId")}
-                  defaultValue={inputData?.packageTypeId ?? ""}
-                >
-                  <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent text-base border-0 w-full h-6 py-2 px-0 mt-0">
-                    <SelectValue placeholder="Select package type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {packages?.map((item: any) => (
-                      <SelectItem value={item.id} key={item.id}>
-                        {item?.name} ({item?.maxWeight} {item?.weightUnit})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            {errors.packageTypeId && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.packageTypeId.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={size} alt="size" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="location" className="font-clash font-semibold">
-                  Quantity
-                </label>
-
-                <input
-                  type="text"
-                  {...register("quantity")}
-                  placeholder="How many?"
-                  className="w-full outline-0"
-                  onKeyDown={(event) => {
-                    if (
-                      !/[0-9]/.test(event.key) &&
-                      event.key !== "Backspace" &&
-                      event.key !== "Tab"
-                    ) {
-                      event.preventDefault();
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            {errors.quantity && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.quantity.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <Button
-          className="w-fit bg-black hover:bg-black rounded-full outline-black"
-          loading={isPending}
-          size={"lg"}
-        >
-          <FiSearch className="text-white text-xl" />
-          <span className="text-white lg:hidden">Get a quick quote</span>
-        </Button>
-      </form>
+      <CreateBooking bookingRequest={bookingRequest} setData={setData} />
 
       {/* Select options */}
       {/* <Select>

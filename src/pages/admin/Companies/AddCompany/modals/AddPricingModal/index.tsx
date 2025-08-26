@@ -24,6 +24,7 @@ import {
 } from "@/services/companies";
 import { toast } from "sonner";
 import { useGetCompanyServices } from "@/queries/admin/useGetAdminCompanies";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 export function AddPricingModal({
   companyId,
@@ -238,15 +239,7 @@ export function AddPricingModal({
                       defaultValue={info?.basePrice}
                       placeholder="Enter base price"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.basePrice && (
@@ -270,15 +263,7 @@ export function AddPricingModal({
                       defaultValue={info?.discountPercent}
                       placeholder="Enter discount percentage"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.discountPercent && (
@@ -304,15 +289,7 @@ export function AddPricingModal({
                       defaultValue={info?.weightMultiplier}
                       placeholder="Enter weight multiplier"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.weightMultiplier && (
@@ -336,15 +313,7 @@ export function AddPricingModal({
                       defaultValue={info?.zoneMultiplier}
                       placeholder="Enter zone multiplier"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.zoneMultiplier && (

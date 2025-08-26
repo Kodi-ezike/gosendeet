@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { updateUserProfile } from "@/services/user";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 export function UpdateProfileModal({
   open,
@@ -152,15 +153,7 @@ export function UpdateProfileModal({
                       // defaultValue={data?.phone}
                       placeholder="Enter phone number"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.phone && (
@@ -181,15 +174,7 @@ export function UpdateProfileModal({
                       // defaultValue={data?.email}
                       placeholder="Enter postal code"
                       className="w-full outline-0 border-b-0 py-2 "
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.postalCode && (

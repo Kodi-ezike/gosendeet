@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateSingleCompany } from "@/services/companies";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { allowOnlyNumbers } from "@/lib/utils";
 
 export function UpdateCompanyModal({
   open,
@@ -203,15 +204,7 @@ export function UpdateCompanyModal({
                       // defaultValue={data?.phone}
                       placeholder="Enter company number"
                       className="w-full outline-0 border-b-0 py-2"
-                      onKeyDown={(event) => {
-                        if (
-                          !/[0-9]/.test(event.key) &&
-                          event.key !== "Backspace" &&
-                          event.key !== "Tab"
-                        ) {
-                          event.preventDefault();
-                        }
-                      }}
+                      onKeyDown={allowOnlyNumbers}
                     />
                   </div>
                   {errors.phone && (
