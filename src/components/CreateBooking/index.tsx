@@ -22,7 +22,7 @@ const CreateBooking = ({
   setData,
 }: {
   bookingRequest?: any;
-  setData: any;
+  setData?: any;
 }) => {
   const [open, setOpen] = useState(false);
 
