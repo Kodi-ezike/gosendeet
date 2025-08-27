@@ -126,7 +126,7 @@ export function formatDate(dateString: string): string {
   const day = date.getDate().toString().padStart(2, "0");
   const month = date.toLocaleString("en-US", { month: "short" });
   const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
+  return `${day} ${month}, ${year}`;
 }
 
 // Example:

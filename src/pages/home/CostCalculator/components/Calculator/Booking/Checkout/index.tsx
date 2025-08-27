@@ -12,8 +12,8 @@ const Checkout = () => {
   const location = useLocation();
 
   const { bookingId, bookingData } = location?.state || {};
-  const successUrl = `${LIVE_URL}/success-page`;
-  const errorUrl = `${LIVE_URL}/error-page`;
+  const successUrl = `${LIVE_URL}/success-page?bookingId=${bookingId}`;
+  const errorUrl = `${LIVE_URL}/error-page?bookingId=${bookingId}`;
 
   const [isChecked, setIsChecked] = useState(false);
 
