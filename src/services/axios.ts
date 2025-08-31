@@ -1,20 +1,20 @@
 import axios from "axios";
 import { toast } from "sonner";
-export const BASE_URL= "https://gosendeet-backend.onrender.com/api/v1"
+export const BASE_URL= "https://dev.gosendeet.com/api/v1"
 export const LIVE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:5173"
     : "https://gosendeet.vercel.app";
 
 export const authApi = axios.create({
-  baseURL: "https://gosendeet-backend.onrender.com/api/v1",
+  baseURL: "https://dev.gosendeet.com/api/v1",
   timeout: 60000,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
 });
 
 export const api = axios.create({
-  baseURL: "https://gosendeet-backend.onrender.com/api/v1",
+  baseURL: "https://dev.gosendeet.com/api/v1",
   timeout: 60000,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
