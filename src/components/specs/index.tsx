@@ -16,6 +16,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { allowOnlyNumbers } from "@/lib/utils";
+import { useState } from "react";
 
 export function SpecsModal({
   open,
@@ -30,18 +31,24 @@ export function SpecsModal({
 }) {
   // const [inputData, setInputData] = useState({});
 
-  // const [count, setCount] = useState(1);
-  // const plus = () => setCount((prev) => prev + 1);
-  // const minus = () => {
-  //   if (count === 0) {
-  //     return;
-  //   }
-  //   setCount((prev) => prev - 1);
-  // };
+  const [count, setCount] = useState(1);
+  const plus = () => {
+    const newCount = count + 1;
+    setCount(newCount);
+    setValue("itemQuantity", newCount.toString());
+  };
+  const minus = () => {
+    if (count === 1) {
+      return;
+    }
+    const newCount = count - 1;
+    setCount(newCount);
+    setValue("itemQuantity", newCount.toString());
+  };
 
   const schema = z.object({
-    itemValue: z.string().min(1, "Item value is required"),
-    itemWeight: z.string().optional(),
+    itemValue: z.string().optional(),
+    itemQuantity: z.string().min(1, "Quantity is required"),
     isFragile: z.boolean(),
     isPerishable: z.boolean(),
     isExclusive: z.boolean(),
@@ -58,7 +65,7 @@ export function SpecsModal({
     resolver: zodResolver(schema),
     defaultValues: {
       itemValue: "",
-      itemWeight: "",
+      itemQuantity: "1",
       isFragile: false,
       isPerishable: false,
       isExclusive: false,
@@ -99,7 +106,7 @@ export function SpecsModal({
       {
         ...inputData,
         itemValue: data.itemValue,
-        weight: data.itemWeight,
+        quantity: data.itemQuantity || 1,
         packageDescription: {
           isFragile: data?.isFragile,
           isPerishable: data?.isPerishable,
@@ -177,7 +184,7 @@ export function SpecsModal({
                 htmlFor="itemValue"
                 className="font-clash font-semibold text-sm"
               >
-                Item Value <span className="text-red-500 ml-1 text-md">*</span>
+                Item Value
               </label>
               <div className="border border-neutral200  rounded-xl h-[40px] flex items-center justify-between w-full">
                 <p className="p-4">₦</p>
@@ -198,20 +205,43 @@ export function SpecsModal({
 
             <div className="flex flex-col gap-2">
               <label
-                htmlFor="itemWeight"
+                htmlFor="itemQuantity"
                 className="font-clash font-semibold text-sm"
               >
-                Item Weight
+                Item Quantity
               </label>
-              <div className="border border-neutral200  rounded-xl h-[40px] flex items-center justify-between w-full">
-                <p className="p-4">kg</p>
+              <div className="border border-neutral200 rounded-xl h-[40px] px-3 flex items-center justify-between w-[100px]">
+                <p
+                  className="text-neutral500 text-2xl cursor-pointer"
+                  onClick={minus}
+                >
+                  -
+                </p>
                 <input
-                  type="text"
-                  {...register("itemWeight")}
-                  onKeyDown={allowOnlyNumbers}
-                  className="w-[90%] outline-0 text-sm px-4 py-2 border-l-2 border-l-neutral200"
+                  {...register("itemQuantity")}
+                  className="text-neutral600 border-0 outline-0 w-[40px] px-1 text-center"
+                  value={count}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    const regex = /^\d*$/;
+                    if (regex.test(inputValue) && inputValue !== "0") {
+                      setCount(Number(inputValue) || 1);
+                      setValue("itemQuantity", inputValue || "1");
+                    }
+                  }}
                 />
+                <p
+                  className="text-neutral500 text-2xl cursor-pointer"
+                  onClick={plus}
+                >
+                  +
+                </p>
               </div>
+              {errors.itemQuantity && (
+                <p className="error text-xs text-[#FF0000] my-1">
+                  {errors.itemQuantity.message}
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -314,7 +344,7 @@ export function SpecsModal({
             loading={isPending}
           >
             <FiSearch className="text-white text-xl" />
-            <span className="text-white">Get a quick quote</span>
+            <span className="text-white">Get Quote</span>
           </Button>
         </form>
       </DialogContent>

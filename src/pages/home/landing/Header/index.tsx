@@ -1,26 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import logos from "@/assets/images/logos.png";
 import { PiGpsFixFill } from "react-icons/pi";
 import CreateBooking from "@/components/CreateBooking";
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("delivery");
-  const [paused, setPaused] = useState(false);
 
   const tabs = [
     { key: "delivery", label: "Delivery/Pickup" },
     { key: "track", label: "Track" },
   ];
 
-  useEffect(() => {
-    if (paused) return;
-    const currentIndex = tabs.findIndex((tab) => tab.key === activeTab);
-    const nextIndex = (currentIndex + 1) % tabs.length;
-    const timer = setTimeout(() => {
-      setActiveTab(tabs[nextIndex].key);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [activeTab, paused]);
 
   return (
     <div className="homepage-header lg:h-[90vh] lg:flex items-center md:px-20 px-6 lg:py-0 py-20">
@@ -64,11 +54,7 @@ const Header = () => {
                 className={`flex-1 relative z-10 py-2 rounded-full font-outfit font-medium transition-colors duration-300 cursor-pointer ${
                   activeTab === tab.key ? "text-black" : "text-black opacity-70"
                 }`}
-                onMouseEnter={() => {
-                  setPaused(true);
-                  setActiveTab(tab.key);
-                }}
-                onMouseLeave={() => setPaused(false)}
+                onMouseEnter={() => setActiveTab(tab.key)}
                 onClick={() => setActiveTab(tab.key)}
               >
                 {tab.label}
@@ -77,23 +63,11 @@ const Header = () => {
           </div>
           <div className="bg-white rounded-3xl">
             {activeTab === "delivery" ? (
-              <div
-                className="p-4 text-sm"
-                onMouseEnter={() => {
-                  setPaused(true);
-                }}
-                onMouseLeave={() => setPaused(false)}
-              >
+              <div className="p-4 text-sm">
                 <CreateBooking />
               </div>
             ) : (
-              <div
-                className="p-4 text-sm"
-                onMouseEnter={() => {
-                  setPaused(true);
-                }}
-                onMouseLeave={() => setPaused(false)}
-              >
+              <div className="p-4 text-sm">
                 <form action="">
                   <div className="flex gap-3 items-center py-3 px-4 border-b">
                     <PiGpsFixFill className="text-purple400 text-xl" />
