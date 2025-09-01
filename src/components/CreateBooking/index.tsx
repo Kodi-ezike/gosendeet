@@ -1,4 +1,3 @@
-import { FiPlus } from "react-icons/fi";
 import size from "@/assets/icons/size.png";
 import location from "@/assets/icons/location.png";
 import { SpecsModal } from "@/components/specs";
@@ -16,6 +15,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { allowOnlyNumbers, cn } from "@/lib/utils";
+import { getQuotes } from "@/services/user";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { FiPlus, FiSearch } from "react-icons/fi";
 
 const CreateBooking = ({
   bookingRequest,
@@ -25,8 +29,32 @@ const CreateBooking = ({
   setData?: any;
 }) => {
   const [open, setOpen] = useState(false);
-
   const [inputData, setInputData] = useState({});
+  const navigate = useNavigate();
+
+  const { mutate: getQuotesDirectly, isPending: isQuoteLoading } = useMutation({
+    mutationFn: getQuotes,
+    onSuccess: (data: any) => {
+      if (data?.data?.length > 0) {
+        toast.success("Successful");
+        navigate("/cost-calculator", {
+          state: {
+            inputData: inputData,
+            results: data,
+          },
+        });
+        if (
+          window.location.pathname === "/cost-calculator" &&
+          typeof setData === "function"
+        ) {
+          setData(data);
+        }
+      }
+    },
+    onError: (data: any) => {
+      toast.error(data?.message);
+    },
+  });
 
   const { data: packageTypes } = useGetPackageType({ minimize: true });
 
@@ -42,9 +70,9 @@ const CreateBooking = ({
     packageTypeId: z
       .string({ required_error: "Package type is required" })
       .min(1, { message: "Please enter package type" }),
-    quantity: z
-      .string({ required_error: "Quantity is required" })
-      .min(1, { message: "Please enter quantity" }),
+    weight: z
+      .string({ required_error: "Weight is required" })
+      .min(1, { message: "Please enter weight" }),
   });
 
   const {
@@ -67,7 +95,7 @@ const CreateBooking = ({
         pickupLocation: bookingRequest.pickupLocation ?? "",
         dropOffLocation: bookingRequest.dropOffLocation ?? "",
         packageTypeId: bookingRequest.packageTypeId ?? "",
-        quantity: bookingRequest.quantity ?? "",
+        weight: bookingRequest.weight ?? "",
       });
     }
   }, [bookingRequest, reset]);
@@ -177,45 +205,65 @@ const CreateBooking = ({
               <img src={size} alt="size" className="w-[18px]" />
               <div className="flex flex-col gap-2 w-full">
                 <label htmlFor="location" className="font-clash font-semibold">
-                  Quantity
+                  Weight
                 </label>
 
                 <input
                   type="text"
-                  {...register("quantity")}
-                  placeholder="How many?"
+                  {...register("weight")}
+                  placeholder="Enter weight"
                   className="w-full outline-0"
                   onKeyDown={allowOnlyNumbers}
                 />
               </div>
             </div>
-            {errors.quantity && (
+            {errors.weight && (
               <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.quantity.message}
+                {errors.weight.message}
               </p>
             )}
           </div>
         </div>
 
-        <Button
-          type="button" // prevent form submit here
-          className="bg-black hover:bg-black rounded-full px-8 py-3 outline-black mt-4"
-          onClick={handleSubmit((data) => {
-            // form is valid ✅
-            setInputData(data);
-            setOpen(true);
-          })}
-        >
-          <FiPlus className="text-white" />
-          <span
-            className={cn(
-              window.location.pathname.includes("cost-calculator") && "hidden",
-              "text-white"
-            )}
+        <div className="flex gap-4 mt-4">
+          <Button
+            type="button"
+            className="bg-black hover:bg-black rounded-full px-8 py-3 outline-black flex items-center gap-2"
+            loading={isQuoteLoading}
+            onClick={handleSubmit((data) => {
+              // form is valid ✅ - get quote directly
+              setInputData(data);
+              getQuotesDirectly([
+                {
+                  ...data,
+                  quantity: 1, // default quantity for quick quote
+                  packageDescription: {
+                    isFragile: false,
+                    isPerishable: false,
+                    isExclusive: false,
+                    isHazardous: false,
+                  },
+                },
+              ]);
+            })}
           >
-            Add specifications
-          </span>
-        </Button>
+            <FiSearch className="text-white" />
+            <span className="text-white">Quick Quote</span>
+          </Button>
+          
+          <Button
+            type="button"
+            className="bg-gray-200 hover:bg-gray-300 rounded-full px-8 py-3 outline-gray-200 flex items-center gap-2"
+            onClick={handleSubmit((data) => {
+              // form is valid ✅ - open modal for additional options
+              setInputData(data);
+              setOpen(true);
+            })}
+          >
+            <FiPlus className="text-gray-700" />
+            <span className="text-gray-700">Additional Options</span>
+          </Button>
+        </div>
       </form>
 
       <SpecsModal
