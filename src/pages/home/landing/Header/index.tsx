@@ -11,7 +11,6 @@ const Header = () => {
     { key: "track", label: "Track" },
   ];
 
-
   return (
     <div className="homepage-header lg:h-[90vh] lg:flex items-center md:px-20 px-6 lg:py-0 py-20">
       <div className="lg:w-1/2">
@@ -35,7 +34,7 @@ const Header = () => {
         </p>
       </div>
       <div className="lg:w-1/2 lg:mt-0 mt-10">
-        <div className="md:w-[90%] mx-auto border md:h-[480px] bg-purple300 border-purple100 rounded-3xl shadow-deliveryShadow py-8 px-4">
+        <div className="md:w-[90%] mx-auto border md:min-h-[480px] bg-purple300 border-purple100 rounded-3xl shadow-deliveryShadow py-8 px-4">
           {/* Tab Buttons */}
           <div className="w-full rounded-full bg-purple200 h-[60px] flex py-1 relative overflow-hidden">
             <div
@@ -61,6 +60,7 @@ const Header = () => {
               </button>
             ))}
           </div>
+
           <div className="bg-white rounded-3xl">
             {activeTab === "delivery" ? (
               <div className="p-4 text-sm">

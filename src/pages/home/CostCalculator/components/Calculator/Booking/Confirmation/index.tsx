@@ -25,8 +25,6 @@ const Confirmation = () => {
     }
   }, [userId]);
 
-  console.log(data);
-
   return (
     <Layout>
       {isLoading && !isSuccess && (
