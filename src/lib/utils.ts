@@ -145,3 +145,36 @@ export const allowOnlyNumbers = (event: React.KeyboardEvent<HTMLInputElement>) =
   }
 };
 
+export function formatTo12Hour(timeString: string): string {
+  const date = new Date(timeString);
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+// Example
+// const formatted = formatTo12Hour("2025-08-27T17:17:55.297429");
+// console.log(formatted); // 👉 "5:17 PM"
+
+export function formatDateTime(dateString: string): string {
+  const date = new Date(dateString);
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  };
+
+  // Example output: "05:17 PM, 27 May 2023"
+  return date.toLocaleString("en-US", options);
+}
+
+// Example
+// const formatted = formatDateTime("2023-05-27T17:17:55.297429");
+// console.log(formatted); // 👉 "05:17 PM, 27 May 2023"
+

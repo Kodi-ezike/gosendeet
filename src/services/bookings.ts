@@ -8,3 +8,12 @@ export const getBookingsById = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const getAllBookings = async (page:number) => {
+  try {
+    const res = await api.get(`/bookings?page=${page}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import usePlacesAutocomplete from "use-places-autocomplete";
 import { useClickAway } from "@/hooks/useClickAway";
+// import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 // import { usePlacesAutocompleteV2 } from "@/hooks/usePlacesAutocompleteV2";
 
 const CreateBooking = ({
@@ -31,6 +32,7 @@ const CreateBooking = ({
   bookingRequest?: any;
   setData?: any;
 }) => {
+  // useGoogleMaps(import.meta.env.VITE_GOOGLE_MAPS_KEY, ["places"]);
   const [open, setOpen] = useState(false);
   const [inputData, setInputData] = useState({});
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ const CreateBooking = ({
   useClickAway(destRef, () => setOpenDestSuggestions(false));
 
   const {
-    ready,
+    // ready,
     // value: pickupValue,
     suggestions: { status: pickupStatus, data: pickupSuggestions },
     setValue: setPickupValue,
@@ -55,7 +57,7 @@ const CreateBooking = ({
   } = usePlacesAutocomplete();
 
   const {
-    ready: destReady,
+    // ready: destReady,
     // value: destValue,
     suggestions: { status: destStatus, data: destSuggestions },
     setValue: setDestValue,
@@ -173,7 +175,7 @@ const CreateBooking = ({
                     });
                     setOpenPickupSuggestions(true);
                   }}
-                  disabled={!ready}
+                  // disabled={!ready}
                   placeholder="Where from?"
                   className="w-full outline-0"
                 />
@@ -229,7 +231,7 @@ const CreateBooking = ({
                     });
                     setOpenDestSuggestions(true);
                   }}
-                  disabled={!destReady}
+                  // disabled={!destReady}
                   placeholder="Where to?"
                   className="w-full outline-0"
                 />
