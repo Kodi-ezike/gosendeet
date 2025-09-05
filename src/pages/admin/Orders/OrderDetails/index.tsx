@@ -11,8 +11,7 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const { bookingData } = location.state;
-  console.log(bookingData);
+  const { bookingData } = location?.state ?? {};
 
   return (
     <div className="md:px-20 px-6 py-8 bg-neutral100">
@@ -21,7 +20,7 @@ const OrderDetails = () => {
           variant={"ghost"}
           size={"ghost"}
           className=""
-          onClick={() => navigate("/admin-dashboard")}
+          onClick={() => navigate(-1)}
         >
           <FaArrowLeft />
           Back

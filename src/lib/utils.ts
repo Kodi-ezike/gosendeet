@@ -180,7 +180,7 @@ export function formatDateTime(dateString: string): string {
 
 export function formatStatus(status: string) {
   return status
-    .toLowerCase()
+    ?.toLowerCase()
     .replace(/_/g, " ") // replace underscores with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
 }
