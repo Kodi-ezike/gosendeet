@@ -162,9 +162,7 @@ const Bookings = () => {
               return (
                 <div
                   key={index}
-                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                  } hover:bg-purple300`}
+                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center border-b border-b-neutral300 hover:bg-purple300`}
                 >
                   <span className="w-[1%] mr-4">
                     <input type="checkbox" name="" id="" className="mt-1" />
