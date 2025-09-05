@@ -8,18 +8,23 @@ import {
 } from "@/components/ui/dialog";
 import { BiDetail } from "react-icons/bi";
 import { FiDownloadCloud } from "react-icons/fi";
-import card from "@/assets/images/mastercard.png";
 import { RxExternalLink } from "react-icons/rx";
+import { cn, formatDateTime, formatStatus } from "@/lib/utils";
+import { statusClasses } from "@/constants";
 
-export function BookingDetails({ setActiveModalId, setIsDialogOpen }: any) {
+export function BookingDetails({
+  // setActiveModalId,
+  // setIsDialogOpen,
+  bookingData,
+}: any) {
   return (
     <Dialog
-      onOpenChange={(open) => {
-        setIsDialogOpen(open);
-        if (!open) {
-          setActiveModalId(null); // Close parent modal when Dialog closes
-        }
-      }}
+      // onOpenChange={(open) => {
+      //   setIsDialogOpen(open);
+      //   if (!open) {
+      //     setActiveModalId(null); // Close parent modal when Dialog closes
+      //   }
+      // }}
     >
       <DialogTrigger asChild>
         <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
@@ -30,7 +35,7 @@ export function BookingDetails({ setActiveModalId, setIsDialogOpen }: any) {
         <DialogHeader>
           <DialogTitle>
             <p className="font-clash text-[20px] text-left font-semibold mt-2">
-              #3948774
+              {bookingData?.trackingNumber}
             </p>
           </DialogTitle>
           <DialogDescription className="hidden"></DialogDescription>
@@ -41,8 +46,14 @@ export function BookingDetails({ setActiveModalId, setIsDialogOpen }: any) {
               <FiDownloadCloud />
               Download
             </p>
-            <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-green100 text-green500">
-              Paid
+            <p
+              className={cn(
+                statusClasses[bookingData?.status] ??
+                  "bg-gray-100 text-gray-800", // fallback if status not found
+                "px-2 py-1 w-fit font-medium rounded-2xl text-xs"
+              )}
+            >
+              {formatStatus(bookingData?.status)}
             </p>
             {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-[#FEF2F2] text-[#EC2D30]">
               Canceled
@@ -52,58 +63,58 @@ export function BookingDetails({ setActiveModalId, setIsDialogOpen }: any) {
           <div className="grid md:grid-cols-3 gap-5 my-10">
             <div className="flex flex-col gap-2">
               <p className="font-clash font-semibold ">From</p>
-              <p className="text-sm font-medium">Victor Agbeniga</p>
-              <p className="text-neutral600">
-                14, Aare quarters, New-Bodija, Ibadan, Oyo, Nigeria. 394877
-              </p>
+              <p className="text-sm font-medium">{bookingData?.senderName}</p>
+              <p className="text-neutral600">{bookingData?.pickupLocation}</p>
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-clash font-semibold ">To</p>
-              <p className="text-sm font-medium">Johanne Effiong</p>
-              <p className="text-neutral600">17, Marina, VI, Lagos</p>
+              <p className="text-sm font-medium">{bookingData?.receiverName}</p>
+              <p className="text-neutral600">{bookingData?.destination}</p>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="font-clash font-semibold ">Payment</p>
-              <div>
-                <img src={card} alt="card" className="h-[24px]" />
-              </div>
+              <p className="font-clash font-semibold ">Category</p>
+              <p className="text-sm">{bookingData?.packageType}</p>
             </div>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             <div className="flex flex-col gap-2">
               <p className="font-clash font-semibold ">Pickup Created</p>
-              <p className="text-sm">11:37 PM, 27 May 2023 </p>
+              <p className="text-sm">
+                {formatDateTime(bookingData?.bookingDate)}
+              </p>
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-clash font-semibold ">Logistics</p>
-              <p className="text-sm">DHL</p>
-              <p className="text-neutral600">Ibadan</p>
+              <p className="text-sm">{bookingData?.companyName}</p>
             </div>
             <div className="flex flex-col gap-2">
               <p className="font-clash font-semibold ">Parcel Weight</p>
-              <p className="text-sm">15kg | 3x5x8 cm</p>
+              <p className="text-sm">{`${bookingData?.weight} ${bookingData?.weightUnit} | ${bookingData?.length}x${bookingData?.width}x${bookingData?.height} ${bookingData?.dimensionsUnit}`}</p>
             </div>
           </div>
-          <div className="flex flex-col gap-2 mt-6">
-            <p className="font-clash font-semibold ">Category</p>
-            <p className="text-sm">Envelope</p>
-          </div>
+
           <div className="flex flex-col gap-2 my-10 text-sm">
             <p className="flex justify-between items-center md:px-8 px-4">
               Subtotal
-              <span className="font-clash font-semibold">$40.00</span>
+              <span className="font-clash font-semibold">
+                ₦ {bookingData?.cost?.subTotal}
+              </span>
             </p>
             <p className="flex justify-between items-center md:px-8 px-4">
               Shipping Fee
-              <span className="font-clash font-semibold">FREE</span>
+              <span className="font-clash font-semibold">
+                ₦ {bookingData?.cost?.shippingFee}
+              </span>
             </p>
             <p className="flex justify-between items-center md:px-8 px-4">
               Tax
-              <span className="font-clash font-semibold">$4.00</span>
+              <span className="font-clash font-semibold">
+                ₦ {bookingData?.cost?.tax ?? 0}{" "}
+              </span>
             </p>
             <p className="flex justify-between items-center md:px-8 px-4 py-4 font-clash font-semibold bg-neutral200 rounded-full">
               TOTAL COSTS + VAT
-              <span>$44.00</span>
+              <span>₦ {bookingData?.cost?.total}</span>
             </p>
           </div>
           <div className="flex md:flex-row flex-col justify-center gap-2 items-center mb-10">

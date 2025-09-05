@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 
@@ -13,9 +13,15 @@ import { LuDownload } from "react-icons/lu";
 import { BookingDetails } from "./details";
 import { useGetAllBookings } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
-import { formatDateTime } from "@/lib/utils";
+import { cn, formatDateTime, formatStatus } from "@/lib/utils";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
 import { PaginationComponent } from "@/components/Pagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { statusClasses } from "@/constants";
 
 const statusOptions = [
   { value: "paid", title: "Paid" },
@@ -34,38 +40,34 @@ const Bookings = () => {
   const { currentPage, updatePage } = usePaginationSync(lastPage);
   const { data, isLoading, isSuccess, isError } =
     useGetAllBookings(currentPage);
-  // console.log(data);
-  useEffect(() => {
+
+    useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
     if (totalPages && totalPages !== lastPage) {
       setLastPage(totalPages);
     }
   }, [data?.data?.page?.totalPages]);
-
+  const [bookingData, setBookingData] =useState({})
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const modalRef = useRef<HTMLDivElement | null>(null);
+  // const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const showModal = (id: number) => {
-    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
-  };
+  // // Close modal on outside click
+  // useEffect(() => {
+  //   const handleOutsideClick = (event: MouseEvent) => {
+  //     if (isDialogOpen) return; // Skip if dialog is open
 
-  // Close modal on outside click
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (isDialogOpen) return; // Skip if dialog is open
+  //     const target = event.target as Node;
+  //     if (modalRef.current && !modalRef.current.contains(target)) {
+  //       setActiveModalId(null); // Close parent modal
+  //     }
+  //   };
 
-      const target = event.target as Node;
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        setActiveModalId(null); // Close parent modal
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, [isDialogOpen]);
+  //   document.addEventListener("mousedown", handleOutsideClick);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleOutsideClick);
+  //   };
+  // }, [isDialogOpen]);
 
   return (
     <div className="md:px-4">
@@ -141,12 +143,12 @@ const Bookings = () => {
 
       {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
         <div className="overflow-x-auto">
-          <div className="min-w-[1100px] w-full">
+          <div className="min-w-[1200px] w-full">
             <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-clash font-semibold bg-purple300 w-full">
               <span className="w-[1%] mr-4">
                 <input type="checkbox" name="" id="" className="mt-[2px]" />
               </span>
-              <span className="flex-1">Order Number</span>
+              <span className="flex-1">Tracking Number</span>
               <span className="flex-1">Courier</span>
               <span className="flex-1">Category</span>
               <span className="flex-1">Parcel Weight</span>
@@ -168,17 +170,15 @@ const Bookings = () => {
                     <input type="checkbox" name="" id="" className="mt-1" />
                   </span>
                   <div className="flex-1 text-left">
-                    <p className="truncate">
-                      {item?.orderNumber?.split("-")[0]}
-                    </p>
+                    <p>{item?.trackingNumber}</p>
                   </div>
                   <div className="flex-1">
-                    <p>{item?.companyName}</p>
+                    <p className="truncate">{item?.companyName}</p>
                   </div>
                   <div className="flex-1">
-                    <p className="text-neutral600">Envelope</p>
+                    <p className="text-neutral600">{item?.packageType}</p>
                   </div>
-                  <div className="flex-1">15kg | 3x5x8 cm</div>
+                  <div className="flex-1">{`${item.weight} ${item.weightUnit} | ${item.length}x${item.width}x${item.height} ${item.dimensionsUnit}`}</div>
                   <div className="flex-1">
                     {formatDateTime(item?.bookingDate)}
                   </div>
@@ -186,37 +186,51 @@ const Bookings = () => {
                     <p>{item?.destination}</p>
                   </div>
                   <div className="w-[9%]">
-                    <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-[#FEF2F2] text-[#EC2D30]">
-                      Canceled
+                    <p
+                      className={cn(
+                        statusClasses[item.status] ??
+                          "bg-gray-100 text-gray-800", // fallback if status not found
+                        "px-2 py-1 w-fit font-medium rounded-2xl text-xs"
+                      )}
+                    >
+                      {formatStatus(item?.status)}
                     </p>
                     {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-neutral200 text-neutral600">Refunded</p> */}
                     {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-green100 text-green500">Paid</p> */}
                   </div>
                   <div className="w-[2%]">
-                    <button className="border p-1 rounded-md border-neutral200">
-                      <BsThreeDotsVertical
-                        size={20}
-                        className="p-1 cursor-pointer"
-                        onClick={() => showModal(index)}
-                      />
-                    </button>
+                    <Popover
+                      open={activeModalId === index}
+                      onOpenChange={(open) =>
+                        setActiveModalId(open ? index : null)
+                      }
+                    >
+                      <PopoverTrigger asChild>
+                        <button className="border p-1 rounded-md border-neutral200">
+                          <BsThreeDotsVertical
+                            size={20}
+                            className="p-1 cursor-pointer"
+                            onClick={() => {
+                              setActiveModalId(index);
+                              setBookingData(item)
+                            }}
+                          />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-fit p-1">
+                        <BookingDetails
+                          // setActiveModalId={setActiveModalId}
+                          // setIsDialogOpen={setIsDialogOpen}
+                          bookingData={bookingData}
+                        />
+                        <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                          <LuDownload size={18} /> Download
+                        </p>
+                      </PopoverContent>
+                    </Popover>
                   </div>
 
-                  {/* Modal */}
-                  {activeModalId === index && ( // Show modal only for the active event
-                    <div
-                      className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                      ref={modalRef} // Attach ref to the modal
-                    >
-                      <BookingDetails
-                        setActiveModalId={setActiveModalId}
-                        setIsDialogOpen={setIsDialogOpen}
-                      />
-                      <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        <LuDownload size={18} /> Download
-                      </p>
-                    </div>
-                  )}
+                
                 </div>
               );
             })}

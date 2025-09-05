@@ -557,3 +557,14 @@ export const faqData: Record<
     ],
   },
 };
+
+export const statusClasses: Record<string, string> = {
+  PENDING: "bg-yellow-100 text-yellow-800",
+  CONFIRMED: "bg-blue-100 text-blue-800",
+  PICKED_UP: "bg-indigo-100 text-indigo-800",
+  IN_TRANSIT: "bg-purple-100 text-purple-800",
+  OUT_FOR_DELIVERY: "bg-orange-100 text-orange-800",
+  DELIVERED: "bg-green-100 text-green-800",
+  CANCELLED: "bg-red-100 text-red-800",
+  FAILED_DELIVERY: "bg-gray-200 text-gray-800",
+};

@@ -93,7 +93,7 @@ const Confirmation = () => {
                     </span>
                   </p>
                   <p className="flex justify-between items-center font-medium text-sm">
-                    <span className="text-neutral600">Address</span>
+                    <span className="text-neutral600">Destination</span>
                     <span className="text-right">
                       {data?.data?.receiver?.address}
                     </span>

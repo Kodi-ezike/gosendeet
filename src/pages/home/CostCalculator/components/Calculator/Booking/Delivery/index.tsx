@@ -79,8 +79,9 @@ const Delivery = () => {
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     const payload = {
-      senderId: userId,
+      // senderId: userId,
       packageTypeId: bookingRequest?.packageTypeId,
+      weight: bookingRequest?.weight,
       receiverName: data.receiver_name,
       receiverPhone: data.receiver_phone,
       receiverEmail: data.receiver_email, // NUllable
