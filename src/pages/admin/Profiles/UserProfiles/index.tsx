@@ -182,7 +182,7 @@ const UserProfiles = () => {
 
           {/* Tab Content */}
           <div className="mt-6">
-            {activeTab === "orders" && <Orders />}
+          {activeTab === "orders" && <Orders userId={userId} />}
             {activeTab === "login" && <LoginHistory data={login}/>}
             {/* {activeTab === "settings" && <Settings />} */}
           </div>

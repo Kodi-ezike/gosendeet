@@ -6,13 +6,16 @@ import { useState } from "react";
 import { UpdateProgressModal } from "../modals/UpdateProgressModal";
 import { cn, formatDateTime, formatStatus } from "@/lib/utils";
 import { statusClasses } from "@/constants";
+import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const { bookingData } = location?.state ?? {};
-
+  //  isLoading, isSuccess, isError
+  const { data } = useGetBookingsById(bookingData.id);
+  console.log(data);
   return (
     <div className="md:px-20 px-6 py-8 bg-neutral100">
       <div className="flex justify-between items-center mb-8">

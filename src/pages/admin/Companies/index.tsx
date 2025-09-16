@@ -5,7 +5,7 @@
 //   SelectTrigger,
 //   SelectValue,
 // } from "@/components/ui/select";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
@@ -23,6 +23,11 @@ import { UpdateCompanyModal } from "./modals/UpdateCompanyModal";
 import UpdateCompanyStatusModal from "./modals/UpdateCompanyStatusModal";
 import { PaginationComponent } from "@/components/Pagination";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Companies = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
@@ -43,8 +48,7 @@ const Companies = () => {
   // const resetPageRef = useRef(false);
 
   const [lastPage, setLastPage] = useState(1);
-  const { currentPage, updatePage } =
-    usePaginationSync(lastPage);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
 
   const { data: stats } = useGetCompanyStats();
   const companyStats = stats?.data ?? {};
@@ -59,7 +63,7 @@ const Companies = () => {
     size,
     companyStatus,
     serviceLevelId,
-    debouncedSearchTerm,
+    debouncedSearchTerm
     // {
     //   enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
     //   queryKey: [
@@ -93,29 +97,6 @@ const Companies = () => {
   // );
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-  // const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const showModal = (id: number) => {
-    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
-  };
-
-  // Close modal on outside click
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      // if (isDialogOpen) return; // Skip if dialog is open
-
-      const target = event.target as Node;
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        setActiveModalId(null); // Close parent modal
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
 
   const statusTabs = [
     {
@@ -329,22 +310,25 @@ const Companies = () => {
                     <div className="flex-1">
                       <p className="capitalize">{item.status}</p>
                     </div>
-                    <div className="w-[2%]">
-                      <button className="border p-1 rounded-md border-neutral200">
-                        <BsThreeDotsVertical
-                          size={20}
-                          className="p-1 cursor-pointer"
-                          onClick={() => showModal(index)}
-                        />
-                      </button>
-                    </div>
 
-                    {/* Modal */}
-                    {activeModalId === index && ( // Show modal only for the active event
-                      <div
-                        className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                        ref={modalRef} // Attach ref to the modal
-                      >
+                    <Popover
+                      open={activeModalId === index}
+                      onOpenChange={(open) =>
+                        setActiveModalId(open ? index : null)
+                      }
+                    >
+                      <PopoverTrigger asChild>
+                        <button className="border p-1 rounded-md border-neutral200">
+                          <BsThreeDotsVertical
+                            size={20}
+                            className="p-1 cursor-pointer"
+                            onClick={() => {
+                              setActiveModalId(index);
+                            }}
+                          />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-fit p-1">
                         <Link
                           to={`/admin-dashboard/company/${index + 1}`}
                           state={{ id: item.id }}
@@ -373,8 +357,8 @@ const Companies = () => {
                         >
                           Update status
                         </p>
-                      </div>
-                    )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 );
               })}

@@ -1,45 +1,90 @@
 import { UpdateProgressModal } from "@/pages/admin/Orders/modals/UpdateProgressModal";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
-// import { AccountStatusModal } from "./modals/AccountStatusModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Link } from "react-router-dom";
-const Orders = () => {
+import { usePaginationSync } from "@/hooks/usePaginationSync";
+import {
+  useGetAllBookings,
+  useGetBookingsStats,
+} from "@/queries/user/useGetUserBookings";
+import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
+import { Spinner } from "@/components/Spinner";
+import { cn, formatDateTime, formatStatus } from "@/lib/utils";
+import { statusClasses } from "@/constants";
+import { PaginationComponent } from "@/components/Pagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const Orders = ({ userId }: { userId: any }) => {
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const [bookingStatus, setBookingStatus] = useState("");
+  const [packageTypeId, setPackageTypeId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: bookingStats } = useGetBookingsStats();
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
+  const packages = packageTypes?.data;
+  const { data, isLoading, isSuccess, isError } = useGetAllBookings({
+    page: currentPage,
+    senderId: userId,
+    bookingStatus,
+    search: debouncedSearchTerm,
+    packageTypeId,
+  });
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 second after user stops typing
+
+    return () => {
+      clearTimeout(handler); // cancel timeout if user types again
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
+  const [bookingData, setBookingData] = useState({});
+
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
+
   const statusTabs = [
-    { label: "All", count: 1000 },
-    { label: "Ongoing", count: 2 },
-    { label: "Completed", count: 990 },
-    { label: "Canceled", count: 6 },
-    { label: "Refunded", count: 2 },
+    { label: "All", status: "", count: bookingStats?.data?.totalBookings ?? 0 },
+    {
+      label: "Active",
+      status: "PENDING",
+      count: bookingStats?.data?.activeBookings ?? 0,
+    },
+    {
+      label: "Completed",
+      status: "DELIVERED",
+      count: bookingStats?.data?.deliveredBookings ?? 0,
+    },
+    {
+      label: "Cancelled",
+      status: "CANCELLED",
+      count: bookingStats?.data?.cancelledBookings ?? 0,
+    },
   ];
 
-  const results = [1, 2, 3, 4, 5];
-
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-
-  const showModal = (id: number) => {
-    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
-  };
-
-  // Close modal on outside click
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      // if (isDialogOpen) return; // Skip if dialog is open
-
-      const target = event.target as Node;
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        setActiveModalId(null); // Close parent modal
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
 
   return (
     <div>
@@ -48,8 +93,11 @@ const Orders = () => {
           {statusTabs.map((tab) => (
             <button
               key={tab.label}
-              onClick={() => setActiveStatusTab(tab.label)}
-              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium ${
+              onClick={() => {
+                setActiveStatusTab(tab.label);
+                setBookingStatus(tab.status);
+              }}
+              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium cursor-pointer ${
                 activeStatusTab === tab.label
                   ? "bg-neutral300 text-neutral800 "
                   : "bg-neutral200 text-neutral500"
@@ -65,110 +113,176 @@ const Orders = () => {
             <input
               type="text"
               role="search"
-              className="border-0 outline-0 w-[200px] text-sm text-neutral600"
+              className="border-0 outline-0 w-[150px] text-sm text-neutral600"
               placeholder="Search order"
+              onChange={(e: any) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </div>
+          <div>
+            {/* Select options */}
+            <Select
+              onValueChange={(value) =>
+                value === "all" ? setPackageTypeId("") : setPackageTypeId(value)
+              }
+            >
+              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[150px] max-w-[300px]">
+                <SelectValue placeholder="Package Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                {packages?.map((item: any) => (
+                  <SelectItem value={item.id} key={item.id}>
+                    {item?.name} ({item?.maxWeight} {item?.weightUnit})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {/* <div>
+            <Select>
+              <SelectTrigger className="h-[40px] rounded-lg border-2">
+                <SelectValue placeholder="Date Created" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">This month</SelectItem>
+                <SelectItem value="2">This week</SelectItem>
+              </SelectContent>
+            </Select>
+          </div> */}
         </div>
       </div>
-      <div className="overflow-x-auto">
-        <div className="min-w-[1100px] w-full relative">
-          <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
-            <span className="w-[1%] mr-4">
-              <input type="checkbox" name="" id="" className="mt-[2px]" />
-            </span>
-            <span className="flex-1">Order Number</span>
-            <span className="flex-1">Courier</span>
-            <span className="flex-1">Category</span>
-            <span className="flex-1">Parcel Weight</span>
-            <span className="flex-1">Pickup Created</span>
-            <span className="flex-1">Destination</span>
-            <span className="w-[10%]">Status</span>
-            <span className="w-[10%]">Progress</span>
-            <span className="w-[2%]"></span>
+
+      {isLoading && !isSuccess && (
+        <div className="h-[50vh] w-full flex items-center justify-center">
+          <Spinner />
+        </div>
+      )}
+
+      {isError && !isLoading && (
+        <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+          <p className="font-semibold font-inter text-xl text-center">
+            There was an error getting the data
+          </p>
+        </div>
+      )}
+
+      {!isLoading && isSuccess && data && data?.data?.content?.length > 0 && (
+        <div className="overflow-x-auto">
+          <div className="min-w-[1100px] w-full relative">
+            <div className="flex justify-between text-left px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple300 w-full">
+              <span className="w-[1%] mr-4">
+                <input type="checkbox" name="" id="" className="mt-[2px]" />
+              </span>
+              <span className="flex-1">Tracking Number</span>
+              <span className="flex-1">Courier</span>
+              <span className="flex-1">Category</span>
+              <span className="flex-1">Parcel Weight</span>
+              <span className="flex-1">Pickup Created</span>
+              <span className="w-[10%]">Status</span>
+              <span className="w-[10%]">Progress</span>
+              <span className="w-[2%]"></span>
+            </div>
+
+            {data?.data?.content?.map((item: any, index: number) => {
+              return (
+                <div
+                  key={index}
+                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
+                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
+                  } hover:bg-purple300`}
+                >
+                  <span className="w-[1%] mr-4">
+                    <input type="checkbox" name="" id="" className="mt-1" />
+                  </span>
+                  <div className="flex-1">
+                    <p>{item?.trackingNumber}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p>{item?.companyName}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p>{item?.packageType}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p>{`${item?.weight} ${item?.weightUnit} | ${item?.length}x${item?.width}x${item?.height} ${item?.dimensionsUnit}`}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p>{formatDateTime(item?.bookingDate)} </p>
+                  </div>
+                  <div className="w-[10%]">
+                    <p
+                      className={cn(
+                        statusClasses[item?.status] ??
+                          "bg-gray-100 text-gray-800", // fallback if status not found
+                        "px-2 py-1 w-fit font-medium rounded-2xl text-xs"
+                      )}
+                    >
+                      {formatStatus(item?.status)}
+                    </p>
+                  </div>
+                  <div className="w-[10%]">{item?.currentProgress}</div>
+
+                  <Popover
+                    open={activeModalId === index}
+                    onOpenChange={(open) =>
+                      setActiveModalId(open ? index : null)
+                    }
+                  >
+                    <PopoverTrigger asChild>
+                      <button className="border p-1 rounded-md border-neutral200">
+                        <BsThreeDotsVertical
+                          size={20}
+                          className="p-1 cursor-pointer"
+                          onClick={() => {
+                            setActiveModalId(index);
+                            setBookingData(item);
+                          }}
+                        />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-fit p-1">
+                      <Link
+                        to={`/admin-dashboard/order/${index}`}
+                        state={{ bookingData: bookingData }}
+                      >
+                        <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                          View full details
+                        </p>
+                      </Link>
+                      <p
+                        className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                        onClick={() => setOpen(true)}
+                      >
+                        Update progress
+                      </p>
+                      <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
+                        Refund
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              );
+            })}
           </div>
 
-          {results?.map((index) => {
-            return (
-              <div
-                key={index}
-                className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
-                  index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                } hover:bg-purple300`}
-              >
-                <span className="w-[1%] mr-4">
-                  <input type="checkbox" name="" id="" className="mt-1" />
-                </span>
-                <div className="flex-1">
-                  <p>#95214362</p>
-                </div>
-                <div className="flex-1">
-                  <p>DHL Logistics</p>
-                </div>
-                <div className="flex-1">
-                  <p>Envelope</p>
-                </div>
-                <div className="flex-1">
-                  <p>15kg | 3x5x8 cm</p>
-                </div>
-                <div className="flex-1">
-                  <p>11:37 PM, 27 May 2023 </p>
-                </div>
-                <div className="flex-1">
-                  <p>Emery Torff</p>
-                  <p>Marina, VI, Lagos</p>
-                </div>
-                <div className="w-[10%]">
-                  {/* <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-[#FEF2F2] text-[#EC2D30]">
-                                  Inactive
-                                </p> */}
-                  <p className="px-4 py-1 w-fit font-medium rounded-2xl bg-green100 text-green500">
-                    Active
-                  </p>
-                </div>
-                <div className="w-[10%]">On the way</div>
-
-                <div className="w-[2%]">
-                  <button className="border p-1 rounded-md border-neutral200">
-                    <BsThreeDotsVertical
-                      size={20}
-                      className="p-1 cursor-pointer"
-                      onClick={() => showModal(index)}
-                    />
-                  </button>
-                </div>
-
-                {/* Modal */}
-                {activeModalId === index && ( // Show modal only for the active event
-                  <div
-                    className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                    ref={modalRef} // Attach ref to the modal
-                  >
-                    <Link to={`/admin-dashboard/order/${index}`}>
-                      <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                        View full details
-                      </p>
-                    </Link>
-                    <p
-                      className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                      onClick={() => setOpen(true)}
-                    >
-                      Update progress
-                    </p>
-                    <p className="py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                      Refund
-                    </p>
-                    {/* <AccountStatusModal
-                              setActiveModalId={setActiveModalId}
-                              dialogRef={dialogRef}
-                            /> */}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
         </div>
-      </div>
+      )}
+
+      {data && data?.data?.content?.length === 0 && !isLoading && isSuccess && (
+        <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+          <p className="font-semibold font-inter text-xl text-center">
+            There are no results
+          </p>
+        </div>
+      )}
+
       <UpdateProgressModal open={open} setOpen={setOpen} />
     </div>
   );

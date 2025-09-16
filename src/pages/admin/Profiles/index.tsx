@@ -18,6 +18,11 @@ import {
 import { Spinner } from "@/components/Spinner";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
 import { PaginationComponent } from "@/components/Pagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Profiles = () => {
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
@@ -42,9 +47,9 @@ const Profiles = () => {
   const { data: profileStats } = useGetProfileStats();
 
   useEffect(() => {
-      resetPageRef.current = true;
-      setCurrentPage(1); // Triggers a rerender
-    }, [userStatus]);
+    resetPageRef.current = true;
+    setCurrentPage(1); // Triggers a rerender
+  }, [userStatus]);
 
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
     resetPageRef.current ? 1 : currentPage, // 👈 Always fetch page 1 during status change
@@ -63,12 +68,12 @@ const Profiles = () => {
     }
   );
 
- useEffect(() => {
-     const totalPages = data?.data?.page?.totalPages;
-     if (totalPages && totalPages !== lastPage) {
-       setLastPage(totalPages);
-     }
-   }, [data?.data?.page?.totalPages]);
+  useEffect(() => {
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -105,28 +110,6 @@ const Profiles = () => {
   ];
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
-  const modalRef = useRef<HTMLDivElement | null>(null);
-
-  const showModal = (id: number) => {
-    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
-  };
-
-  // Close modal on outside click
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      // if (isDialogOpen) return; // Skip if dialog is open
-
-      const target = event.target as Node;
-      if (modalRef.current && !modalRef.current.contains(target)) {
-        setActiveModalId(null); // Close parent modal
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
 
   return (
     <div>
@@ -315,22 +298,25 @@ const Profiles = () => {
                         {item.status}
                       </p>
                     </div>
-                    <div className="w-[2%]">
-                      <button className="border p-1 rounded-md border-neutral200">
-                        <BsThreeDotsVertical
-                          size={20}
-                          className="p-1 cursor-pointer"
-                          onClick={() => showModal(index)}
-                        />
-                      </button>
-                    </div>
 
-                    {/* Modal */}
-                    {activeModalId === index && ( // Show modal only for the active event
-                      <div
-                        className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-12 right-6"
-                        ref={modalRef} // Attach ref to the modal
-                      >
+                    <Popover
+                      open={activeModalId === index}
+                      onOpenChange={(open) =>
+                        setActiveModalId(open ? index : null)
+                      }
+                    >
+                      <PopoverTrigger asChild>
+                        <button className="border p-1 rounded-md border-neutral200">
+                          <BsThreeDotsVertical
+                            size={20}
+                            className="p-1 cursor-pointer"
+                            onClick={() => {
+                              setActiveModalId(index);
+                            }}
+                          />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-fit p-1">
                         <Link
                           to={`/admin-dashboard/user/${index + 1}`}
                           state={{ id: item.id }}
@@ -350,8 +336,8 @@ const Profiles = () => {
                         >
                           Update status
                         </p>
-                      </div>
-                    )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 );
               })}

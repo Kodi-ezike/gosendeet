@@ -14,12 +14,14 @@ export const getAllBookings = async ({
   bookingStatus,
   packageTypeId,
   companyId,
+  senderId,
   search,
 }: {
   page: number;
   bookingStatus?: string;
   packageTypeId?: string;
   companyId?: string;
+  senderId?: string;
   search?: string;
 }
 ) => {
@@ -30,6 +32,7 @@ export const getAllBookings = async ({
     if (bookingStatus) params.append("status", bookingStatus);
     if (packageTypeId) params.append("packageTypeId", packageTypeId);
     if (companyId) params.append("companyId", companyId);
+    if (senderId) params.append("senderId", senderId);
     if (search) params.append("searchTerm", search);
 
     const res = await api.get(`/bookings?${params.toString()}`);
@@ -40,9 +43,21 @@ export const getAllBookings = async ({
 };
 
 
-export const getBookingStats = async () => {
+export const getBookingStats = async ({
+  companyId,
+  senderId,
+}: {
+  companyId?: string;
+  senderId?: string;
+}) => {
   try {
-    const res = await api.get(`/bookings/stats`);
+
+    const params = new URLSearchParams();
+
+    if (companyId) params.append("companyId", companyId);
+    if (senderId) params.append("senderId", senderId);
+
+    const res = await api.get(`/bookings/stats?${params.toString()}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

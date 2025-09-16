@@ -19,21 +19,21 @@ export const useGetBookingsById = (id: string) => {
   };
 };
 
-export const useGetAllBookings = ( params: {
+export const useGetAllBookings = (
+  params: {
     page: number;
     bookingStatus?: string;
     packageTypeId?: string;
     companyId?: string;
+    senderId?: string;
     search?: string;
   },
   options?: UseQueryOptions<any>
-
 ) => {
   const query = useQuery({
     queryKey: ["bookings", params],
-    queryFn: () =>
-      getAllBookings(params),
-     ...options, // spread options last to allow overriding defaults
+    queryFn: () => getAllBookings(params),
+    ...options, // spread options last to allow overriding defaults
   });
   return {
     isLoading: query.isPending,
@@ -44,10 +44,17 @@ export const useGetAllBookings = ( params: {
   };
 };
 
-export const useGetBookingsStats = () => {
+export const useGetBookingsStats = (
+  params: {
+    companyId?: string;
+    senderId?: string;
+  } = {},
+  options?: UseQueryOptions<any>
+) => {
   const query = useQuery({
-    queryKey: ["booking_stats"],
-    queryFn: () => getBookingStats(),
+    queryKey: ["booking_stats", params],
+    queryFn: () => getBookingStats(params),
+    ...options, // spread options last to allow overriding defaults
   });
   return {
     isLoading: query.isPending,
