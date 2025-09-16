@@ -568,3 +568,14 @@ export const statusClasses: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-800",
   FAILED_DELIVERY: "bg-gray-200 text-gray-800",
 };
+
+export const statusOptions = [
+  { value: "PENDING", title: "Pending" },
+  { value: "CONFIRMED", title: "Confirmed" },
+  { value: "PICKED_UP", title: "Picked Up" },
+  { value: "IN_TRANSIT", title: "In Transit" },
+  { value: "OUT_FOR_DELIVERY", title: "Out For Delivery" },
+  { value: "DELIVERED", title: "Delivered" },
+  { value: "CANCELLED", title: "Cancelled" },
+  { value: "FAILED_DELIVERY", title: "Failed Delivery" },
+]

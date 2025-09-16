@@ -13,7 +13,10 @@ import bellComplete from "@/assets/icons/bell-complete.png";
 import bellOff from "@/assets/icons/bell-off.png";
 import { Link } from "react-router-dom";
 import { UpdateProgressModal } from "./modals/UpdateProgressModal";
-import { useGetAllBookings } from "@/queries/user/useGetUserBookings";
+import {
+  useGetAllBookings,
+  useGetBookingsStats,
+} from "@/queries/user/useGetUserBookings";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
 import { Spinner } from "@/components/Spinner";
 import { PaginationComponent } from "@/components/Pagination";
@@ -24,12 +27,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { TbBellRinging } from "react-icons/tb";
+import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 
 const Orders = () => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
-  const { data, isLoading, isSuccess, isError } =
-    useGetAllBookings(currentPage);
+  const [bookingStatus, setBookingStatus] = useState("");
+  const [packageTypeId, setPackageTypeId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: bookingStats } = useGetBookingsStats();
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
+  const packages = packageTypes?.data;
+  const { data, isLoading, isSuccess, isError } = useGetAllBookings({
+    page: currentPage,
+    bookingStatus,
+    search: debouncedSearchTerm,
+    packageTypeId,
+  });
 
   useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
@@ -42,14 +58,38 @@ const Orders = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
   const statusTabs = [
-    { label: "All", count: 1000 },
-    { label: "Ongoing", count: 2 },
-    { label: "Completed", count: 990 },
-    { label: "Canceled", count: 6 },
-    { label: "Refunded", count: 2 },
+    { label: "All",
+      status: "",
+      count: bookingStats?.data?.totalBookings ?? 0,
+    },
+    {
+      label: "Active",
+      status: "PENDING",
+      count: bookingStats?.data?.activeBookings ?? 0,
+    },
+    {
+      label: "Completed",
+      status: "DELIVERED",
+      count: bookingStats?.data?.deliveredBookings ?? 0,
+    },
+    {
+      label: "Cancelled",
+      status: "CANCELLED",
+      count: bookingStats?.data?.cancelledBookings ?? 0,
+    },
   ];
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 second after user stops typing
+
+    return () => {
+      clearTimeout(handler); // cancel timeout if user types again
+    };
+  }, [searchTerm]);
 
   return (
     <div>
@@ -61,79 +101,62 @@ const Orders = () => {
       </div>
       <div className="w-full bg-neutral200 p-4 md:flex items-center rounded-2xl mb-8">
         <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-neutral500 text-sm">Active Orders</p>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-neutral500 text-sm">All Orders</p>
             <img src={bellActive} alt="bellActive" />
           </div>
-          <p className="text-[20px] font-inter font-semibold my-2">50</p>
-          <hr className="border-neutral700" />
-          <div className="flex justify-between items-center py-2">
-            <Select>
-              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="font-inter font-semibold text-green400">9.12%</p>
-          </div>
+          <p className="text-[20px] font-inter font-semibold my-2">
+            {bookingStats?.data?.totalBookings ?? 0}
+          </p>
         </div>
 
         <p className="h-[0.7px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
 
         <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-neutral500 text-sm">Active Orders</p>
+            <TbBellRinging size={24} className="text-yellow-500" />
+          </div>
+          <p className="text-[20px] font-inter font-semibold my-2">
+            {bookingStats?.data?.activeBookings ?? 0}
+          </p>
+        </div>
+
+        <p className="h-[0.7px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
+
+        <div className="w-full">
+          <div className="flex justify-between items-center mb-4">
             <p className="text-neutral500 text-sm ">Completed Orders</p>
             <img src={bellComplete} alt="bellComplete" />
           </div>
-          <p className="text-[20px] font-inter font-semibold my-2">2</p>
-          <hr className="border-neutral700" />
-          <div className="flex justify-between items-center py-2">
-            <Select>
-              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="font-inter font-semibold text-neutral500">0%</p>
-          </div>
+          <p className="text-[20px] font-inter font-semibold my-2">
+            {bookingStats?.data?.deliveredBookings ?? 0}
+          </p>
         </div>
 
         <p className="h-[1px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
 
         <div className="w-full">
-          <div className="flex justify-between items-center mt-2">
+          <div className="flex justify-between items-center mb-4">
             <p className="text-neutral500 text-sm ">Cancelled Orders</p>
             <img src={bellOff} alt="bellOff" />
           </div>
-          <p className="text-[20px] font-inter font-semibold my-2">2</p>
-          <hr className="border-neutral700" />
-          <div className="flex justify-between items-center py-2">
-            <Select>
-              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="font-inter font-semibold text-neutral500">0%</p>
-          </div>
+          <p className="text-[20px] font-inter font-semibold my-2">
+            {bookingStats?.data?.cancelledBookings ?? 0}
+          </p>
         </div>
       </div>
+
       <div className="flex xl:flex-row flex-col justify-between xl:items-center gap-4 mb-6">
         <div className="flex gap-4 flex-wrap">
           {statusTabs.map((tab) => (
             <button
               key={tab.label}
-              onClick={() => setActiveStatusTab(tab.label)}
-              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium ${
+              onClick={() => {
+                setActiveStatusTab(tab.label);
+                setBookingStatus(tab.status);
+              }}
+              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium cursor-pointer ${
                 activeStatusTab === tab.label
                   ? "bg-neutral300 text-neutral800 "
                   : "bg-neutral200 text-neutral500"
@@ -151,23 +174,32 @@ const Orders = () => {
               role="search"
               className="border-0 outline-0 w-[150px] text-sm text-neutral600"
               placeholder="Search order"
+              onChange={(e: any) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </div>
           <div>
             {/* Select options */}
-            <Select>
-              <SelectTrigger className="h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Category" />
+            <Select
+              onValueChange={(value) =>
+                value === "all" ? setPackageTypeId("") : setPackageTypeId(value)
+              }
+            >
+              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[150px] max-w-[300px]">
+                <SelectValue placeholder="Package Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="51">All</SelectItem>
-                <SelectItem value="1">Envelope</SelectItem>
-                <SelectItem value="2">Parcel</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                {packages?.map((item: any) => (
+                  <SelectItem value={item.id} key={item.id}>
+                    {item?.name} ({item?.maxWeight} {item?.weightUnit})
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <div>
-            {/* Select options */}
+          {/* <div>
             <Select>
               <SelectTrigger className="h-[40px] rounded-lg border-2">
                 <SelectValue placeholder="Date Created" />
@@ -177,7 +209,7 @@ const Orders = () => {
                 <SelectItem value="2">This week</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -204,7 +236,7 @@ const Orders = () => {
               </span>
               <span className="flex-1">Customer</span>
               <span className="flex-1">Courier</span>
-              <span className="flex-1">Category</span>
+              <span className="flex-1">Package Type</span>
               <span className="flex-1">Parcel Weight</span>
               <span className="flex-1">Pickup Created</span>
               <span className="flex-1">Status</span>

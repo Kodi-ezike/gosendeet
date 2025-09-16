@@ -74,8 +74,8 @@ const AddCompany = () => {
 
   // console.log(company_list?.data?.content);
 
-  const companyServices = company_services?.data || [];
-  const companyPricing = company_pricing?.data || [];
+  const companyServices = company_services?.data?.content || [];
+  const companyPricing = company_pricing?.data?.content || [];
 
   const schema = z.object({
     name: z

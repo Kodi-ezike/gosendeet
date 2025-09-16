@@ -8,7 +8,10 @@ import {
 } from "@/components/ui/select";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
 import { UpdateProgressModal } from "@/pages/admin/Orders/modals/UpdateProgressModal";
-import { useGetAllBookings } from "@/queries/user/useGetUserBookings";
+import {
+  useGetAllBookings,
+  useGetBookingsStats,
+} from "@/queries/user/useGetUserBookings";
 import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
@@ -21,12 +24,25 @@ import {
 import { cn, formatDateTime, formatStatus } from "@/lib/utils";
 import { statusClasses } from "@/constants";
 import { Spinner } from "@/components/Spinner";
+import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 
-const Orders = () => {
+const Orders = ({ companyId }: { companyId: string }) => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
-  const { data, isLoading, isSuccess, isError } =
-    useGetAllBookings(currentPage);
+  const [bookingStatus, setBookingStatus] = useState("");
+  const [packageTypeId, setPackageTypeId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: bookingStats } = useGetBookingsStats();
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
+  const packages = packageTypes?.data;
+  const { data, isLoading, isSuccess, isError } = useGetAllBookings({
+    page: currentPage,
+    companyId,
+    bookingStatus,
+    search: debouncedSearchTerm,
+    packageTypeId,
+  });
 
   useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
@@ -39,14 +55,35 @@ const Orders = () => {
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
   const statusTabs = [
-    { label: "All", count: 1000 },
-    { label: "Ongoing", count: 2 },
-    { label: "Completed", count: 990 },
-    { label: "Canceled", count: 6 },
-    { label: "Refunded", count: 2 },
+    { label: "All", status: "", count: bookingStats?.data?.totalBookings ?? 0 },
+    {
+      label: "Active",
+      status: "PENDING",
+      count: bookingStats?.data?.activeBookings ?? 0,
+    },
+    {
+      label: "Completed",
+      status: "DELIVERED",
+      count: bookingStats?.data?.deliveredBookings ?? 0,
+    },
+    {
+      label: "Cancelled",
+      status: "CANCELLED",
+      count: bookingStats?.data?.cancelledBookings ?? 0,
+    },
   ];
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 second after user stops typing
+
+    return () => {
+      clearTimeout(handler); // cancel timeout if user types again
+    };
+  }, [searchTerm]);
 
   return (
     <div>
@@ -55,8 +92,11 @@ const Orders = () => {
           {statusTabs.map((tab) => (
             <button
               key={tab.label}
-              onClick={() => setActiveStatusTab(tab.label)}
-              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium ${
+              onClick={() => {
+                setActiveStatusTab(tab.label);
+                setBookingStatus(tab.status);
+              }}
+              className={`rounded-full px-4 py-2 text-sm transition-colors font-medium cursor-pointer ${
                 activeStatusTab === tab.label
                   ? "bg-neutral300 text-neutral800 "
                   : "bg-neutral200 text-neutral500"
@@ -74,23 +114,32 @@ const Orders = () => {
               role="search"
               className="border-0 outline-0 w-[150px] text-sm text-neutral600"
               placeholder="Search order"
+              onChange={(e: any) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </div>
           <div>
             {/* Select options */}
-            <Select>
-              <SelectTrigger className="h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Category" />
+            <Select
+              onValueChange={(value) =>
+                value === "all" ? setPackageTypeId("") : setPackageTypeId(value)
+              }
+            >
+              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[150px] max-w-[300px]">
+                <SelectValue placeholder="Package Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="51">All</SelectItem>
-                <SelectItem value="1">Envelope</SelectItem>
-                <SelectItem value="2">Parcel</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                {packages?.map((item: any) => (
+                  <SelectItem value={item.id} key={item.id}>
+                    {item?.name} ({item?.maxWeight} {item?.weightUnit})
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <div>
-            {/* Select options */}
+          {/* <div>
             <Select>
               <SelectTrigger className="h-[40px] rounded-lg border-2">
                 <SelectValue placeholder="Date Created" />
@@ -100,7 +149,7 @@ const Orders = () => {
                 <SelectItem value="2">This week</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -126,10 +175,9 @@ const Orders = () => {
                 <input type="checkbox" name="" id="" className="mt-[2px]" />
               </span>
               <span className="flex-1">Customer</span>
-              <span className="flex-1">Category</span>
+              <span className="flex-1">Package Type</span>
               <span className="flex-1">Parcel Weight</span>
               <span className="flex-1">Pickup Created</span>
-              <span className="flex-1">Destination</span>
               <span className="flex-1">Status</span>
               <span className="flex-1">Progress</span>
               <span className="w-[2%]"></span>
@@ -158,10 +206,7 @@ const Orders = () => {
                   <div className="flex-1">
                     <p> {formatDateTime(item?.bookingDate)}</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{item?.receiverName}</p>
-                    <p>{item?.destination}</p>
-                  </div>
+
                   <div className="flex-1">
                     <p
                       className={cn(

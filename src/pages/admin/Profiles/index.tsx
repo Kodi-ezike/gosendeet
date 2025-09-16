@@ -138,6 +138,28 @@ const Profiles = () => {
       </div>
       <div className="w-full bg-neutral200 p-4 md:flex items-center rounded-2xl mb-8">
         <div className="w-full flex flex-col gap-4 justify-between py-2">
+          <p className="text-neutral500 text-sm">All Profiles</p>
+          <p className="text-[20px] font-inter font-semibold md:mb-6">
+            {profileStats?.data?.totalUsers ?? 0}
+          </p>
+          {/* <hr className="border-neutral700" />
+          <div className="flex justify-between items-center py-2">
+            <Select>
+              <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent text-xs text-grey500 w-[120px] p-0">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">This month</SelectItem>
+                <SelectItem value="2">This week</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="font-inter font-semibold text-green400">9.12%</p>
+          </div> */}
+        </div>
+
+        <p className="h-[1px] w-full my-4 mx-0 bg-neutral700 sm:h-[120px] sm:w-[1px] sm:mx-4 sm:my-0"></p>
+
+        <div className="w-full flex flex-col gap-4 justify-between py-2">
           <p className="text-neutral500 text-sm">Active Profiles</p>
           <p className="text-[20px] font-inter font-semibold md:mb-6">
             {profileStats?.data?.activeUsers ?? 0}

@@ -21,25 +21,26 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { statusClasses } from "@/constants";
-
-const statusOptions = [
-  { value: "paid", title: "Paid" },
-  { value: "canceled", title: "Canceled" },
-  { value: "refunded", title: "Refunded" },
-];
-
-const categoryOptions = [
-  { value: "all", title: "All" },
-  { value: "envelope", title: "Envelope" },
-  { value: "package", title: "Package" },
-];
+import { statusClasses, statusOptions } from "@/constants";
+import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 
 const Bookings = () => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
+   const [bookingStatus, setBookingStatus] = useState("");
+    const [packageTypeId, setPackageTypeId] = useState("");
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const { data: packageTypes } = useGetPackageType({ minimize: true });
+    const packages = packageTypes?.data;
   const { data, isLoading, isSuccess, isError } =
-    useGetAllBookings(currentPage);
+    useGetAllBookings({
+  page: currentPage,
+  bookingStatus,
+    search: debouncedSearchTerm,
+    packageTypeId,
+  
+});
 
     useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
@@ -49,25 +50,15 @@ const Bookings = () => {
   }, [data?.data?.page?.totalPages]);
   const [bookingData, setBookingData] =useState({})
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
-  // const modalRef = useRef<HTMLDivElement | null>(null);
-  // const [isDialogOpen, setIsDialogOpen] = useState(false);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 second after user stops typing
 
-  // // Close modal on outside click
-  // useEffect(() => {
-  //   const handleOutsideClick = (event: MouseEvent) => {
-  //     if (isDialogOpen) return; // Skip if dialog is open
-
-  //     const target = event.target as Node;
-  //     if (modalRef.current && !modalRef.current.contains(target)) {
-  //       setActiveModalId(null); // Close parent modal
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleOutsideClick);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleOutsideClick);
-  //   };
-  // }, [isDialogOpen]);
+    return () => {
+      clearTimeout(handler); // cancel timeout if user types again
+    };
+  }, [searchTerm]);
 
   return (
     <div className="md:px-4">
@@ -84,18 +75,24 @@ const Bookings = () => {
               role="search"
               className="border-0 outline-0 w-[150px] text-sm text-neutral600"
               placeholder="Search order"
+              onChange={(e: any) => {
+                setSearchTerm(e.target.value);
+              }}
             />
           </div>
           <div>
             {/* Select options */}
-            <Select>
-              <SelectTrigger className="bg-white h-[40px] rounded-lg border-2">
+            <Select onValueChange={(value) =>
+                value === "all" ? setBookingStatus("") : setBookingStatus(value)
+              }>
+              <SelectTrigger className="bg-white h-[40px] rounded-lg border-2 min-w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All</SelectItem>
                 {statusOptions?.map((item, index) => (
                   <SelectItem
-                    value={item.title}
+                    value={item.value}
                     key={index}
                     className="focus:bg-purple200"
                   >
@@ -107,18 +104,19 @@ const Bookings = () => {
           </div>
           <div>
             {/* Select options */}
-            <Select>
-              <SelectTrigger className="bg-white h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Category" />
+            <Select
+              onValueChange={(value) =>
+                value === "all" ? setPackageTypeId("") : setPackageTypeId(value)
+              }
+            >
+              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[150px] max-w-[300px]">
+                <SelectValue placeholder="Package Type" />
               </SelectTrigger>
               <SelectContent>
-                {categoryOptions?.map((item, index) => (
-                  <SelectItem
-                    value={item.title}
-                    key={index}
-                    className="focus:bg-purple200"
-                  >
-                    {item.title}
+                <SelectItem value="all">All</SelectItem>
+                {packages?.map((item: any) => (
+                  <SelectItem value={item.id} key={item.id}>
+                    {item?.name} ({item?.maxWeight} {item?.weightUnit})
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -153,7 +151,6 @@ const Bookings = () => {
               <span className="flex-1">Category</span>
               <span className="flex-1">Parcel Weight</span>
               <span className="flex-1">Pickup Created</span>
-              <span className="flex-1">Destination</span>
               <span className="w-[9%]">Status</span>
               <span className="w-[2%]"></span>
             </div>
@@ -179,9 +176,6 @@ const Bookings = () => {
                   <div className="flex-1">{`${item.weight} ${item.weightUnit} | ${item.length}x${item.width}x${item.height} ${item.dimensionsUnit}`}</div>
                   <div className="flex-1">
                     {formatDateTime(item?.bookingDate)}
-                  </div>
-                  <div className="flex-1">
-                    <p>{item?.destination}</p>
                   </div>
                   <div className="w-[9%]">
                     <p

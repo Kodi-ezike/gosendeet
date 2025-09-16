@@ -69,6 +69,9 @@ const UpdateUserStatusModal = ({
       queryClient.invalidateQueries({
         queryKey: ["single_profile"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["profile_stats"],
+      });
     },
 
     onError: (error: any) => {

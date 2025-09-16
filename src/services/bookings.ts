@@ -9,9 +9,40 @@ export const getBookingsById = async (id: string) => {
   }
 };
 
-export const getAllBookings = async (page:number) => {
+export const getAllBookings = async ({
+  page,
+  bookingStatus,
+  packageTypeId,
+  companyId,
+  search,
+}: {
+  page: number;
+  bookingStatus?: string;
+  packageTypeId?: string;
+  companyId?: string;
+  search?: string;
+}
+) => {
   try {
-    const res = await api.get(`/bookings?page=${page}`);
+    const params = new URLSearchParams();
+
+    params.append("page", page.toString());
+    if (bookingStatus) params.append("status", bookingStatus);
+    if (packageTypeId) params.append("packageTypeId", packageTypeId);
+    if (companyId) params.append("companyId", companyId);
+    if (search) params.append("searchTerm", search);
+
+    const res = await api.get(`/bookings?${params.toString()}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+
+export const getBookingStats = async () => {
+  try {
+    const res = await api.get(`/bookings/stats`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
