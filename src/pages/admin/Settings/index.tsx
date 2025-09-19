@@ -4,6 +4,7 @@ import ServiceLevel from "./components/ServiceLevel";
 import CoverageArea from "./components/CoverageArea";
 import PickupOption from "./components/PickupOption";
 import LocationCode from "./components/LocationCode";
+import DeliveryProgress from "./components/DeliveryProgress";
 
 const Settings = () => {
   const initialTab = sessionStorage.getItem("settingsTab");
@@ -18,6 +19,7 @@ const Settings = () => {
     { key: "area", label: "Coverage Areas" },
     { key: "option", label: "Pickup Options" },
     { key: "code", label: "Location Codes" },
+    { key: "progress", label: "Delivery Progress" },
   ];
 
   const updateUnderline = (index: number) => {
@@ -94,6 +96,7 @@ const Settings = () => {
             {activeTab === "area" && <CoverageArea />}
             {activeTab === "option" && <PickupOption />}
             {activeTab === "code" && <LocationCode />}
+            {activeTab === "progress" && <DeliveryProgress />}
           </div>
         </div>
       </div>

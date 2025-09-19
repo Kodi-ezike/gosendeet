@@ -33,7 +33,7 @@ const Orders = ({ companyId }: { companyId: string }) => {
   const [packageTypeId, setPackageTypeId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const { data: bookingStats } = useGetBookingsStats({companyId});
+  const { data: bookingStats } = useGetBookingsStats({ companyId });
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({
@@ -51,6 +51,7 @@ const Orders = ({ companyId }: { companyId: string }) => {
     }
   }, [data?.data?.page?.totalPages]);
   const [bookingData, setBookingData] = useState({});
+  const [bookingId, setBookingId] = useState("");
 
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
@@ -218,8 +219,7 @@ const Orders = ({ companyId }: { companyId: string }) => {
                       {formatStatus(item?.status)}
                     </p>
                   </div>
-                  <div className="flex-1">On the way</div>
-
+                  <div className="flex-1">{item?.currentProgress}</div>
                   <div className="w-[2%]">
                     <Popover
                       open={activeModalId === index}
@@ -250,7 +250,10 @@ const Orders = ({ companyId }: { companyId: string }) => {
                         </Link>
                         <p
                           className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                          onClick={() => setOpen(true)}
+                          onClick={() => {
+                            setOpen(true);
+                            setBookingId(item?.id);
+                          }}
                         >
                           Update progress
                         </p>
@@ -281,7 +284,11 @@ const Orders = ({ companyId }: { companyId: string }) => {
         </div>
       )}
 
-      <UpdateProgressModal open={open} setOpen={setOpen} />
+      <UpdateProgressModal
+        open={open}
+        setOpen={setOpen}
+        bookingId={bookingId}
+      />
     </div>
   );
 };

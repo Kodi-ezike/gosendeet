@@ -230,6 +230,53 @@ export const deletePackageType = async (id: string) => {
 
 
 
+export const createDeliveryProgress = async (data: any) => {
+  try {
+    const res = await api.post(`/delivery-progress`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getDeliveryProgress = async (options?: { page?: number; minimize?: boolean }) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/delivery-progress?${params.toString()}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const updateDeliveryProgress = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`/delivery-progress/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const deleteDeliveryProgress = async (id: string) => {
+  try {
+    const res = await api.delete(`/delivery-progress/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+
+
+
 export const getAdminWeightUnits = async () => {
   try {
     const res = await api.get(`/admin/package-types/weight-units`);

@@ -4,13 +4,10 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  // DialogTrigger,
 } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-// import { toast } from "sonner";
-// import { useMutation } from "@tanstack/react-query";
 import {
   Select,
   SelectContent,
@@ -19,56 +16,75 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useGetDeliveryProgress } from "@/queries/admin/useGetAdminSettings";
+import { statusOptions } from "@/constants";
+import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createTrackingHistory } from "@/services/bookings";
 
-const options = [
-  { value: "price", title: "On the way" },
-  { value: "time", title: "Delivered" },
-];
-
-export function UpdateProgressModal({open, setOpen}:{open:boolean; setOpen:any}) {
+export function UpdateProgressModal({
+  open,
+  setOpen,
+  bookingId,
+}: {
+  open: boolean;
+  setOpen: any;
+  bookingId: string;
+}) {
+  const { data: deliveryProgress } = useGetDeliveryProgress({ minimize: true });
 
   const schema = z.object({
-    progress: z
-      .string({ required_error: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
-    date: z
-      .string({ required_error: "Password is required" })
-      .min(8, { message: "Password must be at least 8 characters" }),
-    time: z
-      .string({ required_error: "Please confirm your password" })
-      .min(8, { message: "Password must be at least 8 characters" }),
-    message: z.string().optional(),
-    mail: z.string().optional(),
+    deliveryProgressId: z
+      .string({ required_error: "Progress is required" })
+      .min(1, { message: "Please select a progress" }),
+    status: z
+      .string({ required_error: "Status is required" })
+      .min(1, { message: "Please select a status" }),
+    location: z
+      .string({ required_error: "Location is required" })
+      .min(1, { message: "Please add a location" }),
+    notes: z.string().optional(),
+    sendEmailNotification: z.boolean().optional(),
   });
 
   const {
+    control,
     register,
     handleSubmit,
-    // reset,
+    reset,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      deliveryProgressId: "",
+      status: "",
+      location: "",
+      notes: "",
+      sendEmailNotification: false,
+    },
+  });
+  const queryClient = useQueryClient();
+
+  const { mutate: create, isPending: pendingCreate } = useMutation({
+    mutationFn: createTrackingHistory,
+    onSuccess: () => {
+      toast.success("Successful");
+      setOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["tracking_history"],
+      });
+      reset();
+    },
+    onError: (data) => {
+      toast.error(data?.message);
+    },
   });
 
-  // const { mutate, isPending } = useMutation({
-  //   mutationFn: changePassword,
-  //   onSuccess: () => {
-  //     toast.success("Successful");
-  //     setOpen(false);
-  //     reset();
-  //   },
-  //   onError: (data) => {
-  //     toast.error(data?.message);
-  //   },
-  // });
-
   const onSubmit = (data: z.infer<typeof schema>) => {
-    console.log(data);
-    // mutate({
-    //   oldPassword: data.currentPassword,
-    //   newPassword: data.password,
-    //   confirmPassword: data.confirmPassword,
-    // });
+    create({
+      bookingId: bookingId,
+      ...data,
+    });
   };
 
   return (
@@ -81,115 +97,123 @@ export function UpdateProgressModal({open, setOpen}:{open:boolean; setOpen:any})
           You are adding an order progress to this order, it will reflect on
           their tracking page and also be sent to mail
         </DialogDescription>
-        <>
-          <div className="py-4 text-sm mt-4">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-8"
-            >
-              <div className="flex flex-col gap-2 w-full ">
-                <label htmlFor="password" className="font-inter font-semibold">
-                  Shipment Progress
-                </label>
-                <Select>
-                  <SelectTrigger className="w-full bg-white h-[40px]">
-                    <SelectValue placeholder="Filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {options?.map((item, index) => (
-                      <SelectItem
-                        value={item.title}
-                        key={index}
-                        className="focus:bg-purple200"
-                      >
-                        {item.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.progress && (
-                  <p className="error text-xs text-[#FF0000]">
-                    {errors.progress.message}
-                  </p>
-                )}
-              </div>
 
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-inter font-semibold">
-                  Estimated Date of Occurrence
-                </label>
-                <div className="flex justify-between items-center gap-2 border-b">
-                  <input
-                    type="date"
-                    {...register("date")}
-                    className="w-full outline-0 border-b-0 py-2"
-                  />
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5 py-4 text-sm mt-4"
+        >
+          {/* Delivery Progress */}
+          <div className="flex flex-col  w-full">
+            <label className="font-inter font-semibold">
+              Delivery Progress
+            </label>
+            <Controller
+              name="deliveryProgressId"
+              control={control}
+              render={({ field }) => (
+                <div className="border-b">
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full py-2 px-0 mt-0">
+                      <SelectValue placeholder="Select delivery progress" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="no_progress">No progress</SelectItem>
+                      {deliveryProgress?.data?.map((item: any) => (
+                        <SelectItem value={item.id} key={item.id}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                {errors.date && (
-                  <p className="error text-xs text-[#FF0000]">
-                    {errors.date.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-inter font-semibold">
-                  Estimated Time of Occurrence
-                </label>
-                <div className="flex justify-between items-center gap-2 border-b">
-                  <input
-                    type="time"
-                    {...register("time")}
-                    className="w-full outline-0 border-b-0 py-2"
-                  />
-                </div>
-                {errors.time && (
-                  <p className="error text-xs text-[#FF0000]">
-                    {errors.time.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password" className="font-inter font-semibold">
-                  Additional Message
-                </label>
-                <div className="flex justify-between items-center gap-2 border-b">
-                  <input
-                    type="text"
-                    {...register("message")}
-                    placeholder="Type in a short message"
-                    className="w-full outline-0 border-b-0 py-2"
-                  />
-                </div>
-                {errors.message && (
-                  <p className="error text-xs text-[#FF0000]">
-                    {errors.message.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-start gap-2">
-                <Checkbox className="mt-[1px]"/>
-                <label htmlFor="mail" className="">
-                  Check this box if you want to send a notification email to your customer
-
-                </label>
-              </div>
-
-              
-              
-
-              <Button
-                variant={"secondary"}
-                className=" w-fit"
-                // loading={isPending}
-              >
-                Update
-              </Button>
-            </form>
+              )}
+            />
+            {errors.deliveryProgressId && (
+              <p className="error text-xs text-[#FF0000]">
+                {errors.deliveryProgressId.message}
+              </p>
+            )}
           </div>
-        </>
+
+          {/* Status */}
+          <div className="flex flex-col  w-full">
+            <label className="font-inter font-semibold">Status</label>
+            <Controller
+              name="status"
+              control={control}
+              render={({ field }) => (
+                <div className="border-b">
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full py-2 px-0 mt-0">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statusOptions?.map((item: any) => (
+                        <SelectItem value={item.value} key={item.value}>
+                          {item.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            />
+            {errors.status && (
+              <p className="error text-xs text-[#FF0000]">
+                {errors.status.message}
+              </p>
+            )}
+          </div>
+
+          {/* Location */}
+          <div className="flex flex-col  w-full">
+            <label className="font-inter font-semibold">Location</label>
+            <input
+              type="text"
+              {...register("location")}
+              className="w-full outline-0 border-b border-gray-300 py-2"
+              placeholder="Enter location"
+            />
+            {errors.location && (
+              <p className="error text-xs text-[#FF0000]">
+                {errors.location.message}
+              </p>
+            )}
+          </div>
+
+          {/* Message */}
+          <div className="flex flex-col  w-full">
+            <label className="font-inter font-semibold">
+              Additional Message
+            </label>
+            <input
+              type="text"
+              {...register("notes")}
+              placeholder="Type in a short message"
+              className="w-full outline-0 border-b border-gray-300 py-2"
+            />
+          </div>
+
+          {/* Mail checkbox */}
+          <div className="flex items-start gap-2">
+            <Controller
+              name="sendEmailNotification"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(!!checked)}
+                  className="mt-[1px]"
+                />
+              )}
+            />
+            <label>Send a notification email to your customer</label>
+          </div>
+
+          <Button variant="secondary" className="w-fit" loading={pendingCreate}>
+            Update
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );
