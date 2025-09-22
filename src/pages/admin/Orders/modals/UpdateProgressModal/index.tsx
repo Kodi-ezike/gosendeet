@@ -21,17 +21,27 @@ import { statusOptions } from "@/constants";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTrackingHistory } from "@/services/bookings";
+import { useEffect } from "react";
 
 export function UpdateProgressModal({
   open,
   setOpen,
   bookingId,
+  progress,
+  status,
 }: {
   open: boolean;
   setOpen: any;
   bookingId: string;
+  progress: string;
+  status: string;
 }) {
   const { data: deliveryProgress } = useGetDeliveryProgress({ minimize: true });
+
+  // find the matching progress item by name
+  const matchedProgressId =
+    deliveryProgress?.data?.find((item: any) => item.name === progress)?.id ||
+    "No Progress";
 
   const schema = z.object({
     deliveryProgressId: z
@@ -56,13 +66,24 @@ export function UpdateProgressModal({
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      deliveryProgressId: "",
-      status: "",
+      deliveryProgressId: matchedProgressId,
+      status: status || "",
       location: "",
       notes: "",
       sendEmailNotification: false,
     },
   });
+
+  useEffect(() => {
+    reset({
+      deliveryProgressId: matchedProgressId,
+      status: status || "",
+      location: "",
+      notes: "",
+      sendEmailNotification: false,
+    });
+  }, [progress, status, reset]);
+
   const queryClient = useQueryClient();
 
   const { mutate: create, isPending: pendingCreate } = useMutation({
@@ -72,6 +93,9 @@ export function UpdateProgressModal({
       setOpen(false);
       queryClient.invalidateQueries({
         queryKey: ["tracking_history"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["bookings"],
       });
       reset();
     },
@@ -117,7 +141,7 @@ export function UpdateProgressModal({
                       <SelectValue placeholder="Select delivery progress" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="no_progress">No progress</SelectItem>
+                      <SelectItem value="No Progress">No progress</SelectItem>
                       {deliveryProgress?.data?.map((item: any) => (
                         <SelectItem value={item.id} key={item.id}>
                           {item.name}

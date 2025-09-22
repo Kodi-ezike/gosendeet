@@ -55,14 +55,13 @@ const Orders = () => {
   }, [data?.data?.page?.totalPages]);
   const [bookingData, setBookingData] = useState({});
   const [bookingId, setBookingId] = useState("");
+  const [orderProgress, setOrderProgress] = useState("");
+  const [orderStatus, setOrderStatus] = useState("");
 
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
   const statusTabs = [
-    { label: "All",
-      status: "",
-      count: bookingStats?.data?.totalBookings ?? 0,
-    },
+    { label: "All", status: "", count: bookingStats?.data?.totalBookings ?? 0 },
     {
       label: "Active",
       status: "PENDING",
@@ -313,7 +312,12 @@ const Orders = () => {
                         </Link>
                         <p
                           className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
-                          onClick={() => {setOpen(true); setBookingId(item?.id)}}
+                          onClick={() => {
+                            setOpen(true);
+                            setBookingId(item?.id);
+                            setOrderProgress(item?.currentProgress);
+                            setOrderStatus(item.status);
+                          }}
                         >
                           Update progress
                         </p>
@@ -344,7 +348,13 @@ const Orders = () => {
         </div>
       )}
 
-      <UpdateProgressModal open={open} setOpen={setOpen} bookingId={bookingId}/>
+      <UpdateProgressModal
+        open={open}
+        setOpen={setOpen}
+        bookingId={bookingId}
+        progress={orderProgress}
+        status={orderStatus}
+      />
     </div>
   );
 };

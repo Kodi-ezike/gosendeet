@@ -46,7 +46,9 @@ export function UpdateCompanyModal({
       .min(1, { message: "Please enter company email" }),
     phone: z
       .string({ required_error: "Company number is required" })
-      .min(11, { message: "Please enter valid phone number" }),
+      .regex(/^\+?[0-9]{11,15}$/, {
+        message: "Invalid phone number",
+      }),
     address: z
       .string({ required_error: "Company address is required" })
       .min(1, { message: "Please enter company address" }),

@@ -136,6 +136,7 @@ export function formatDate(dateString: string): string {
 export const allowOnlyNumbers = (event: React.KeyboardEvent<HTMLInputElement>) => {
   if (
     !/[0-9]/.test(event.key) &&
+    event.key !== "+" &&
     event.key !== "Backspace" &&
     event.key !== "Tab" &&
     event.key !== "ArrowLeft" &&
@@ -161,18 +162,19 @@ export function formatTo12Hour(timeString: string): string {
 export function formatDateTime(dateString: string): string {
   const date = new Date(dateString);
 
-  const options: Intl.DateTimeFormatOptions = {
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = date.toLocaleString("en-US", { month: "short" });
+  const year = date.getFullYear();
+
+  const time = date.toLocaleString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: true,
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  };
+  });
 
-  // Example output: "05:17 PM, 27 May 2023"
-  return date.toLocaleString("en-US", options);
+  return `${day} ${month} ${year}, ${time}`;
 }
+
 
 // Example
 // const formatted = formatDateTime("2023-05-27T17:17:55.297429");

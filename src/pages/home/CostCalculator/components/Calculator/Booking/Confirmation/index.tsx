@@ -129,14 +129,14 @@ const Confirmation = () => {
                   <p className="flex justify-between items-center font-medium text-sm">
                     <span className="text-neutral600">Subtotal</span>
                     <span className="text-right">
-                      ₦ {data?.data?.courierCost}
+                      ₦ {data?.data?.cost?.subTotal}
                     </span>
                   </p>
 
                   <p className="flex justify-between items-center font-medium text-sm">
                     <span className="text-neutral600">Tax</span>
                     <span className="text-right">
-                      {data?.data?.tax ? `₦${data?.data?.tax}` : "--"}
+                      {data?.data?.cost?.tax ? `₦${data?.data?.cost?.tax}` : "--"}
                     </span>
                   </p>
                 </div>
@@ -145,7 +145,7 @@ const Confirmation = () => {
 
                 <p className="flex justify-between items-center font-semibold">
                   <span className="text-neutral600">Total</span>
-                  <span className="text-right">₦ {data?.data?.totalCost}</span>
+                  <span className="text-right">₦ {data?.data?.cost?.total}</span>
                 </p>
               </div>
             </div>

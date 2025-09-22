@@ -62,6 +62,8 @@ const Orders = ({ userId }: { userId: any }) => {
   }, [data?.data?.page?.totalPages]);
   const [bookingData, setBookingData] = useState({});
   const [bookingId, setBookingId] = useState("");
+  const [orderProgress, setOrderProgress] = useState("");
+  const [orderStatus, setOrderStatus] = useState("");
 
   const [activeStatusTab, setActiveStatusTab] = useState("All");
   const [open, setOpen] = useState(false);
@@ -257,6 +259,8 @@ const Orders = ({ userId }: { userId: any }) => {
                         onClick={() => {
                           setOpen(true);
                           setBookingId(item?.id);
+                          setOrderProgress(item?.currentProgress);
+                          setOrderStatus(item.status);
                         }}
                       >
                         Update progress
@@ -291,6 +295,8 @@ const Orders = ({ userId }: { userId: any }) => {
         open={open}
         setOpen={setOpen}
         bookingId={bookingId}
+        progress={orderProgress}
+        status={orderStatus}
       />
     </div>
   );

@@ -38,7 +38,9 @@ export function UpdateProfileModal({
       .min(1, { message: "Please enter username" }),
     phone: z
       .string({ required_error: "Phone number is required" })
-      .min(11, { message: "Please enter valid phone number" }),
+      .regex(/^\+?[0-9]{11,15}$/, {
+        message: "Invalid phone number",
+      }),
     address: z
       .string({ required_error: "Address is required" })
       .min(1, { message: "Please enter address" }),

@@ -9,7 +9,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { createBooking } from "@/services/user";
-import { parseDateInput } from "@/lib/utils";
+import { allowOnlyNumbers, parseDateInput } from "@/lib/utils";
+import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 
 const Delivery = () => {
   const location = useLocation();
@@ -30,13 +31,23 @@ const Delivery = () => {
     }
   }, [userId]);
 
+  const { data: userData, refetchUserData } = useGetUserDetails(userId);
+
+  useEffect(() => {
+    if (userId) {
+      refetchUserData();
+    }
+  }, [userId]);
+
   const schema = z.object({
     sender_name: z
       .string({ required_error: "Sender’s name is required" })
       .min(1, { message: "Name cannot be empty" }),
     sender_phone: z
       .string({ required_error: "Sender’s number is required" })
-      .min(1, { message: "Phone number cannot be empty" }),
+      .regex(/^\+?[0-9]{11,15}$/, {
+        message: "Invalid phone number",
+      }),
     sender_email: z
       .string()
       .email({ message: "Invalid email address" })
@@ -47,7 +58,10 @@ const Delivery = () => {
       .min(1, { message: "Name cannot be empty" }),
     receiver_phone: z
       .string({ required_error: "Receiver’s number is required" })
-      .min(1, { message: "Phone number cannot be empty" }),
+      .regex(/^\+?[0-9]{11,15}$/, {
+        message: "Invalid phone number",
+      }),
+
     receiver_email: z
       .string()
       .email({ message: "Invalid email address" })
@@ -59,15 +73,36 @@ const Delivery = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      sender_name: "",
+      sender_phone: "",
+      sender_email: "",
+      receiver_name: "",
+      receiver_phone: "",
+      receiver_email: "",
+    },
   });
+
+  useEffect(() => {
+    if (userData?.data) {
+      reset({
+        sender_name: userData.data.username ?? "",
+        sender_phone: userData.data.phone ?? "",
+        sender_email: userData.data.email ?? "",
+        receiver_name: "",
+        receiver_phone: "",
+        receiver_email: "",
+      });
+    }
+  }, [userData, reset]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createBooking,
     onSuccess: (data: any) => {
       toast.success("Successful");
-      // setData(data);
       navigate("/checkout", {
         state: { bookingId: data?.data?.id, bookingData: bookingData },
       });
@@ -140,11 +175,10 @@ const Delivery = () => {
               <Input
                 label="Sender’s Phone Number"
                 name="sender_phone"
-                type="tel"
+                type="text"
                 placeholder="Enter your phone number"
                 register={register}
-                pattern="[0-9]{11}"
-                inputMode="numeric"
+                onKeyDown={allowOnlyNumbers}
               />
 
               {errors.sender_phone && (
@@ -195,6 +229,7 @@ const Delivery = () => {
                 type="text"
                 placeholder="Enter receiver's phone number"
                 register={register}
+                onKeyDown={allowOnlyNumbers}
               />
               {errors.receiver_phone && (
                 <p className="error text-xs text-[#FF0000]">
