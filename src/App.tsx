@@ -40,7 +40,7 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/success-page" element={<Confirmation />} />
           <Route path="/error-page" element={<ErrorPage />} />
-          <Route path="/track/:id" element={<Tracking />} />
+          <Route path="/track-booking" element={<Tracking />} />
 
         <Route element={<PublicRoutes />}>
           <Route path="/signup" element={<Signup />} />

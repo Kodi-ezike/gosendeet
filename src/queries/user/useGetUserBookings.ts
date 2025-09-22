@@ -2,6 +2,7 @@ import {
   getAllBookings,
   getBookingsById,
   getBookingStats,
+  trackBookings,
 } from "@/services/bookings";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
@@ -61,5 +62,19 @@ export const useGetBookingsStats = (
     isSuccess: query.isSuccess,
     isError: query.isError,
     data: query.data,
+  };
+};
+
+export const useTrackBookings = (id: string) => {
+  const query = useQuery({
+    queryKey: ["bookings", id],
+    queryFn: () => trackBookings(id),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+    refetchUserData: query.refetch,
   };
 };

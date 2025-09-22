@@ -1,34 +1,10 @@
-import { Button } from "@/components/ui/button";
 import Layout from "@/layouts/HomePageLayout";
 import { LuInfo } from "react-icons/lu";
-import { PiGpsFixFill } from "react-icons/pi";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import TrackBooking from "@/components/TrackBooking";
 
 const Track = () => {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-  const schema = z.object({
-    tracking_number: z
-      .string({ required_error: "Tracking number is required" })
-      .min(1, { message: "Tracking number be empty" }),
-  });
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-  });
-
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    // console.log(data);
-    navigate(`/track/${data?.tracking_number}`);
-  };
-
   return (
     <Layout>
       <div className="md:px-20 px-6 md:py-16 py-8">
@@ -90,31 +66,7 @@ const Track = () => {
             )}
           </div>
           <div className="py-4 text-sm">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex gap-3 items-center py-3 md:px-4 border-b">
-                <PiGpsFixFill className="text-purple400 text-xl" />
-                <div className="flex flex-col gap-2 w-full">
-                  <label htmlFor="track" className="font-clash font-semibold">
-                    Tracking Number
-                  </label>
-                  <input
-                    type="text"
-                    {...register("tracking_number")}
-                    placeholder="What is your tracking number?"
-                    className="w-full outline-0"
-                  />
-                  {errors.tracking_number && (
-                    <p className="error text-xs text-[#FF0000]">
-                      {errors.tracking_number.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <Button variant={"secondary"} className=" w-full mt-4">
-                Track Delivery
-              </Button>
-            </form>
+            <TrackBooking />
           </div>
         </div>
       </div>

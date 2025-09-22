@@ -1,7 +1,7 @@
 import { useState } from "react";
 import logos from "@/assets/images/logos.png";
-import { PiGpsFixFill } from "react-icons/pi";
 import CreateBooking from "@/components/CreateBooking";
+import TrackBooking from "@/components/TrackBooking";
 
 const Header = () => {
   const [activeTab, setActiveTab] = useState("delivery");
@@ -68,29 +68,7 @@ const Header = () => {
               </div>
             ) : (
               <div className="p-4 text-sm">
-                <form action="">
-                  <div className="flex gap-3 items-center py-3 px-4 border-b">
-                    <PiGpsFixFill className="text-purple400 text-xl" />
-                    <div className="flex flex-col gap-2 w-full">
-                      <label
-                        htmlFor="track"
-                        className="font-clash font-semibold"
-                      >
-                        Tracking Number
-                      </label>
-                      <input
-                        type="text"
-                        name="track"
-                        placeholder="What is your tracking number?"
-                        className="w-full outline-0"
-                      />
-                    </div>
-                  </div>
-
-                  <button className="flex items-center gap-3 bg-black rounded-full px-16 py-4 outline-black mt-4 text-white">
-                    Track Delivery
-                  </button>
-                </form>
+                <TrackBooking/>
               </div>
             )}
           </div>

@@ -39,9 +39,9 @@ export function UpdateProgressModal({
   const { data: deliveryProgress } = useGetDeliveryProgress({ minimize: true });
 
   // find the matching progress item by name
-  const matchedProgressId =
-    deliveryProgress?.data?.find((item: any) => item.name === progress)?.id ||
-    "No Progress";
+  const matchedProgressId = deliveryProgress?.data?.find(
+    (item: any) => item.name === progress
+  )?.id;
 
   const schema = z.object({
     deliveryProgressId: z
@@ -141,7 +141,6 @@ export function UpdateProgressModal({
                       <SelectValue placeholder="Select delivery progress" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="No Progress">No progress</SelectItem>
                       {deliveryProgress?.data?.map((item: any) => (
                         <SelectItem value={item.id} key={item.id}>
                           {item.name}

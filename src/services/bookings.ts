@@ -73,3 +73,13 @@ export const createTrackingHistory = async (data: any) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+export const trackBookings = async (id: string) => {
+  try {
+    const res = await api.get(`/bookings/track/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

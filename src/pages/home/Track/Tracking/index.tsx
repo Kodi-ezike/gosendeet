@@ -1,17 +1,19 @@
 import { Button } from "@/components/ui/button";
 import Layout from "@/layouts/HomePageLayout";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import OrderHistory from "./components/OrderHistory";
 import ItemDetails from "./components/ItemDetails";
 import ReceiverDetails from "./components/ReceiverDetails";
 
 const Tracking = () => {
-  const { id } = useParams();
   const [activeTab, setActiveTab] = useState("history");
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const location = useLocation()
+  const {data} = location.state ?? {}
+  console.log(data)
 
   const tabs = [
     { key: "history", label: "Order History" },
@@ -37,12 +39,12 @@ const Tracking = () => {
       <div className="md:px-20 px-6 md:py-16 py-8">
         <div className="xl:w-[65%] md:w-[90%] mx-auto bg-purple300 md:py-16 py-4 xl:px-24 md:px-10 px-4">
           <h1 className="lg:text-[40px] md:text-[30px] text-2xl font-semibold font-clash mb-6">
-            Tracking #{id}
+            Tracking {data?.data?.trackingNumber}
           </h1>
 
           <div className="grid md:grid-cols-2 gap-4 md:text-base text-sm">
             <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Item #{id}</p>
+              <p className="text-md font-semibold font-clash">Item </p>
               <p>2464 Royal Ln. Mesa, New Jersey 45463</p>
             </div>
             <div className="flex flex-col gap-1">
