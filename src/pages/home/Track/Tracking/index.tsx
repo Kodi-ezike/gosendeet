@@ -8,6 +8,7 @@ import ReceiverDetails from "./components/ReceiverDetails";
 import { cn, formatDateTime, formatStatus } from "@/lib/utils";
 import { useGetTrackBookings } from "@/queries/user/useGetUserBookings";
 import { statusClasses } from "@/constants";
+import { Spinner } from "@/components/Spinner";
 
 const Tracking = () => {
   const [activeTab, setActiveTab] = useState("history");
@@ -16,7 +17,9 @@ const Tracking = () => {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const location = useLocation();
   const { result } = location.state ?? {};
-  const { data } = useGetTrackBookings(result?.data?.trackingNumber);
+  const { data, isLoading, isSuccess, isError } = useGetTrackBookings(
+    result?.data?.trackingNumber
+  );
 
   const tabs = [
     { key: "history", label: "Order History" },
@@ -41,86 +44,110 @@ const Tracking = () => {
     <Layout>
       <div className="md:px-20 px-6 md:py-16 py-8">
         <div className="xl:w-[65%] md:w-[90%] mx-auto bg-purple300 md:py-16 py-4 xl:px-24 md:px-10 px-4">
-          <div className="flex lg:flex-row flex-col lg:items-center gap-4 mb-6 lg:justify-between">
-            <h1 className="lg:text-[40px] md:text-[30px] flex items-center md:gap-3 gap-2 text-2xl font-semibold font-clash">
-              Tracking <span>{data?.data?.trackingNumber}</span>
-            </h1>
-
-            <p
-              className={cn(
-                statusClasses[data?.data?.status] ??
-                  "bg-gray-100 text-gray-800", // fallback if status not found
-                "px-2 py-1 w-fit font-medium rounded-2xl text-base"
-              )}
-            >
-              {formatStatus(data?.data?.status)}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4 md:text-base text-sm">
-            <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Package Type</p>
-              <p>{data?.data?.packageType?.name}</p>
+          {isLoading && !isSuccess && (
+            <div className="h-[50vh] w-full flex items-center justify-center">
+              <Spinner />
             </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Weight</p>
-              <p>{`${data?.data?.maxWeight} ${data?.data?.weightUnit} | ${data?.data?.length}x${data?.data?.width}x${data?.data?.height} ${data?.data?.dimensionsUnit}`}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Courier</p>
-              <p>{data?.data?.company?.name}</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Pickup Created</p>
-              <p>{formatDateTime(data?.data?.bookingDate)}</p>
-            </div>
-          </div>
+          )}
 
-          {/* Tab Buttons */}
-          <div className="w-full border-b border-b-neutral300 md:h-[40px] h-[60px] flex md:gap-4 mt-6 relative overflow-hidden">
-            {tabs.map((tab, index) => (
-              <button
-                key={tab.key}
-                ref={(el) => {
-                  tabRefs.current[index] = el;
-                }}
-                className={`relative z-10 px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
-                  activeTab === tab.key ? "text-purple500" : "text-black"
-                }`}
-                onClick={() => {
-                  updateUnderline(index);
-                  setActiveTab(tab.key);
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {isError && !isLoading && (
+            <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+              <p className="font-semibold font-inter text-xl text-center">
+                There was an error getting the data
+              </p>
+            </div>
+          )}
 
-            {/* Active underline */}
-            <div
-              className="absolute bottom-0 h-[1px] bg-purple500 transition-all duration-300 rounded-full"
-              style={{
-                left: underlineLeft,
-                width: underlineWidth,
-              }}
-            />
-          </div>
+          {!isLoading && isSuccess && data && data?.data?.length > 0 && (
+            <>
+              <div className="flex lg:flex-row flex-col lg:items-center gap-4 mb-6 lg:justify-between">
+                <h1 className="lg:text-[40px] md:text-[30px] flex items-center md:gap-3 gap-2 text-2xl font-semibold font-clash">
+                  Tracking <span>{data?.data?.trackingNumber}</span>
+                </h1>
 
-          {/* Tab Content */}
-          <div className="mt-4">
-            {activeTab === "history" && (
-              <div className="md:text-base text-sm py-4">
-                <OrderHistory data={data} />
+                <p
+                  className={cn(
+                    statusClasses[data?.data?.status] ??
+                      "bg-gray-100 text-gray-800", // fallback if status not found
+                    "px-2 py-1 w-fit font-medium rounded-2xl text-base"
+                  )}
+                >
+                  {formatStatus(data?.data?.status)}
+                </p>
               </div>
-            )}
-            {activeTab === "order_details" && <ItemDetails data={data} />}
-            {activeTab === "contact_details" && <ReceiverDetails data={data} />}
-          </div>
 
-          <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-5">
-            <p className="font-medium">Need help with delivery</p>
-            <Button variant="secondary">Contact Support</Button>
-          </div>
+              <div className="grid md:grid-cols-2 gap-4 md:text-base text-sm">
+                <div className="flex flex-col gap-1">
+                  <p className="text-md font-semibold font-clash">
+                    Package Type
+                  </p>
+                  <p>{data?.data?.packageType?.name}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-md font-semibold font-clash">Weight</p>
+                  <p>{`${data?.data?.maxWeight} ${data?.data?.weightUnit} | ${data?.data?.length}x${data?.data?.width}x${data?.data?.height} ${data?.data?.dimensionsUnit}`}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-md font-semibold font-clash">Courier</p>
+                  <p>{data?.data?.company?.name}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-md font-semibold font-clash">
+                    Pickup Created
+                  </p>
+                  <p>{formatDateTime(data?.data?.bookingDate)}</p>
+                </div>
+              </div>
+
+              {/* Tab Buttons */}
+              <div className="w-full border-b border-b-neutral300 md:h-[40px] h-[60px] flex md:gap-4 mt-6 relative overflow-hidden">
+                {tabs.map((tab, index) => (
+                  <button
+                    key={tab.key}
+                    ref={(el) => {
+                      tabRefs.current[index] = el;
+                    }}
+                    className={`relative z-10 px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
+                      activeTab === tab.key ? "text-purple500" : "text-black"
+                    }`}
+                    onClick={() => {
+                      updateUnderline(index);
+                      setActiveTab(tab.key);
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+
+                {/* Active underline */}
+                <div
+                  className="absolute bottom-0 h-[1px] bg-purple500 transition-all duration-300 rounded-full"
+                  style={{
+                    left: underlineLeft,
+                    width: underlineWidth,
+                  }}
+                />
+              </div>
+
+              {/* Tab Content */}
+              <div className="mt-4">
+                {activeTab === "history" && (
+                  <div className="md:text-base text-sm py-4">
+                    <OrderHistory data={data} />
+                  </div>
+                )}
+                {activeTab === "order_details" && <ItemDetails data={data} />}
+                {activeTab === "contact_details" && (
+                  <ReceiverDetails data={data} />
+                )}
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-5">
+                <p className="font-medium">Need help with delivery</p>
+                <Button variant="secondary">Contact Support</Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Layout>

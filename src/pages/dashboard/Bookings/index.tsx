@@ -27,28 +27,29 @@ import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 const Bookings = () => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
-   const [bookingStatus, setBookingStatus] = useState("");
-    const [packageTypeId, setPackageTypeId] = useState("");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-    const { data: packageTypes } = useGetPackageType({ minimize: true });
-    const packages = packageTypes?.data;
-  const { data, isLoading, isSuccess, isError } =
-    useGetAllBookings({
-  page: currentPage,
-  bookingStatus,
+  const [bookingStatus, setBookingStatus] = useState("");
+  const [packageTypeId, setPackageTypeId] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const { data: packageTypes } = useGetPackageType({ minimize: true });
+  const packages = packageTypes?.data;
+  const userId = sessionStorage.getItem("userId") || "";
+
+  const { data, isLoading, isSuccess, isError } = useGetAllBookings({
+    page: currentPage,
+    bookingStatus,
     search: debouncedSearchTerm,
     packageTypeId,
-  
-});
+    senderId: userId,
+  });
 
-    useEffect(() => {
+  useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
     if (totalPages && totalPages !== lastPage) {
       setLastPage(totalPages);
     }
   }, [data?.data?.page?.totalPages]);
-  const [bookingData, setBookingData] =useState({})
+  const [bookingData, setBookingData] = useState({});
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -82,9 +83,11 @@ const Bookings = () => {
           </div>
           <div>
             {/* Select options */}
-            <Select onValueChange={(value) =>
+            <Select
+              onValueChange={(value) =>
                 value === "all" ? setBookingStatus("") : setBookingStatus(value)
-              }>
+              }
+            >
               <SelectTrigger className="bg-white h-[40px] rounded-lg border-2 min-w-[150px]">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -204,7 +207,7 @@ const Bookings = () => {
                             className="p-1 cursor-pointer"
                             onClick={() => {
                               setActiveModalId(index);
-                              setBookingData(item)
+                              setBookingData(item);
                             }}
                           />
                         </button>
@@ -221,8 +224,6 @@ const Bookings = () => {
                       </PopoverContent>
                     </Popover>
                   </div>
-
-                
                 </div>
               );
             })}
