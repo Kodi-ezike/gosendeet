@@ -5,20 +5,23 @@ import { useLocation } from "react-router-dom";
 import OrderHistory from "./components/OrderHistory";
 import ItemDetails from "./components/ItemDetails";
 import ReceiverDetails from "./components/ReceiverDetails";
+import { cn, formatDateTime, formatStatus } from "@/lib/utils";
+import { useGetTrackBookings } from "@/queries/user/useGetUserBookings";
+import { statusClasses } from "@/constants";
 
 const Tracking = () => {
   const [activeTab, setActiveTab] = useState("history");
   const [underlineLeft, setUnderlineLeft] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const location = useLocation()
-  const {data} = location.state ?? {}
-  console.log(data)
+  const location = useLocation();
+  const { result } = location.state ?? {};
+  const { data } = useGetTrackBookings(result?.data?.trackingNumber);
 
   const tabs = [
     { key: "history", label: "Order History" },
-    { key: "item_details", label: "Item Details" },
-    { key: "receiver_details", label: "Receiver Details" },
+    { key: "order_details", label: "Order Details" },
+    { key: "contact_details", label: "Contact Details" },
   ];
 
   const updateUnderline = (index: number) => {
@@ -38,26 +41,38 @@ const Tracking = () => {
     <Layout>
       <div className="md:px-20 px-6 md:py-16 py-8">
         <div className="xl:w-[65%] md:w-[90%] mx-auto bg-purple300 md:py-16 py-4 xl:px-24 md:px-10 px-4">
-          <h1 className="lg:text-[40px] md:text-[30px] text-2xl font-semibold font-clash mb-6">
-            Tracking {data?.data?.trackingNumber}
-          </h1>
+          <div className="flex lg:flex-row flex-col lg:items-center gap-4 mb-6 lg:justify-between">
+            <h1 className="lg:text-[40px] md:text-[30px] flex items-center md:gap-3 gap-2 text-2xl font-semibold font-clash">
+              Tracking <span>{data?.data?.trackingNumber}</span>
+            </h1>
+
+            <p
+              className={cn(
+                statusClasses[data?.data?.status] ??
+                  "bg-gray-100 text-gray-800", // fallback if status not found
+                "px-2 py-1 w-fit font-medium rounded-2xl text-base"
+              )}
+            >
+              {formatStatus(data?.data?.status)}
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-4 md:text-base text-sm">
             <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Item </p>
-              <p>2464 Royal Ln. Mesa, New Jersey 45463</p>
+              <p className="text-md font-semibold font-clash">Package Type</p>
+              <p>{data?.data?.packageType?.name}</p>
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-md font-semibold font-clash">Weight</p>
-              <p>15kg</p>
+              <p>{`${data?.data?.maxWeight} ${data?.data?.weightUnit} | ${data?.data?.length}x${data?.data?.width}x${data?.data?.height} ${data?.data?.dimensionsUnit}`}</p>
             </div>
             <div className="flex flex-col gap-1">
               <p className="text-md font-semibold font-clash">Courier</p>
-              <p>DHL Logistics</p>
+              <p>{data?.data?.company?.name}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-md font-semibold font-clash">Start Time</p>
-              <p>11:37 PM, 27 May 2023</p>
+              <p className="text-md font-semibold font-clash">Pickup Created</p>
+              <p>{formatDateTime(data?.data?.bookingDate)}</p>
             </div>
           </div>
 
@@ -72,11 +87,10 @@ const Tracking = () => {
                 className={`relative z-10 px-4 font-medium md:text-base text-sm outline-white transition-colors duration-300 cursor-pointer ${
                   activeTab === tab.key ? "text-purple500" : "text-black"
                 }`}
-                onMouseEnter={() => {
+                onClick={() => {
                   updateUnderline(index);
                   setActiveTab(tab.key);
                 }}
-                onClick={() => setActiveTab(tab.key)}
               >
                 {tab.label}
               </button>
@@ -94,9 +108,13 @@ const Tracking = () => {
 
           {/* Tab Content */}
           <div className="mt-4">
-            {activeTab === "history" && <OrderHistory />}
-            {activeTab === "item_details" && <ItemDetails />}
-            {activeTab === "receiver_details" && <ReceiverDetails />}
+            {activeTab === "history" && (
+              <div className="md:text-base text-sm py-4">
+                <OrderHistory data={data} />
+              </div>
+            )}
+            {activeTab === "order_details" && <ItemDetails data={data} />}
+            {activeTab === "contact_details" && <ReceiverDetails data={data} />}
           </div>
 
           <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-5">

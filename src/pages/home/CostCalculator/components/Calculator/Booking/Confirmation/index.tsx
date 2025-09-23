@@ -2,11 +2,12 @@ import Layout from "@/layouts/HomePageLayout";
 import purple from "@/assets/icons/big-purple-checkmark.png";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
 import { formatDate } from "@/lib/utils";
+import { trackBookingsHandler } from "@/hooks/useTrackBookings";
 
 const Confirmation = () => {
   const [searchParams] = useSearchParams();
@@ -24,6 +25,11 @@ const Confirmation = () => {
       }, 1000);
     }
   }, [userId]);
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = () => {
+    trackBookingsHandler(data?.data?.trackingNumber, navigate, setLoading);
+  };
 
   return (
     <Layout>
@@ -63,7 +69,9 @@ const Confirmation = () => {
                       from us in approximately 15 minutes.
                     </p>
                   </div>
-                  <Button>Track Order Progress</Button>
+                  <Button onClick={onSubmit} loading={loading}>
+                    Track Order Progress
+                  </Button>
                 </div>
 
                 <div className="flex md:flex-row flex-col gap-4 items-center justify-center mt-20">
@@ -136,7 +144,9 @@ const Confirmation = () => {
                   <p className="flex justify-between items-center font-medium text-sm">
                     <span className="text-neutral600">Tax</span>
                     <span className="text-right">
-                      {data?.data?.cost?.tax ? `₦${data?.data?.cost?.tax}` : "--"}
+                      {data?.data?.cost?.tax
+                        ? `₦${data?.data?.cost?.tax}`
+                        : "--"}
                     </span>
                   </p>
                 </div>
@@ -145,7 +155,9 @@ const Confirmation = () => {
 
                 <p className="flex justify-between items-center font-semibold">
                   <span className="text-neutral600">Total</span>
-                  <span className="text-right">₦ {data?.data?.cost?.total}</span>
+                  <span className="text-right">
+                    ₦ {data?.data?.cost?.total}
+                  </span>
                 </p>
               </div>
             </div>

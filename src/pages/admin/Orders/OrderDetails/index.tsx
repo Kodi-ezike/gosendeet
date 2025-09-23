@@ -8,6 +8,7 @@ import { cn, formatDate, formatDateTime, formatStatus } from "@/lib/utils";
 import { statusClasses } from "@/constants";
 import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
+import OrderHistory from "@/pages/home/Track/Tracking/components/OrderHistory";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -207,32 +208,7 @@ const OrderDetails = () => {
               <p>Delivery Progress</p>
             </div>
             <div className="grid xl:grid-cols-3 gap-4 text-sm px-3 xl:px-4 py-4 bg-white mb-6">
-              {data?.data?.trackingHistories?.length > 0 ? (
-                data?.data?.trackingHistories?.map((item: any) => (
-                  <div className="flex gap-4 py-4" key={item?.id}>
-                    <div className="flex flex-col gap-1 justify-center items-center">
-                      <p className="w-[10px] h-[10px] rounded-full bg-green500"></p>
-                      <p className="flex-1 w-[1.5px] bg-green500/50"></p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold font-inter mb-1">
-                        {item.title}
-                      </h4>
-                      <p className="text-neutral500 mb-1">
-                        {formatDateTime(item.timestamp)}
-                      </p>
-                      <p className="text-neutral600 mb-2">{item.location}</p>
-                      <p className="text-neutral600 text-[13px] mb-2">
-                        {item.notes}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="mb-8">
-                  <p className="font-medium mb-2">No progress</p>
-                </div>
-              )}
+              <OrderHistory data={data} />
             </div>
           </div>
 

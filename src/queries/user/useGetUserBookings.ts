@@ -65,7 +65,7 @@ export const useGetBookingsStats = (
   };
 };
 
-export const useTrackBookings = (id: string) => {
+export const useGetTrackBookings = (id: string) => {
   const query = useQuery({
     queryKey: ["bookings", id],
     queryFn: () => trackBookings(id),

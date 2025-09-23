@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import usePlacesAutocomplete from "use-places-autocomplete";
 import { useClickAway } from "@/hooks/useClickAway";
+import { useLocation } from "react-router-dom";
 // import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 // import { usePlacesAutocompleteV2 } from "@/hooks/usePlacesAutocompleteV2";
 
@@ -36,6 +37,8 @@ const CreateBooking = ({
   const [open, setOpen] = useState(false);
   const [inputData, setInputData] = useState({});
   const navigate = useNavigate();
+  const locationRef = useLocation();
+  const isCostCalculator = locationRef.pathname === "/cost-calculator";
   // ✅ separate states
   const [openPickupSuggestions, setOpenPickupSuggestions] = useState(false);
   const [openDestSuggestions, setOpenDestSuggestions] = useState(false);
@@ -137,22 +140,17 @@ const CreateBooking = ({
   };
   const packageTypeId = watch("packageTypeId");
 
-  
-
   return (
     <div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className={cn(
-          window.location.pathname.includes("cost-calculator") &&
+          isCostCalculator &&
             "flex lg:flex-row lg:items-center flex-col gap-4 w-full"
         )}
       >
         <div
-          className={cn(
-            window.location.pathname.includes("cost-calculator") &&
-              "grid lg:grid-cols-4 gap-4 w-full"
-          )}
+          className={cn(isCostCalculator && "grid lg:grid-cols-4 gap-4 w-full")}
         >
           <div className="w-full">
             <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
@@ -322,10 +320,12 @@ const CreateBooking = ({
           </div>
         </div>
 
-        <div className="flex gap-4 mt-4">
+        <div className="flex md:gap-4 gap-3 mt-4">
           <Button
             type="button"
-            className="bg-black hover:bg-black rounded-full px-8 py-3 outline-black flex items-center gap-2"
+            variant={"secondary"}
+            size={"custom"}
+            className=" md:px-6 px-2 "
             loading={isQuoteLoading}
             onClick={handleSubmit((data) => {
               // form is valid ✅ - get quote directly
@@ -350,7 +350,8 @@ const CreateBooking = ({
 
           <Button
             type="button"
-            className="bg-gray-200 hover:bg-gray-300 rounded-full px-8 py-3 outline-gray-200 flex items-center gap-2"
+            size={"custom"}
+            className="bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
             onClick={handleSubmit((data) => {
               // form is valid ✅ - open modal for additional options
               setInputData(data);
@@ -358,7 +359,7 @@ const CreateBooking = ({
             })}
           >
             <FiPlus className="text-gray-700" />
-            <span className="text-gray-700">Additional Options</span>
+            <span className="text-gray-700">More Options</span>
           </Button>
         </div>
       </form>
