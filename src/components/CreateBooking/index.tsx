@@ -36,6 +36,8 @@ const CreateBooking = ({
   // useGoogleMaps(import.meta.env.VITE_GOOGLE_MAPS_KEY, ["places"]);
   const [open, setOpen] = useState(false);
   const [inputData, setInputData] = useState<any>({});
+  // track when we've finished trying to rehydrate inputs (from sessionStorage or bookingRequest)
+  const [isHydrated, setIsHydrated] = useState(false);
   const navigate = useNavigate();
   const locationRef = useLocation();
   const isCostCalculator = locationRef.pathname === "/cost-calculator";
@@ -67,7 +69,11 @@ const CreateBooking = ({
     clearSuggestions: clearDestSuggestions,
   } = usePlacesAutocomplete();
 
-  const { mutate: getQuotesDirectly, isPending: isQuoteLoading } = useMutation({
+  const {
+    mutate: getQuotesDirectly,
+    isPending: isQuoteLoading,
+    reset: resetQuoteMutation,
+  } = useMutation({
     mutationFn: getQuotes,
     onSuccess: (data: any) => {
       if (data?.data?.length === 0 && !isCostCalculator) {
@@ -95,16 +101,17 @@ const CreateBooking = ({
           setData(data);
         }
       }
+      resetQuoteMutation();
     },
     onError: (data: any) => {
       toast.error(data?.message);
+      resetQuoteMutation();
     },
   });
 
   const { data: packageTypes } = useGetPackageType({ minimize: true });
 
   const packages = packageTypes?.data;
-  console.log(packages);
 
   const schema = z.object({
     pickupLocation: z
@@ -140,55 +147,71 @@ const CreateBooking = ({
   });
 
   const packageTypeId = watch("packageTypeId");
+  // ----- Helpers -----
+  const normalizeData = (data: any) => ({
+    ...data,
+    packageTypeId: String(data?.packageTypeId ?? ""),
+  });
 
+  const saveInputData = (data: any) => {
+    // const normalized = normalizeData(data);
+    // setInputData(normalized);
+    sessionStorage.setItem("bookingInputData", JSON.stringify(data));
+  };
+
+  // ----- Rehydrate Form -----
   useEffect(() => {
     const stored = sessionStorage.getItem("bookingInputData");
-    if (stored) {
-      const parsed = JSON.parse(stored);
+    const storedData = stored ? normalizeData(JSON.parse(stored)) : null;
 
-      // ✅ Force packageTypeId to string
-      if (parsed.packageTypeId) {
-        parsed.packageTypeId = String(parsed.packageTypeId);
-      }
-
-      setInputData(parsed);
+    if (storedData) {
+      setInputData(storedData);
       reset({
-        pickupLocation: parsed.pickupLocation ?? "",
-        dropOffLocation: parsed.dropOffLocation ?? "",
-        packageTypeId: parsed.packageTypeId ?? "",
-        weight: parsed.weight ?? "",
-      }); // hydrate RHF with fixed values
-    } else if (bookingRequest) {
-      reset({
-        pickupLocation: bookingRequest.pickupLocation ?? "",
-        dropOffLocation: bookingRequest.dropOffLocation ?? "",
-        packageTypeId: bookingRequest.packageTypeId ?? "",
-        weight: bookingRequest.weight ?? "",
+        pickupLocation: storedData.pickupLocation ?? "",
+        dropOffLocation: storedData.dropOffLocation ?? "",
+        packageTypeId: storedData.packageTypeId ?? "",
+        weight: storedData.weight ?? "",
       });
+    } else if (bookingRequest) {
+      const normalized = normalizeData(bookingRequest);
+      setInputData(normalized);
+      reset(normalized);
     }
+    // mark hydration attempt complete (even if nothing was found)
+    setIsHydrated(true);
   }, [bookingRequest, reset]);
 
-  const isUnauthenticated =
-    sessionStorage.getItem("unauthenticated") === "true";
-
+  // ----- Re-sync packageTypeId when data or packages load -----
   useEffect(() => {
-    if (!isUnauthenticated) return; // only run if unauthenticated
+    if (inputData?.packageTypeId && packages?.length > 0) {
+      reset((prevValues) => ({
+        ...prevValues,
+        packageTypeId: String(inputData.packageTypeId),
+      }));
+    }
+  }, [inputData?.packageTypeId, packages, reset]);
+
+  // ----- Handle unauthenticated quick quote -----
+  useEffect(() => {
+    const isUnauthenticated =
+      sessionStorage.getItem("unauthenticated") === "true";
+    if (!isUnauthenticated) return;
 
     const stored = sessionStorage.getItem("bookingInputData");
-    if (!stored) return; // stop if nothing is stored
+    if (!stored) return;
 
     let parsed;
     try {
-      parsed = JSON.parse(stored);
-    } catch (error) {
-      console.error("Invalid bookingInputData in sessionStorage:", error);
+      parsed = normalizeData(JSON.parse(stored));
+    } catch {
+      console.error("Invalid bookingInputData in sessionStorage");
       return;
     }
 
     getQuotesDirectly([
       {
         ...parsed,
-        quantity: 1, // default quantity for quick quote
+        quantity: 1,
         packageDescription: {
           isFragile: false,
           isPerishable: false,
@@ -197,252 +220,258 @@ const CreateBooking = ({
         },
       },
     ]);
-    sessionStorage.removeItem("unauthenticated"); // reset flag
-  }, [isUnauthenticated]);
 
-  const handleSaveInputData = (data: any) => {
-    // ✅ store packageTypeId as string
-    const normalized = { ...data, packageTypeId: String(data.packageTypeId) };
-    setInputData(normalized);
-    sessionStorage.setItem("bookingInputData", JSON.stringify(normalized));
-  };
+    sessionStorage.removeItem("unauthenticated");
+  }, []);
 
+  // ----- Form Submit -----
   const onSubmit = (data: z.infer<typeof schema>) => {
-    handleSaveInputData(data);
+    saveInputData(data);
   };
 
   return (
-    <div>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className={cn(
-          isCostCalculator &&
-            "flex lg:flex-row lg:items-center flex-col gap-4 w-full"
-        )}
-      >
-        <div
-          className={cn(isCostCalculator && "grid lg:grid-cols-4 gap-4 w-full")}
+    // don't render the form until we've attempted to rehydrate inputs
+    !isHydrated ? null : (
+      <div>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className={cn(
+            isCostCalculator &&
+              "flex lg:flex-row lg:items-center flex-col gap-4 w-full"
+          )}
         >
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={location} alt="location" className="w-[18px]" />
-              <div
-                ref={pickupRef}
-                className="flex flex-col gap-2 w-full relative"
-              >
-                <label htmlFor="pickup" className="font-clash font-semibold">
-                  Pickup Location
-                </label>
-                {/* Pickup Location */}
-                <input
-                  type="text"
-                  {...register("pickupLocation")}
-                  onChange={(e) => {
-                    setPickupValue(e.target.value);
-                    setValue("pickupLocation", e.target.value, {
-                      shouldValidate: true,
-                    });
-                    setOpenPickupSuggestions(true);
-                  }}
-                  // disabled={!ready}
-                  placeholder="Where from?"
-                  className="w-full outline-0"
-                />
-
-                {pickupStatus === "OK" && openPickupSuggestions && (
-                  <ul className="bg-white border rounded shadow-md mt-1 max-h-40 w-full overflow-y-auto absolute top-14 z-10">
-                    {pickupSuggestions.map(({ place_id, description }) => (
-                      <li
-                        key={place_id}
-                        onClick={() => {
-                          setPickupValue(description, false);
-                          setValue("pickupLocation", description, {
-                            shouldValidate: true,
-                          });
-                          clearPickupSuggestions();
-                        }}
-                        className="px-2 py-1 cursor-pointer hover:bg-gray-100"
-                      >
-                        {description}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-            {errors.pickupLocation && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.pickupLocation.message}
-              </p>
+          <div
+            className={cn(
+              isCostCalculator && "grid lg:grid-cols-4 gap-4 w-full"
             )}
-          </div>
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={location} alt="location" className="w-[18px]" />
-              <div
-                ref={destRef}
-                className="flex flex-col gap-2 w-full relative"
-              >
-                <label
-                  htmlFor="destination"
-                  className="font-clash font-semibold"
+          >
+            <div className="w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+                <img src={location} alt="location" className="w-[18px]" />
+                <div
+                  ref={pickupRef}
+                  className="flex flex-col gap-2 w-full relative"
                 >
-                  Destination
-                </label>
-                {/* Destination */}
-                <input
-                  type="text"
-                  {...register("dropOffLocation")}
-                  onChange={(e) => {
-                    setDestValue(e.target.value);
-                    setValue("dropOffLocation", e.target.value, {
-                      shouldValidate: true,
-                    });
-                    setOpenDestSuggestions(true);
-                  }}
-                  // disabled={!destReady}
-                  placeholder="Where to?"
-                  className="w-full outline-0"
-                />
-                {destStatus === "OK" && openDestSuggestions && (
-                  <ul className="bg-white border rounded shadow-md mt-1 max-h-40 w-full overflow-y-auto absolute top-14 z-10">
-                    {destSuggestions.map(({ place_id, description }) => (
-                      <li
-                        key={place_id}
-                        onClick={() => {
-                          setDestValue(description, false);
-                          setValue("dropOffLocation", description, {
-                            shouldValidate: true,
-                          });
-                          clearDestSuggestions();
-                        }}
-                        className="px-2 py-1 cursor-pointer hover:bg-gray-100"
-                      >
-                        {description}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-            {errors.dropOffLocation && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.dropOffLocation.message}
-              </p>
-            )}
-          </div>
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={size} alt="size" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="location" className="font-clash font-semibold">
-                  Package Type
-                </label>
+                  <label htmlFor="pickup" className="font-clash font-semibold">
+                    Pickup Location
+                  </label>
+                  {/* Pickup Location */}
+                  <input
+                    type="text"
+                    {...register("pickupLocation")}
+                    onChange={(e) => {
+                      setPickupValue(e.target.value);
+                      setValue("pickupLocation", e.target.value, {
+                        shouldValidate: true,
+                      });
+                      setOpenPickupSuggestions(true);
+                    }}
+                    // disabled={!ready}
+                    placeholder="Where from?"
+                    className="w-full outline-0"
+                  />
 
-                <Select
-                  onValueChange={(val) => {
-                    setValue("packageTypeId", val, {
-                      shouldValidate: true,
-                    });
-                  }}
-                  value={packageTypeId} // ✅ force sync with RHF
-                  disabled={!packages || packages.length === 0} // disable if not ready
+                  {pickupStatus === "OK" && openPickupSuggestions && (
+                    <ul className="bg-white border rounded shadow-md mt-1 max-h-40 w-full overflow-y-auto absolute top-14 z-10">
+                      {pickupSuggestions.map(({ place_id, description }) => (
+                        <li
+                          key={place_id}
+                          onClick={() => {
+                            setPickupValue(description, false);
+                            setValue("pickupLocation", description, {
+                              shouldValidate: true,
+                            });
+                            clearPickupSuggestions();
+                          }}
+                          className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+                        >
+                          {description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+              {errors.pickupLocation && (
+                <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                  {errors.pickupLocation.message}
+                </p>
+              )}
+            </div>
+            <div className="w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+                <img src={location} alt="location" className="w-[18px]" />
+                <div
+                  ref={destRef}
+                  className="flex flex-col gap-2 w-full relative"
                 >
-                  <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full h-6 py-2 px-0 mt-0">
-                    <SelectValue placeholder="Select package type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {packages?.map((item: any) => (
-                      <SelectItem value={String(item.id)} key={item.id}>
-                        {item?.name} ({item?.maxWeight} {item?.weightUnit})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <label
+                    htmlFor="destination"
+                    className="font-clash font-semibold"
+                  >
+                    Destination
+                  </label>
+                  {/* Destination */}
+                  <input
+                    type="text"
+                    {...register("dropOffLocation")}
+                    onChange={(e) => {
+                      setDestValue(e.target.value);
+                      setValue("dropOffLocation", e.target.value, {
+                        shouldValidate: true,
+                      });
+                      setOpenDestSuggestions(true);
+                    }}
+                    // disabled={!destReady}
+                    placeholder="Where to?"
+                    className="w-full outline-0"
+                  />
+                  {destStatus === "OK" && openDestSuggestions && (
+                    <ul className="bg-white border rounded shadow-md mt-1 max-h-40 w-full overflow-y-auto absolute top-14 z-10">
+                      {destSuggestions.map(({ place_id, description }) => (
+                        <li
+                          key={place_id}
+                          onClick={() => {
+                            setDestValue(description, false);
+                            setValue("dropOffLocation", description, {
+                              shouldValidate: true,
+                            });
+                            clearDestSuggestions();
+                          }}
+                          className="px-2 py-1 cursor-pointer hover:bg-gray-100"
+                        >
+                          {description}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
+              {errors.dropOffLocation && (
+                <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                  {errors.dropOffLocation.message}
+                </p>
+              )}
             </div>
-            {errors.packageTypeId && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.packageTypeId.message}
-              </p>
-            )}
-          </div>
-          <div className="w-full">
-            <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
-              <img src={size} alt="size" className="w-[18px]" />
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="location" className="font-clash font-semibold">
-                  Weight (kg)
-                </label>
+            <div className="w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+                <img src={size} alt="size" className="w-[18px]" />
+                <div className="flex flex-col gap-2 w-full">
+                  <label
+                    htmlFor="location"
+                    className="font-clash font-semibold"
+                  >
+                    Package Type
+                  </label>
 
-                <input
-                  type="text"
-                  {...register("weight")}
-                  placeholder="Enter weight"
-                  className="w-full outline-0"
-                  onKeyDown={allowOnlyNumbers}
-                />
+                  <Select
+                    onValueChange={(val) => {
+                      setValue("packageTypeId", val, {
+                        shouldValidate: true,
+                      });
+                    }}
+                    value={packageTypeId} // ✅ force sync with RHF
+                    disabled={!packages || packages.length === 0} // disable if not ready
+                  >
+                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full h-6 py-2 px-0 mt-0">
+                      <SelectValue placeholder="Select package type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {packages?.map((item: any) => (
+                        <SelectItem value={String(item.id)} key={item.id}>
+                          {item?.name} ({item?.maxWeight} {item?.weightUnit})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+              {errors.packageTypeId && (
+                <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                  {errors.packageTypeId.message}
+                </p>
+              )}
             </div>
-            {errors.weight && (
-              <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
-                {errors.weight.message}
-              </p>
-            )}
-          </div>
-        </div>
+            <div className="w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+                <img src={size} alt="size" className="w-[18px]" />
+                <div className="flex flex-col gap-2 w-full">
+                  <label
+                    htmlFor="location"
+                    className="font-clash font-semibold"
+                  >
+                    Weight (kg)
+                  </label>
 
-        <div className="flex md:gap-4 gap-3 mt-4">
-          <Button
-            type="button"
-            variant={"secondary"}
-            size={"custom"}
-            className=" md:px-6 px-2 "
-            loading={isQuoteLoading}
-            onClick={handleSubmit((data) => {
-              // form is valid ✅ - get quote directly
-              handleSaveInputData(data);
-              getQuotesDirectly([
-                {
-                  ...data,
-                  quantity: 1, // default quantity for quick quote
-                  packageDescription: {
-                    isFragile: false,
-                    isPerishable: false,
-                    isExclusive: false,
-                    isHazardous: false,
+                  <input
+                    type="text"
+                    {...register("weight")}
+                    placeholder="Enter weight"
+                    className="w-full outline-0"
+                    onKeyDown={allowOnlyNumbers}
+                  />
+                </div>
+              </div>
+              {errors.weight && (
+                <p className="error text-xs text-[#FF0000] pl-[45px] my-1">
+                  {errors.weight.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex md:gap-4 gap-3 mt-4">
+            <Button
+              type="button"
+              variant={"secondary"}
+              size={"custom"}
+              className=" md:px-6 px-2 "
+              loading={isQuoteLoading}
+              onClick={handleSubmit((data) => {
+                // form is valid ✅ - get quote directly
+                saveInputData(data);
+                getQuotesDirectly([
+                  {
+                    ...data,
+                    quantity: 1, // default quantity for quick quote
+                    packageDescription: {
+                      isFragile: false,
+                      isPerishable: false,
+                      isExclusive: false,
+                      isHazardous: false,
+                    },
                   },
-                },
-              ]);
-            })}
-          >
-            <FiSearch className="text-white" />
-            <span className="text-white">Quick Quote</span>
-          </Button>
+                ]);
+              })}
+            >
+              <FiSearch className="text-white" />
+              <span className="text-white">Quick Quote</span>
+            </Button>
 
-          <Button
-            type="button"
-            size={"custom"}
-            className="bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
-            onClick={handleSubmit((data) => {
-              // form is valid ✅ - open modal for additional options
-              handleSaveInputData(data);
-              setOpen(true);
-            })}
-          >
-            <FiPlus className="text-gray-700" />
-            <span className="text-gray-700">More Options</span>
-          </Button>
-        </div>
-      </form>
+            <Button
+              type="button"
+              size={"custom"}
+              className="bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
+              onClick={handleSubmit((data) => {
+                // form is valid ✅ - open modal for additional options
+                saveInputData(data);
+                setOpen(true);
+              })}
+            >
+              <FiPlus className="text-gray-700" />
+              <span className="text-gray-700">More Options</span>
+            </Button>
+          </div>
+        </form>
 
-      <SpecsModal
-        open={open}
-        setOpen={setOpen}
-        inputData={inputData}
-        setData={setData}
-      />
-    </div>
+        <SpecsModal
+          open={open}
+          setOpen={setOpen}
+          inputData={inputData}
+          setData={setData}
+        />
+      </div>
+    )
   );
 };
 
