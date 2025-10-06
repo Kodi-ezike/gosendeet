@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import CreateBooking from "@/components/CreateBooking";
+import empty from "@/assets/images/white-empty.png";
+
 const Calculator = () => {
   // const options = [
   //   { value: "price", title: "Price (cheapest first)" },
@@ -29,9 +31,11 @@ const Calculator = () => {
   const handleClick = (data: any) => {
     if (!userId) {
       toast.error("Please sign in to continue");
+      sessionStorage.setItem("unauthenticated", "true");
       setTimeout(() => {
         navigate("/signin");
       }, 1000);
+
     } else {
       navigate("/delivery", {
         state: { bookingDetails: data, bookingRequest: bookingRequest },
@@ -60,6 +64,15 @@ const Calculator = () => {
           ))}
         </SelectContent>
       </Select> */}
+      {(Object.keys(data).length === 0 || data?.data?.length === 0) && (
+        <div className="flex flex-col items-center justify-center mt-16">
+          <img src={empty} alt="empty quotes" className="h-[300px]" />
+
+          <p className="text-center font-bold text-purple500 ">
+            No courier services available for the selected route.
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-6 mt-16 mb-6">
         {data?.data?.map((item: any, index: number) => (

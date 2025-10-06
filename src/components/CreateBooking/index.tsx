@@ -35,7 +35,7 @@ const CreateBooking = ({
 }) => {
   // useGoogleMaps(import.meta.env.VITE_GOOGLE_MAPS_KEY, ["places"]);
   const [open, setOpen] = useState(false);
-  const [inputData, setInputData] = useState({});
+  const [inputData, setInputData] = useState<any>({});
   const navigate = useNavigate();
   const locationRef = useLocation();
   const isCostCalculator = locationRef.pathname === "/cost-calculator";
@@ -70,7 +70,17 @@ const CreateBooking = ({
   const { mutate: getQuotesDirectly, isPending: isQuoteLoading } = useMutation({
     mutationFn: getQuotes,
     onSuccess: (data: any) => {
-      if (data?.data?.length > 0) {
+      if (data?.data?.length === 0 && !isCostCalculator) {
+        toast.error("No quotes found! Please try a different package type.");
+      } else if (data?.data?.length === 0 && isCostCalculator) {
+        toast.error("No quotes found! Please try a different package type.");
+        navigate("/cost-calculator", {
+          state: {
+            inputData: inputData,
+            results: data,
+          },
+        });
+      } else if (data?.data?.length > 0) {
         toast.success("Successful");
         navigate("/cost-calculator", {
           state: {
@@ -94,6 +104,7 @@ const CreateBooking = ({
   const { data: packageTypes } = useGetPackageType({ minimize: true });
 
   const packages = packageTypes?.data;
+  console.log(packages);
 
   const schema = z.object({
     pickupLocation: z
@@ -120,12 +131,34 @@ const CreateBooking = ({
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      packageTypeId: bookingRequest ? bookingRequest.packageTypeId : "",
+      packageTypeId: bookingRequest
+        ? bookingRequest.packageTypeId
+        : inputData
+        ? inputData.packageTypeId
+        : "",
     },
   });
 
+  const packageTypeId = watch("packageTypeId");
+
   useEffect(() => {
-    if (bookingRequest) {
+    const stored = sessionStorage.getItem("bookingInputData");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+
+      // ✅ Force packageTypeId to string
+      if (parsed.packageTypeId) {
+        parsed.packageTypeId = String(parsed.packageTypeId);
+      }
+
+      setInputData(parsed);
+      reset({
+        pickupLocation: parsed.pickupLocation ?? "",
+        dropOffLocation: parsed.dropOffLocation ?? "",
+        packageTypeId: parsed.packageTypeId ?? "",
+        weight: parsed.weight ?? "",
+      }); // hydrate RHF with fixed values
+    } else if (bookingRequest) {
       reset({
         pickupLocation: bookingRequest.pickupLocation ?? "",
         dropOffLocation: bookingRequest.dropOffLocation ?? "",
@@ -135,10 +168,48 @@ const CreateBooking = ({
     }
   }, [bookingRequest, reset]);
 
-  const onSubmit = (data: z.infer<typeof schema>) => {
-    setInputData(data);
+  const isUnauthenticated =
+    sessionStorage.getItem("unauthenticated") === "true";
+
+  useEffect(() => {
+    if (!isUnauthenticated) return; // only run if unauthenticated
+
+    const stored = sessionStorage.getItem("bookingInputData");
+    if (!stored) return; // stop if nothing is stored
+
+    let parsed;
+    try {
+      parsed = JSON.parse(stored);
+    } catch (error) {
+      console.error("Invalid bookingInputData in sessionStorage:", error);
+      return;
+    }
+
+    getQuotesDirectly([
+      {
+        ...parsed,
+        quantity: 1, // default quantity for quick quote
+        packageDescription: {
+          isFragile: false,
+          isPerishable: false,
+          isExclusive: false,
+          isHazardous: false,
+        },
+      },
+    ]);
+    sessionStorage.removeItem("unauthenticated"); // reset flag
+  }, [isUnauthenticated]);
+
+  const handleSaveInputData = (data: any) => {
+    // ✅ store packageTypeId as string
+    const normalized = { ...data, packageTypeId: String(data.packageTypeId) };
+    setInputData(normalized);
+    sessionStorage.setItem("bookingInputData", JSON.stringify(normalized));
   };
-  const packageTypeId = watch("packageTypeId");
+
+  const onSubmit = (data: z.infer<typeof schema>) => {
+    handleSaveInputData(data);
+  };
 
   return (
     <div>
@@ -275,13 +346,14 @@ const CreateBooking = ({
                     });
                   }}
                   value={packageTypeId} // ✅ force sync with RHF
+                  disabled={!packages || packages.length === 0} // disable if not ready
                 >
                   <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full h-6 py-2 px-0 mt-0">
                     <SelectValue placeholder="Select package type" />
                   </SelectTrigger>
                   <SelectContent>
                     {packages?.map((item: any) => (
-                      <SelectItem value={item.id} key={item.id}>
+                      <SelectItem value={String(item.id)} key={item.id}>
                         {item?.name} ({item?.maxWeight} {item?.weightUnit})
                       </SelectItem>
                     ))}
@@ -329,7 +401,7 @@ const CreateBooking = ({
             loading={isQuoteLoading}
             onClick={handleSubmit((data) => {
               // form is valid ✅ - get quote directly
-              setInputData(data);
+              handleSaveInputData(data);
               getQuotesDirectly([
                 {
                   ...data,
@@ -354,7 +426,7 @@ const CreateBooking = ({
             className="bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
             onClick={handleSubmit((data) => {
               // form is valid ✅ - open modal for additional options
-              setInputData(data);
+              handleSaveInputData(data);
               setOpen(true);
             })}
           >

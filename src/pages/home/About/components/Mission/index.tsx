@@ -1,6 +1,9 @@
 import admission from "@/assets/icons/admission.png";
 import simple from "@/assets/icons/simple.png";
-import checker from "@/assets/images/checker.png";
+import phone from "@/assets/images/phone-delivery.png";
+import box from "@/assets/images/logistics-box.png";
+import close from "@/assets/images/close-delivery.png";
+import purple from "@/assets/icons/purple-checkmark.png";
 
 const Mission = () => {
   return (
@@ -8,7 +11,11 @@ const Mission = () => {
       <div className="flex lg:flex-row flex-col lg:gap-4 gap-8 justify-between items-center mb-8">
         <div className="lg:w-1/2">
           <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
-            <img src={admission} alt="admission" className="w-[18px] h-[18px]" />
+            <img
+              src={admission}
+              alt="admission"
+              className="w-[18px] h-[18px]"
+            />
             <span>Our Mission</span>
           </p>
           <p className="leading-[140%] lg:w-[90%]">
@@ -20,10 +27,10 @@ const Mission = () => {
           </p>
         </div>
         <div className="lg:w-1/2">
-          <img src={checker} alt="checker" />
+          <img src={box} alt="box" />
         </div>
       </div>
-      <div className="flex lg:flex-row flex-col lg:gap-4 gap-8 justify-between items-center">
+      <div className="flex lg:flex-row-reverse flex-col lg:gap-4 gap-8 justify-between items-center">
         <div className="lg:w-1/2">
           <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
             <img src={simple} alt="simple" className="w-[18px] h-[18px]" />
@@ -38,11 +45,12 @@ const Mission = () => {
           </p>
         </div>
         <div className="lg:w-1/2">
-          <img src={checker} alt="checker" />
+          <img src={close} alt="close" />
         </div>
       </div>
       <div className="grid md:grid-cols-2 lg:gap-8 gap-6 py-20">
         <div className="text-center bg-purple300 lg:p-12 p-4">
+          <img src={purple} alt="purple" className="mx-auto mb-3" />
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             Wide Range of Courier Service
           </p>
@@ -52,6 +60,7 @@ const Mission = () => {
           </p>
         </div>
         <div className="text-center bg-purple300 lg:p-12 p-4">
+          <img src={purple} alt="purple" className="mx-auto mb-3" />
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             Competitive Price at a View{" "}
           </p>
@@ -61,6 +70,7 @@ const Mission = () => {
           </p>
         </div>
         <div className="text-center bg-purple300 lg:p-12 p-4">
+          <img src={purple} alt="purple" className="mx-auto mb-3" />
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             No More Multiple Registrations
           </p>
@@ -70,6 +80,7 @@ const Mission = () => {
           </p>
         </div>
         <div className="text-center bg-purple300 lg:p-12 p-4">
+          <img src={purple} alt="purple" className="mx-auto mb-3" />
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             All-in-One Convenience
           </p>
@@ -81,7 +92,7 @@ const Mission = () => {
       </div>
       <div className="flex lg:flex-row flex-col lg:gap-0 gap-8 justify-between">
         <div className="lg:w-1/2">
-          <img src={checker} alt="checker" />
+          <img src={phone} alt="phone" />
         </div>
         <div className="lg:w-1/2 min-h-full p-8 bg-purple300 flex flex-col justify-center">
           <p className=" font-clash font-semibold mb-2 md:text-[32px] text-2xl leading-[130%]">

@@ -137,6 +137,7 @@ export const allowOnlyNumbers = (event: React.KeyboardEvent<HTMLInputElement>) =
   if (
     !/[0-9]/.test(event.key) &&
     event.key !== "+" &&
+    event.key !== "." &&
     event.key !== "Backspace" &&
     event.key !== "Tab" &&
     event.key !== "ArrowLeft" &&
