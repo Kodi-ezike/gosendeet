@@ -36,7 +36,6 @@ import { allowOnlyNumbers } from "@/lib/utils";
 const AddCompany = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("");
-  console.log(status);
   const [searchParams] = useSearchParams();
   const companyId = searchParams.get("id") ?? ""; //?id=a3f93a6d-13b6-4684-bef4-171889b1cbc1
   const [openService, setOpenService] = useState(false);
@@ -46,7 +45,7 @@ const AddCompany = () => {
   const [pricingInfo, setPricingInfo] = useState({});
 
   const [type, setType] = useState("");
-
+  const [isHydrated, setIsHydrated] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState<number | null>(null);
   const handleDeleteModal = () => setOpenDeleteModal(null);
 
@@ -57,22 +56,6 @@ const AddCompany = () => {
 
   const { data: company_services } = useGetCompanyServices(companyId);
   const { data: company_pricing } = useGetCompanyPricing(companyId);
-
-  // const page = 0;
-  // const size = 10;
-  // const companyStatus = "";
-  // const serviceLevelId = "";
-  // const search = "";
-
-  // const { data: company_list } = useGetCompanyList(
-  //   page,
-  //   size,
-  //   companyStatus,
-  //   serviceLevelId,
-  //   search
-  // );
-
-  // console.log(company_list?.data?.content);
 
   const companyServices = company_services?.data?.content || [];
   const companyPricing = company_pricing?.data?.content || [];
@@ -143,6 +126,21 @@ const AddCompany = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (companyId) {
+      const stored = sessionStorage.getItem("companyFormData");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          reset(parsed);
+        } catch (err) {
+          console.error("Error parsing stored company data", err);
+        }
+      }
+      setIsHydrated(true);
+    }
+  }, [companyId, reset]);
+
   const queryClient = useQueryClient();
 
   const { mutate: updateCompany } = useMutation({
@@ -165,6 +163,7 @@ const AddCompany = () => {
       toast.success("Successful");
 
       const id = data?.data?.id;
+
       if (!id) {
         toast("Failed to get company ID.");
         return;
@@ -180,6 +179,7 @@ const AddCompany = () => {
         }, 3000);
       }
       reset(data?.data);
+      sessionStorage.setItem("companyFormData", JSON.stringify(data?.data));
       const params = new URLSearchParams({ id: id });
 
       navigate(`?${params.toString()}`);
@@ -251,210 +251,190 @@ const AddCompany = () => {
             Add New Company
           </h2>
         </div>
-        {companyId === "" ? (
-          <div className="flex gap-4 items-center lg:w-[40%] w-full justify-end">
-            <Button
-              variant={"outline"}
-              className="md:text-base text-sm bg-neutral200 border-neutral700"
-              onClick={() => {
-                handleSubmit((data) => {
-                  setStatus("DRAFT");
-                  onSubmit(data);
-                })();
-              }}
-              loading={pendingCreate && status === "DRAFT"}
-            >
-              Save as draft
-            </Button>
-            <Button
-              variant={"secondary"}
-              className="md:text-base text-sm"
-              onClick={() => {
-                handleSubmit((data) => {
-                  setStatus("PUBLISHED");
-                  onSubmit(data);
-                })();
-              }}
-              loading={pendingCreate && status === "PUBLISHED"}
-            >
-              Save and Publish
-            </Button>
-          </div>
-        ) : null}
       </div>
 
       <div className="flex lg:flex-row flex-col gap-8 justify-between">
-        <div className="lg:w-1/2 border border-neutral700 rounded-2xl md:px-6 px-4 py-10">
-          <form
-            // onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-8 text-sm"
-          >
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="name" className="font-inter font-semibold px-4">
-                Company Name
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("name")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter company name"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
+        {!isHydrated ? null : (
+          <div className="lg:w-1/2 border border-neutral700 rounded-2xl md:px-6 px-4 py-10">
+            <form
+              // onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-5 text-sm"
+            >
+              <div className="flex flex-col w-full">
+                <label htmlFor="name" className="font-inter font-semibold px-4">
+                  Company Name
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("name")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter company name"
+                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                  />
+                </div>
+                {errors.name && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
-              {errors.name && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label
-                htmlFor="website"
-                className="font-inter font-semibold px-4"
-              >
-                Company Website
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("website")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter company website"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
-              </div>
-              {errors.website && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.website.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="email" className="font-inter font-semibold px-4">
-                Company Email
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("email")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter company email"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
-              </div>
-              {errors.email && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="phone" className="font-inter font-semibold px-4">
-                Company Contact Number
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("phone")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter company number"
-                  className="w-full outline-0 border-b-0 py-2 px-4"
-                  onKeyDown={allowOnlyNumbers}
-                />
-              </div>
-              {errors.phone && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.phone.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label
-                htmlFor="address"
-                className="font-inter font-semibold px-4"
-              >
-                Company Address
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("address")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter company address"
-                  className="w-full outline-0 border-b-0 py-2 px-4"
-                />
-              </div>
-              {errors.address && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.address.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="city" className="font-inter font-semibold px-4">
-                City
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("city")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter city"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
-              </div>
-              {errors.city && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.city.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label htmlFor="state" className="font-inter font-semibold px-4">
-                State
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <input
-                  type="text"
-                  {...register("state")}
-                  disabled={companyId !== ""}
-                  placeholder="Enter state"
-                  className="w-full outline-0 border-b-0 py-2 px-4 "
-                />
-              </div>
-              {errors.state && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.state.message}
-                </p>
-              )}
-            </div>
-            <div className="flex flex-col gap-2 w-full">
-              <label
-                htmlFor="country"
-                className="font-inter font-semibold px-4"
-              >
-                Country
-              </label>
-              <div className="flex justify-between items-center gap-2 border-b">
-                <Select
-                  onValueChange={(val) => setValue("country", val)}
-                  value={watch("country")}
-                  disabled={companyId !== ""}
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="website"
+                  className="font-inter font-semibold px-4"
                 >
-                  <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full p-4 mt-0">
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map((country) => (
-                      <SelectItem value={country.label} key={country.key}>
-                        {country.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Company Website
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("website")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter company website"
+                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                  />
+                </div>
+                {errors.website && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.website.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="email"
+                  className="font-inter font-semibold px-4"
+                >
+                  Company Email
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("email")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter company email"
+                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                  />
+                </div>
+                {errors.email && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="phone"
+                  className="font-inter font-semibold px-4"
+                >
+                  Company Contact Number
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("phone")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter company number"
+                    className="w-full outline-0 border-b-0 py-2 px-4"
+                    onKeyDown={allowOnlyNumbers}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.phone.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="address"
+                  className="font-inter font-semibold px-4"
+                >
+                  Company Address
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("address")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter company address"
+                    className="w-full outline-0 border-b-0 py-2 px-4"
+                  />
+                </div>
+                {errors.address && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.address.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label htmlFor="city" className="font-inter font-semibold px-4">
+                  City
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("city")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter city"
+                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                  />
+                </div>
+                {errors.city && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="state"
+                  className="font-inter font-semibold px-4"
+                >
+                  State
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("state")}
+                    disabled={companyId !== ""}
+                    placeholder="Enter state"
+                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                  />
+                </div>
+                {errors.state && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.state.message}
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-col w-full">
+                <label
+                  htmlFor="country"
+                  className="font-inter font-semibold px-4"
+                >
+                  Country
+                </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <Select
+                    onValueChange={(val) => setValue("country", val)}
+                    value={watch("country")}
+                    disabled={companyId !== ""}
+                  >
+                    <SelectTrigger className="outline-0 focus-visible:border-transparent focus-visible:ring-transparent border-0 w-full p-4 mt-0">
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem value={country.label} key={country.key}>
+                          {country.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                {/* <SelectInput
+                  {/* <SelectInput
                 variant="bordered"
                 labelPlacement="outside"
                 size="lg"
@@ -468,15 +448,15 @@ const AddCompany = () => {
                   setValue("country", selectedKey);
                 }}
               /> */}
+                </div>
+                {errors.country && (
+                  <p className="error text-xs text-[#FF0000] px-4">
+                    {errors.country.message}
+                  </p>
+                )}
               </div>
-              {errors.country && (
-                <p className="error text-xs text-[#FF0000] px-4">
-                  {errors.country.message}
-                </p>
-              )}
-            </div>
 
-            {/* <div>
+              {/* <div>
               <p
                 className="flex items-center gap-2 text-base cursor-pointer  text-purple500 font-medium "
                 onClick={() => setAddNumber(true)}
@@ -521,7 +501,7 @@ const AddCompany = () => {
               )}
             </div> */}
 
-            {/* <div>
+              {/* <div>
               <p
                 className="flex items-center gap-2 text-base cursor-pointer  text-purple500 font-medium "
                 onClick={() => setAddress(true)}
@@ -562,8 +542,40 @@ const AddCompany = () => {
             </div>
               )}
             </div> */}
-          </form>
-        </div>
+            </form>
+
+            {companyId === "" ? (
+              <div className="flex gap-4 items-center w-full mt-8 justify-end">
+                <Button
+                  variant={"outline"}
+                  className="md:text-base text-sm bg-neutral200 border-neutral700"
+                  onClick={() => {
+                    handleSubmit((data) => {
+                      setStatus("DRAFT");
+                      onSubmit(data);
+                    })();
+                  }}
+                  loading={pendingCreate && status === "DRAFT"}
+                >
+                  Save as draft
+                </Button>
+                <Button
+                  variant={"secondary"}
+                  className="md:text-base text-sm"
+                  onClick={() => {
+                    handleSubmit((data) => {
+                      setStatus("PUBLISHED");
+                      onSubmit(data);
+                    })();
+                  }}
+                  loading={pendingCreate && status === "PUBLISHED"}
+                >
+                  Save and Publish
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        )}
         <div className="lg:w-1/2 flex flex-col gap-8">
           <div className="w-full border border-neutral700 rounded-2xl px-6 py-10">
             <p className="font-semibold font-inter">Company Services</p>

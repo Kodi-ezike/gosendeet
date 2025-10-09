@@ -58,7 +58,6 @@ export function AddServiceModal({
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
   const { data: service_level } = useGetServiceLevel({ minimize: true });
-  console.log(service_level)
   const { data: pickup_options } = useGetPickupOptions({ minimize: true });
   const { data: package_types } = useGetPackageType({ minimize: true });
   const { data: location_codes } = useGetLocationCode({ minimize: true });
