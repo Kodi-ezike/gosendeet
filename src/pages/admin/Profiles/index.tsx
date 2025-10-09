@@ -30,8 +30,10 @@ const Profiles = () => {
   const [userId, setUserId] = useState("");
   const [singleUserStatus, setSingleUserStatus] = useState("");
 
-  const [userStatus, setUserStatus] = useState("");
-  const [activeStatusTab, setActiveStatusTab] = useState("All");
+  const savedStatus = sessionStorage.getItem("savedStatus") || "";
+  const [userStatus, setUserStatus] = useState(savedStatus);
+  const savedLabel = sessionStorage.getItem("savedLabel") || "All";
+  const [activeStatusTab, setActiveStatusTab] = useState(savedLabel);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedProfileSearchTerm, setDebouncedProfileSearchTerm] =
     useState("");

@@ -33,7 +33,8 @@ import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 const Orders = () => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
-  const [bookingStatus, setBookingStatus] = useState("");
+  const savedStatus = sessionStorage.getItem("savedStatus") || "";
+  const [bookingStatus, setBookingStatus] = useState(savedStatus);
   const [packageTypeId, setPackageTypeId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -58,7 +59,9 @@ const Orders = () => {
   const [orderProgress, setOrderProgress] = useState("");
   const [orderStatus, setOrderStatus] = useState("");
 
-  const [activeStatusTab, setActiveStatusTab] = useState("All");
+  const savedLabel = sessionStorage.getItem("savedLabel") || "All";
+  const [activeStatusTab, setActiveStatusTab] = useState(savedLabel);
+
   const [open, setOpen] = useState(false);
   const statusTabs = [
     { label: "All", status: "", count: bookingStats?.data?.totalBookings ?? 0 },

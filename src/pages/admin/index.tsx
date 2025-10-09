@@ -95,7 +95,7 @@ const AdminDashboard = () => {
         {activeTab === "profiles" && <Profiles />}
         {activeTab === "orders" && <Orders />}
         {activeTab === "companies" && <Companies />}
-        {activeTab === "reports" && <Reports />}
+        {activeTab === "reports" && <Reports  setActiveTab={setActiveTab}/>}
         {activeTab === "settings" && <Settings />}
       </div>
     </div>

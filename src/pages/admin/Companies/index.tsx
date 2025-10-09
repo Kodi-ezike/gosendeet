@@ -30,7 +30,8 @@ import {
 } from "@/components/ui/popover";
 
 const Companies = () => {
-  const [activeStatusTab, setActiveStatusTab] = useState("All");
+  const savedLabel = sessionStorage.getItem("savedLabel") || "All";
+  const [activeStatusTab, setActiveStatusTab] = useState(savedLabel);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
 
@@ -41,7 +42,8 @@ const Companies = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [companyStatus, setCompanyStatus] = useState("");
+  const savedStatus = sessionStorage.getItem("savedStatus") || "";
+  const [companyStatus, setCompanyStatus] = useState(savedStatus);
 
   const size = 10;
   const serviceLevelId = "";
