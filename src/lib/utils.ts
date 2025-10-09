@@ -39,17 +39,21 @@ export function formatTimestampToReadable(dateString: string): string {
 export function timeAgo(timestamp: string): string {
   const now = new Date();
   const past = new Date(timestamp);
+
+  if (isNaN(past.getTime())) return "Invalid date";
+
   const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
-
-  if (isNaN(diffInSeconds)) return "Invalid date";
-
   const seconds = diffInSeconds;
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(seconds / 3600);
   const days = Math.floor(seconds / 86400);
   const weeks = Math.floor(seconds / 604800);
-  const months = Math.floor(seconds / 2629800); // Approx: 30.44 days
-  const years = Math.floor(seconds / 31557600); // Approx: 365.25 days
+
+  // More accurate month/year calculation using calendar math
+  const yearDiff = now.getFullYear() - past.getFullYear();
+  const monthDiff = now.getMonth() - past.getMonth() + yearDiff * 12;
+  const months = Math.floor(monthDiff);
+  const years = Math.floor(monthDiff / 12);
 
   if (seconds < 60) return "just now";
   if (minutes < 60) return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
@@ -59,6 +63,7 @@ export function timeAgo(timestamp: string): string {
   if (months < 12) return `${months} month${months !== 1 ? "s" : ""} ago`;
   return `${years} year${years !== 1 ? "s" : ""} ago`;
 }
+
 
 // Month mapping in one place
 const monthMap: Record<
