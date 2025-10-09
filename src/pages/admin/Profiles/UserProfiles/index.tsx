@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa6";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Orders from "./Orders";
 import LoginHistory from "./LoginHistory";
 import { useGetLoginHistory, useGetSingleProfile } from "@/queries/admin/useGetAdminProfiles";
@@ -12,8 +12,7 @@ import UpdateUserStatusModal from "../modals/UpdateUserStatusModal";
 // import Settings from "./Settings";
 const UserProfiles = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const userId = location.state.id;
+  const userId: string =  useParams().id || ""
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
 
   const { data, isLoading, isSuccess, isError } = useGetSingleProfile(userId);
@@ -32,6 +31,12 @@ const UserProfiles = () => {
     { key: "login", label: "Login History" },
     // { key: "settings", label: "Settings" },
   ];
+
+//   useEffect(() => {
+//   if (location.state?.id) {
+//     sessionStorage.setItem("profileId", location.state.id);
+//   }
+// }, []);
 
   const updateUnderline = (index: number) => {
     const tab = tabRefs.current[index];
@@ -68,7 +73,7 @@ const UserProfiles = () => {
               variant={"ghost"}
               size={"ghost"}
               className=""
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/admin-dashboard')}
             >
               <FaArrowLeft />
               Back

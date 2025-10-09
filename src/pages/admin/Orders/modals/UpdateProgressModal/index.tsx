@@ -52,7 +52,7 @@ export function UpdateProgressModal({
       .min(1, { message: "Please select a status" }),
     location: z
       .string({ required_error: "Location is required" })
-      .min(1, { message: "Please add a location" }),
+      .min(3, { message: "Please add a valid location" }),
     notes: z.string().optional(),
     sendEmailNotification: z.boolean().optional(),
   });
@@ -96,6 +96,9 @@ export function UpdateProgressModal({
       });
       queryClient.invalidateQueries({
         queryKey: ["bookings"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["booking_stats"],
       });
       reset();
     },

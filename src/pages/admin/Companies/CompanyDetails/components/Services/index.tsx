@@ -7,6 +7,11 @@ import { deleteCompanyServices } from "@/services/companies";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { AddServiceModal } from "../../../AddCompany/modals/AddServiceModal";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 const Services = ({
   companyId,
@@ -24,10 +29,6 @@ const Services = ({
 
   const [activeModalId, setActiveModalId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
-
-  const showModal = (id: number) => {
-    setActiveModalId((prevId) => (prevId === id ? null : id)); // Toggle modal on/off
-  };
 
   // Close modal on outside click
   useEffect(() => {
@@ -129,24 +130,26 @@ const Services = ({
                   </div>
 
                   <div className="w-[2%]">
-                    <button className="p-1">
-                      <BsThreeDotsVertical
-                        size={20}
-                        className="p-1 cursor-pointer"
-                        onClick={() => showModal(index)}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Modal */}
-                  {activeModalId === index && (
-                    <>
-                      <div
-                        className="modal w-fit bg-white shadow-md p-1 rounded-md z-10 absolute top-10 right-0"
-                        ref={modalRef}
-                      >
+                    <Popover
+                      open={activeModalId === index}
+                      onOpenChange={(open) =>
+                        setActiveModalId(open ? index : null)
+                      }
+                    >
+                      <PopoverTrigger asChild>
+                        <button className="border p-1 rounded-md border-neutral200">
+                          <BsThreeDotsVertical
+                            size={20}
+                            className="p-1 cursor-pointer"
+                            onClick={() => {
+                              setActiveModalId(index);
+                            }}
+                          />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-fit p-1">
                         <p
-                          className="flex items-center gap-2 py-1 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                          className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
                           onClick={() => {
                             setServiceInfo(item);
                             setOpenService(true);
@@ -156,16 +159,16 @@ const Services = ({
                           Edit service
                         </p>
                         <p
-                          className="flex items-center gap-2 py-1 px-4 hover:bg-purple200 rounded-md cursor-pointer"
+                          className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer"
                           onClick={() => {
                             setOpenDeleteModal(index);
                           }}
                         >
                           Delete service
                         </p>
-                      </div>
-                    </>
-                  )}
+                      </PopoverContent>
+                    </Popover>
+                  </div>
 
                   <DeleteModal
                     onOpenChange={(open) => {

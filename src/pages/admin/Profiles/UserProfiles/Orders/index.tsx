@@ -33,7 +33,7 @@ const Orders = ({ userId }: { userId: any }) => {
   const [packageTypeId, setPackageTypeId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const { data: bookingStats } = useGetBookingsStats();
+  const { data: bookingStats } = useGetBookingsStats({ senderId: userId });
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({

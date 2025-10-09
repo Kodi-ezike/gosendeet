@@ -320,7 +320,7 @@ const Profiles = () => {
                       </PopoverTrigger>
                       <PopoverContent className="w-fit p-1">
                         <Link
-                          to={`/admin-dashboard/user/${index + 1}`}
+                          to={`/admin-dashboard/user/${item.id}`}
                           state={{ id: item.id }}
                         >
                           <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">

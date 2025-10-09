@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FaArrowLeft } from "react-icons/fa";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import purple from "@/assets/icons/purple-checkmark.png";
 // import blue from "@/assets/icons/blue-checkmark.png";
 // import orange from "@/assets/icons/orange-checkmark.png";
@@ -29,15 +29,13 @@ const CompanyDetails = () => {
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const location = useLocation();
-  const companyId = location.state.id;
-
+  const companyId: string = useParams().id || "";
   const { data, isLoading, isSuccess, isError } =
     useGetSingleCompany(companyId);
 
   const { data: company_services } = useGetCompanyServices(companyId);
   const companyServices = company_services?.data || [];
-  
+
   const { data: company_pricing } = useGetCompanyPricing(companyId);
   const companyPricing = company_pricing?.data || [];
 
@@ -85,7 +83,7 @@ const CompanyDetails = () => {
               variant={"ghost"}
               size={"ghost"}
               className=""
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/admin-dashboard")}
             >
               <FaArrowLeft />
               Back
@@ -208,7 +206,7 @@ const CompanyDetails = () => {
             {/* Tab Content */}
             <div className="mt-4">
               {activeTab === "cover" && <CoverSheet data={data?.data} />}
-              {activeTab === "orders" && <Orders companyId={companyId}/>}
+              {activeTab === "orders" && <Orders companyId={companyId} />}
               {activeTab === "rating" && <Ratings />}
               {activeTab === "services" && (
                 <Services
