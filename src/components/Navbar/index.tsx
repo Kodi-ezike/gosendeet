@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU } from "../../constants";
 import logo from "@/assets/images/gosendeet-logo.png";
 import { HiBars3 } from "react-icons/hi2";
 import { GoX } from "react-icons/go";
-import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
+// import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
+import { Home } from "lucide-react";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -18,18 +19,18 @@ const Navbar = () => {
   const location = useLocation(); // Get current location
 
   const authToken = sessionStorage.getItem("authToken");
-
-  const userId = sessionStorage.getItem("userId") || "";
   const role = sessionStorage.getItem("role") || "";
-  const { data: userData, refetchUserData } = useGetUserDetails(userId);
-  const username = userData?.data?.username;
-  const letter = username?.charAt(0).toUpperCase();
 
-  useEffect(() => {
-    if (userId) {
-      refetchUserData();
-    }
-  }, [userId]);
+  // const userId = sessionStorage.getItem("userId") || "";
+  // const { data: userData, refetchUserData } = useGetUserDetails(userId);
+  // const username = userData?.data?.username;
+  // const letter = username?.charAt(0).toUpperCase();
+
+  // useEffect(() => {
+  //   if (userId) {
+  //     refetchUserData();
+  //   }
+  // }, [userId]);
   return (
     <nav className="w-full z-20">
       <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-white border-b border-b-neutral300">
@@ -49,15 +50,25 @@ const Navbar = () => {
               </button>
             </Link>
           ) : (
-            <div
-              className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
-              onClick={() => {
-                role === "user" && navigate("/dashboard");
-                role === "super_admin" && navigate("/admin-dashboard");
-              }}
-            >
-              {letter}
-            </div>
+            <>
+              {/* <div
+                className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
+                onClick={() => {
+                  role === "user" && navigate("/dashboard");
+                  role === "super_admin" && navigate("/admin-dashboard");
+                }}
+              >
+                {letter}
+              </div> */}
+              <Home
+                className="text-purple500"
+                size={24}
+                onClick={() => {
+                  role === "user" && navigate("/dashboard");
+                  role === "super_admin" && navigate("/admin-dashboard");
+                }}
+              />
+            </>
           )}
           <button onClick={handleNavToggle}>
             <HiBars3 size={24} />
@@ -101,15 +112,27 @@ const Navbar = () => {
             </Link>
           </div>
         ) : (
-          <div
-            className="w-[40px] h-[40px] hidden lg:flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
-            onClick={() => {
-              role === "user" && navigate("/dashboard");
-              role === "super_admin" && navigate("/admin-dashboard");
-            }}
-          >
-            {letter}
-          </div>
+          <>
+            {/* <div
+                className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500 cursor-pointer"
+                onClick={() => {
+                  role === "user" && navigate("/dashboard");
+                  role === "super_admin" && navigate("/admin-dashboard");
+                }}
+              >
+                {letter}
+              </div> */}
+            <div
+              className="hidden lg:flex items-center gap-2 text-purple500 cursor-pointer"
+              onClick={() => {
+                role === "user" && navigate("/dashboard");
+                role === "super_admin" && navigate("/admin-dashboard");
+              }}
+            >
+              <Home className="text-purple500" size={24} />
+              <span>Dashboard</span>
+            </div>
+          </>
         )}
         {/* Links (mobile view) */}
         <div

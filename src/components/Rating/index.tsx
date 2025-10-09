@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React from "react";
 
 type RatingProps = {
@@ -30,13 +31,17 @@ const Rating: React.FC<RatingProps> = ({
         const half = !full && i + 0.5 <= value;
 
         return (
-          <div key={i} className="relative cursor-pointer" style={{ width: size, height: size }}>
+          <div
+            key={i}
+            className={cn(!readOnly && "cursor-pointer", "relative ")}
+            style={{ width: size, height: size }}
+          >
             {/* Full Star */}
             <svg
               viewBox="0 0 24 24"
               fill={full ? "#FF8C1A" : "#E1E1E1"}
-            //   stroke="#FF8C1A"
-            //   strokeWidth="2"
+              //   stroke="#FF8C1A"
+              //   strokeWidth="2"
               className="absolute top-0 left-0"
               width={size}
               height={size}
@@ -58,7 +63,13 @@ const Rating: React.FC<RatingProps> = ({
                 onClick={() => handleClick(i, true)}
               >
                 <defs>
-                  <linearGradient id={`half-gradient-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                  <linearGradient
+                    id={`half-gradient-${i}`}
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
                     <stop offset="50%" stopColor="#FF8C1A" />
                     <stop offset="50%" stopColor="transparent" />
                   </linearGradient>

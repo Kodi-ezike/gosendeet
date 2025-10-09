@@ -1,13 +1,14 @@
 import purple from "@/assets/icons/purple-checkmark.png";
 import green from "@/assets/icons/green-checkmark.png";
-import avatar1 from "@/assets/images/avatar1.png";
-import { DetailsModal } from "./modals/details";
+// import avatar1 from "@/assets/images/avatar1.png";
+// import { DetailsModal } from "./modals/details";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import CreateBooking from "@/components/CreateBooking";
 import empty from "@/assets/images/white-empty.png";
+import Rating from "@/components/Rating";
 
 const Calculator = () => {
   // const options = [
@@ -35,7 +36,6 @@ const Calculator = () => {
       setTimeout(() => {
         navigate("/signin");
       }, 1000);
-
     } else {
       navigate("/delivery", {
         state: { bookingDetails: data, bookingRequest: bookingRequest },
@@ -82,15 +82,16 @@ const Calculator = () => {
           >
             <div className="grid lg:grid-cols-3 lg:justify-between lg:items-center gap-4 flex-col py-4 border-b border-b-neutral700">
               <div className="flex gap-2 md:items-center">
-                <img
+                {/* <img
                   src={avatar1}
                   alt="avatar1"
                   className="w-[30px] h-[30px] rounded-full"
-                />
+                /> */}
                 <div>
-                  <div className="flex md:flex-row flex-col md:gap-2 md:text-[18px]">
+                  <div className="flex md:flex-row md:items-center flex-col md:gap-2 md:text-[18px]">
                     <p className="font-medium">{item?.courier?.name}</p>
-                    <DetailsModal />
+                    {/* <DetailsModal /> */}
+                    <Rating value={item?.courier?.totalRatings} readOnly />
                   </div>
                   <p className="text-sm">
                     Pickup date:{" "}
