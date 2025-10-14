@@ -294,3 +294,48 @@ export const getAdminDimensionUnits = async () => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+export const createCrossAreaRoute = async (data: any) => {
+  try {
+    const res = await api.post(`/cross-area-routes`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const getCrossAreaRoute = async (options?: { page?: number; minimize?: boolean }) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (options?.page !== undefined) {
+      params.append("page", options.page.toString());
+    } else if (options?.minimize !== undefined) {
+      params.append("minimize", options.minimize.toString());
+    }
+
+    const res = await api.get(`/cross-area-routes?${params.toString()}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const updateCrossAreaRoute = async (id: string, data: any) => {
+  try {
+    const res = await api.put(`/cross-area-routes/${id}`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const deleteCrossAreaRoute = async (id: string) => {
+  try {
+    const res = await api.delete(`/cross-area-routes/${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

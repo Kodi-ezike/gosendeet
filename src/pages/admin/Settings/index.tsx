@@ -3,8 +3,9 @@ import PackageType from "./components/PackageType";
 import ServiceLevel from "./components/ServiceLevel";
 import CoverageArea from "./components/CoverageArea";
 import PickupOption from "./components/PickupOption";
-import LocationCode from "./components/LocationCode";
+// import LocationCode from "./components/LocationCode";
 import DeliveryProgress from "./components/DeliveryProgress";
+import CrossAreaRoutes from "./components/CrossAreaRoutes";
 
 const Settings = () => {
   const initialTab = sessionStorage.getItem("settingsTab");
@@ -18,7 +19,8 @@ const Settings = () => {
     { key: "level", label: "Service Levels" },
     { key: "area", label: "Coverage Areas" },
     { key: "option", label: "Pickup Options" },
-    { key: "code", label: "Location Codes" },
+    // { key: "code", label: "Location Codes" },
+    { key: "cross", label: "Cross Area Routes" },
     { key: "progress", label: "Delivery Progress" },
   ];
 
@@ -59,7 +61,7 @@ const Settings = () => {
         <div className="xl:w-[85%] w-full">
           <div className="tabs xl:hidden block overflow-auto">
             {/* Tab Buttons */}
-            <div className="w-fit min-w-[800px] border-b border-b-neutral300 md:h-[40px] h-[60px] flex md:gap-4 mb-4 relative overflow-hidden">
+            <div className="w-fit min-w-[800px] border-b border-b-neutral300 md:h-[40px] min-h-[60px] flex md:gap-4 mb-4 relative overflow-hidden">
               {tabs.map((tab, index) => (
                 <button
                   key={tab.key}
@@ -95,7 +97,8 @@ const Settings = () => {
             {activeTab === "level" && <ServiceLevel />}
             {activeTab === "area" && <CoverageArea />}
             {activeTab === "option" && <PickupOption />}
-            {activeTab === "code" && <LocationCode />}
+            {/* {activeTab === "code" && <LocationCode />} */}
+            {activeTab === "cross" && <CrossAreaRoutes />}
             {activeTab === "progress" && <DeliveryProgress />}
           </div>
         </div>

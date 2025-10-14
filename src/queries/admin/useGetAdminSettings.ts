@@ -1,4 +1,4 @@
-import { getAdminDimensionUnits, getAdminWeightUnits, getCoverageArea, getDeliveryProgress, getLocationCode, getPackageType, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
+import { getAdminDimensionUnits, getAdminWeightUnits, getCoverageArea, getCrossAreaRoute, getDeliveryProgress, getLocationCode, getPackageType, getPickupOptions, getServiceLevel } from "@/services/adminSettings";
 import { useQuery } from "@tanstack/react-query";
 
 export const useGetServiceLevel = (options?: { page?: number; minimize?: boolean }) => {
@@ -98,6 +98,20 @@ export const useGetAdminDimensionUnits = () => {
   const query = useQuery({
     queryKey: ["dimension_units"],
     queryFn: () => getAdminDimensionUnits(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+
+
+export const useGetCrossAreaRoute = (options?: { page?: number; minimize?: boolean }) => {
+  const query = useQuery({
+    queryKey: ["cross_area_routes", options],
+    queryFn: () => getCrossAreaRoute(options),
   });
   return {
     isLoading: query.isPending,
