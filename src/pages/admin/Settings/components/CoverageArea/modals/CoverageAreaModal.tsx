@@ -28,9 +28,12 @@ export function CoverageAreaModal({
   info: any;
 }) {
   const schema = z.object({
-    coverageArea: z
-      .string({ required_error: "Coverage area is required" })
-      .min(1, { message: "Please enter a coverage area" }),
+    name: z
+      .string({ required_error: "Name is required" })
+      .min(1, { message: "Please enter a name" }),
+    code: z
+      .string({ required_error: "Code is required" })
+      .min(1, { message: "Please enter a code" }),
   });
 
   const {
@@ -46,11 +49,13 @@ export function CoverageAreaModal({
   useEffect(() => {
     if (open && type === "edit" && info) {
       reset({
-        coverageArea: info.name,
+        name: info.name,
+        code: info.code,
       });
     } else if (open && type === "create") {
       reset({
-        coverageArea: "",
+        name: "",
+        code: "",
       });
     }
   }, [open, info, type, reset]);
@@ -93,13 +98,14 @@ export function CoverageAreaModal({
   const onSubmit = (data: z.infer<typeof schema>) => {
     type === "create" &&
       createArea({
-        name: data.coverageArea,
+        name: data.name,
+        code: data.code,
       });
 
     type === "edit" &&
       updateArea({
         id: info?.id,
-        data: { name: data.coverageArea },
+        data: { name: data.name, code: data.code },
       });
   };
 
@@ -119,24 +125,41 @@ export function CoverageAreaModal({
               className="flex flex-col gap-8"
             >
               <div className="flex flex-col gap-2 w-full">
-                {/* <label
-                  htmlFor="coverageArea"
-                  className="font-inter font-semibold px-4"
-                >
-                  Coverage Area
-                </label> */}
+                <label htmlFor="name" className="font-inter font-semibold">
+                    Name
+                  </label>
                 <div className="flex justify-between items-center gap-2 border-b">
                   <input
                     type="text"
-                    {...register("coverageArea")}
+                    {...register("name")}
                     defaultValue={info?.name}
-                    placeholder="Enter coverage area"
-                    className="w-full outline-0 border-b-0 py-2 px-4 "
+                    placeholder="Enter name"
+                    className="w-full outline-0 border-b-0 py-2 "
                   />
                 </div>
-                {errors.coverageArea && (
-                  <p className="error text-xs text-[#FF0000] px-4">
-                    {errors.coverageArea.message}
+                {errors.name && (
+                  <p className="error text-xs text-[#FF0000]">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2 w-full">
+                <label htmlFor="code" className="font-inter font-semibold">
+                    Code
+                  </label>
+                <div className="flex justify-between items-center gap-2 border-b">
+                  <input
+                    type="text"
+                    {...register("code")}
+                    defaultValue={info?.code}
+                    placeholder="Enter code"
+                    className="w-full outline-0 border-b-0 py-2 "
+                  />
+                </div>
+                {errors.code && (
+                  <p className="error text-xs text-[#FF0000]">
+                    {errors.code.message}
                   </p>
                 )}
               </div>

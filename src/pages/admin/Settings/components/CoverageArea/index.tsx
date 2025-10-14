@@ -107,8 +107,10 @@ const CoverageArea = () => {
                         : "border-t border-t-neutral300"
                     } hover:bg-purple300`}
                   >
-                    <div className="flex-1">
+                    <div className="flex flex-1">
                       <p>{item?.name}</p>
+                      <span className="mx-2">-</span>
+                      <p>{item?.code}</p>
                     </div>
 
                     <div className="w-[5%] flex items-center gap-4">
