@@ -137,8 +137,8 @@ const AddCompany = () => {
           console.error("Error parsing stored company data", err);
         }
       }
-      setIsHydrated(true);
     }
+    setIsHydrated(true);
   }, [companyId, reset]);
 
   const queryClient = useQueryClient();
