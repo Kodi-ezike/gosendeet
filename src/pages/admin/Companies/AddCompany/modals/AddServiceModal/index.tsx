@@ -21,8 +21,9 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
 import {
-  useGetCoverageArea,
-  useGetLocationCode,
+  // useGetCoverageArea,
+  useGetCrossAreaRoute,
+  // useGetLocationCode,
   useGetPackageType,
   useGetPickupOptions,
   useGetServiceLevel,
@@ -55,13 +56,15 @@ export function AddServiceModal({
   const [selectedPackageTypes, setSelectedPackageTypes] = useState<string[]>(
     []
   );
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  // const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [selectedRoutes, setSelectedRoutes] = useState<string[]>([]);
 
   const { data: service_level } = useGetServiceLevel({ minimize: true });
   const { data: pickup_options } = useGetPickupOptions({ minimize: true });
   const { data: package_types } = useGetPackageType({ minimize: true });
-  const { data: location_codes } = useGetLocationCode({ minimize: true });
-  const { data: coverage_areas } = useGetCoverageArea({ minimize: true });
+  // const { data: location_codes } = useGetLocationCode({ minimize: true });
+  const { data: cross_area_routes } = useGetCrossAreaRoute({ minimize: true });
+  // const { data: coverage_areas } = useGetCoverageArea({ minimize: true });
 
   const pickupOptions = pickup_options?.data?.map((item: any) => {
     return {
@@ -75,9 +78,15 @@ export function AddServiceModal({
       value: item.id,
     };
   });
-  const locationOptions = location_codes?.data?.map((item: any) => {
+  // const locationOptions = location_codes?.data?.map((item: any) => {
+  //   return {
+  //     label: item.name,
+  //     value: item.id,
+  //   };
+  // });
+  const routeOptions = cross_area_routes?.data?.map((item: any) => {
     return {
-      label: item.name,
+      label: item.areaA + " - " + item.areaB,
       value: item.id,
     };
   });
@@ -92,12 +101,15 @@ export function AddServiceModal({
     packageTypeIds: z
       .array(z.string())
       .nonempty({ message: "Select at least one package type" }),
-    locationCodeIds: z
+    // locationCodeIds: z
+    //   .array(z.string())
+    //   .nonempty({ message: "Select at least one location code" }),
+    crossAreaRouteIds: z
       .array(z.string())
-      .nonempty({ message: "Select at least one location code" }),
-    coverageAreaId: z
-      .string({ required_error: "Coverage area is required" })
-      .min(1, { message: "Please select an option" }),
+      .nonempty({ message: "Select at least one cross area route" }),
+    // coverageAreaId: z
+    //   .string({ required_error: "Coverage area is required" })
+    //   .min(1, { message: "Please select an option" }),
     weightLimit: z
       .string({ required_error: "Weight limit is required" })
       .min(1, { message: "Please enter a limit" }),
@@ -120,10 +132,11 @@ export function AddServiceModal({
     resolver: zodResolver(schema),
     defaultValues: {
       serviceLevelId: "",
-      coverageAreaId: "",
+      // coverageAreaId: "",
       pickupOptionIds: [],
       packageTypeIds: [],
-      locationCodeIds: [],
+      // locationCodeIds: [],
+      crossAreaRouteIds: [],
     },
   });
 
@@ -139,10 +152,15 @@ export function AddServiceModal({
       setSelectedPackageTypes(defaultIds);
       setValue("packageTypeIds", defaultIds);
     }
-    if (info?.locationCodes) {
-      const defaultIds = info.locationCodes.map((item: any) => item.id);
-      setSelectedLocations(defaultIds);
-      setValue("locationCodeIds", defaultIds);
+    // if (info?.locationCodes) {
+    //   const defaultIds = info.locationCodes.map((item: any) => item.id);
+    //   setSelectedLocations(defaultIds);
+    //   setValue("locationCodeIds", defaultIds);
+    // }
+    if (info?.crossAreaRoutes) {
+      const defaultIds = info.crossAreaRoutes.map((item: any) => item.id);
+      setSelectedRoutes(defaultIds);
+      setValue("crossAreaRouteIds", defaultIds);
     }
   }, [info]);
 
@@ -151,10 +169,12 @@ export function AddServiceModal({
     if (openService && type === "edit" && info) {
       reset({
         serviceLevelId: info?.companyServiceLevel?.id,
-        coverageAreaId: info?.coverageArea?.id,
+        // coverageAreaId: info?.coverageArea?.id,
         pickupOptionIds: info?.pickupOptions?.map((item: any) => item.id) || [],
         packageTypeIds: info?.packageTypes?.map((item: any) => item.id) || [],
-        locationCodeIds: info?.locationCodes?.map((item: any) => item.id) || [],
+        // locationCodeIds: info?.locationCodes?.map((item: any) => item.id) || [],
+        crossAreaRouteIds:
+          info?.crossAreaRoutes?.map((item: any) => item.id) || [],
         weightLimit: info.weightLimit?.toString() ?? "",
         isNextDayDelivery: info?.isNextDayDelivery ?? false,
         numberOfDaysForPickup: info.numberOfDaysForPickup?.toString() ?? "",
@@ -166,8 +186,9 @@ export function AddServiceModal({
         serviceLevelId: "", // or the default ID string if editing
         pickupOptionIds: [], // empty array for multi-select
         packageTypeIds: [],
-        locationCodeIds: [],
-        coverageAreaId: "",
+        // locationCodeIds: [],
+        crossAreaRouteIds: [],
+        // coverageAreaId: "",
         weightLimit: "",
         isNextDayDelivery: false,
         numberOfDaysForPickup: "",
@@ -175,7 +196,8 @@ export function AddServiceModal({
       });
       setSelectedPickupOptions([]);
       setSelectedPackageTypes([]);
-      setSelectedLocations([]);
+      // setSelectedLocations([]);
+      setSelectedRoutes([]);
     }
   }, [openService, info, type, reset]);
   const queryClient = useQueryClient();
@@ -186,15 +208,17 @@ export function AddServiceModal({
       toast.success("Successful");
       reset({
         serviceLevelId: "",
-        coverageAreaId: "",
+        // coverageAreaId: "",
         pickupOptionIds: [],
         packageTypeIds: [],
-        locationCodeIds: [],
+        // locationCodeIds: [],
+        crossAreaRouteIds: [],
         isNextDayDelivery: false,
       });
       setSelectedPickupOptions([]);
       setSelectedPackageTypes([]);
-      setSelectedLocations([]);
+      // setSelectedLocations([]);
+      setSelectedRoutes([]);
       setOpenService(false);
       queryClient.invalidateQueries({
         queryKey: ["company_services"],
@@ -317,7 +341,7 @@ export function AddServiceModal({
               </div>
 
               <div className="flex md:flex-row flex-col gap-4 items-center">
-                <div className="flex flex-col lg:w-1/2 w-full">
+                <div className="flex flex-col w-full">
                   <label
                     htmlFor="packageType"
                     className="font-inter font-semibold"
@@ -345,7 +369,7 @@ export function AddServiceModal({
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col lg:w-1/2 w-full">
+                {/* <div className="flex flex-col lg:w-1/2 w-full">
                   <label
                     htmlFor="coverageArea"
                     className="font-inter font-semibold"
@@ -376,11 +400,11 @@ export function AddServiceModal({
                       {errors.coverageAreaId.message}
                     </p>
                   )}
-                </div>
+                </div> */}
               </div>
 
               <div className="flex md:flex-row flex-col gap-4 items-center">
-                <div className="flex flex-col lg:w-1/2 w-full">
+                {/* <div className="flex flex-col lg:w-1/2 w-full">
                   <label htmlFor="name" className="font-inter font-semibold">
                     Select location code
                   </label>
@@ -389,7 +413,6 @@ export function AddServiceModal({
                       options={locationOptions}
                       value={selectedLocations}
                       placeholder="Select options"
-                      // value={selected || []}
                       onChange={(val) => {
                         setSelectedLocations(val);
                         setValue(
@@ -402,6 +425,32 @@ export function AddServiceModal({
                   {errors.locationCodeIds && (
                     <p className="error text-xs text-[#FF0000]">
                       {errors.locationCodeIds.message}
+                    </p>
+                  )}
+                </div> */}
+
+                <div className="flex flex-col lg:w-1/2 w-full">
+                  <label htmlFor="name" className="font-inter font-semibold">
+                    Select cross area route
+                  </label>
+                  <div className="border-b mb-2">
+                    <MultiSelect
+                      options={routeOptions}
+                      value={selectedRoutes}
+                      placeholder="Select options"
+                      // value={selected || []}
+                      onChange={(val) => {
+                        setSelectedRoutes(val);
+                        setValue(
+                          "crossAreaRouteIds",
+                          val as [string, ...string[]]
+                        );
+                      }}
+                    />
+                  </div>
+                  {errors.crossAreaRouteIds && (
+                    <p className="error text-xs text-[#FF0000]">
+                      {errors.crossAreaRouteIds.message}
                     </p>
                   )}
                 </div>

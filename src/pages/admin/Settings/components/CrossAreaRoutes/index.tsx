@@ -20,7 +20,7 @@ const CrossAreaRoutes = () => {
   const { data, isLoading, isSuccess, isError } = useGetCrossAreaRoute({
     page: currentPage,
   });
-  console.log(data);
+
   useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
     if (totalPages && totalPages !== lastPage) {

@@ -93,7 +93,7 @@ const Services = ({
                 <input type="checkbox" name="" id="" className="mt-[2px]" />
               </span>
               <span className="flex-1">Service level</span>
-              <span className="flex-1">Coverage Area</span>
+              {/* <span className="flex-1">Coverage Area</span> */}
               <span className="flex-1">Weight Limit</span>
               <span className="flex-1">Pickup</span>
               <span className="flex-1">Delivery</span>
@@ -115,9 +115,9 @@ const Services = ({
                   <div className="flex-1">
                     <p>{item?.companyServiceLevel?.name}</p>
                   </div>
-                  <div className="flex-1">
+                  {/* <div className="flex-1">
                     <p>{item?.coverageArea?.name}</p>
-                  </div>
+                  </div> */}
 
                   <div className="flex-1">
                     <p>{item?.weightLimit}</p>
