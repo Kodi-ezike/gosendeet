@@ -5,7 +5,7 @@ import green from "@/assets/icons/green-checkmark.png";
 import { Button } from "@/components/ui/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CreateBooking from "@/components/CreateBooking";
 import empty from "@/assets/images/white-empty.png";
 import Rating from "@/components/Rating";
@@ -18,10 +18,24 @@ const Calculator = () => {
   const navigate = useNavigate();
   const userId = sessionStorage.getItem("userId") || "";
 
-  const location = useLocation();
-  const { inputData, results } = location?.state || {};
-  const [bookingRequest] = useState(inputData || {});
-  const [data, setData] = useState(results || {});
+ const location = useLocation();
+
+const { results, inputData: stateInputData } = location.state || {};
+
+const storedInputData = useMemo(() => {
+  try {
+    const stored = sessionStorage.getItem("bookingInputData");
+    return stored ? JSON.parse(stored) : null;
+  } catch (err) {
+    console.error("Error parsing bookingInputData from sessionStorage:", err);
+    return null;
+  }
+}, []);
+
+const inputData = stateInputData || storedInputData || {};
+
+const [bookingRequest] = useState(inputData);
+const [data, setData] = useState(results || {});
 
   useEffect(() => {
     if (results) {
