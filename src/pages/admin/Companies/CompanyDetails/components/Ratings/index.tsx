@@ -42,62 +42,65 @@ const Ratings = ({ companyId }: { companyId: string }) => {
         </div>
       )}
 
-      {!isLoading && isSuccess && company_ratings && (
-        <div>
-          <div className="bg-white mb-8">
-            <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
-              <div>
-                <p className="font-medium text-sm mb-2">Responses Received</p>
-                <p className="font-semibold text-2xl font-inter">18</p>
-              </div>
-              <div className="flex gap-2 items-center">
-                <img src={positive} alt="positive" />
+      {!isLoading &&
+        isSuccess &&
+        company_ratings &&
+        company_ratings?.data?.content?.length > 0 && (
+          <div>
+            <div className="bg-white mb-8">
+              <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
                 <div>
-                  <p className="font-medium text-sm mb-2">Positive</p>
-                  <p className="font-semibold text-2xl font-inter">85%</p>
+                  <p className="font-medium text-sm mb-2">Responses Received</p>
+                  <p className="font-semibold text-2xl font-inter">18</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <img src={positive} alt="positive" />
+                  <div>
+                    <p className="font-medium text-sm mb-2">Positive</p>
+                    <p className="font-semibold text-2xl font-inter">85%</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <img src={neutral} alt="neutral" />
+                  <div>
+                    <p className="font-medium text-sm mb-2">Neutral</p>
+                    <p className="font-semibold text-2xl font-inter">10%</p>
+                  </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <img src={negative} alt="negative" />
+                  <div>
+                    <p className="font-medium text-sm mb-2">Negative</p>
+                    <p className="font-semibold text-2xl font-inter">5%</p>
+                  </div>
                 </div>
               </div>
-              <div className="flex gap-2 items-center">
-                <img src={neutral} alt="neutral" />
-                <div>
-                  <p className="font-medium text-sm mb-2">Neutral</p>
-                  <p className="font-semibold text-2xl font-inter">10%</p>
-                </div>
-              </div>
-              <div className="flex gap-2 items-center">
-                <img src={negative} alt="negative" />
-                <div>
-                  <p className="font-medium text-sm mb-2">Negative</p>
-                  <p className="font-semibold text-2xl font-inter">5%</p>
-                </div>
-              </div>
-            </div>
 
-            <hr />
+              <hr />
+            </div>
+            {company_ratings?.data?.content?.map((item: any, index: number) => (
+              <div className="bg-white mb-8 md:p-6 p-4" key={index}>
+                <div className="flex gap-2 items-center mb-4">
+                  <img src={avatar} alt="avatar" />
+                  <div>
+                    <p className="font-medium">{item.ratedBy}</p>
+                    <Rating value={item.score} />
+                  </div>
+                </div>
+                {item.comment && <p className="mb-4">"{item.comment}"</p>}
+                <p className="text-sm text-neutral500">
+                  {formatDate(item.createdAt)}
+                </p>
+              </div>
+            ))}
+
+            <PaginationComponent
+              lastPage={company_ratings?.data?.page?.totalPages}
+              currentPage={currentPage}
+              handlePageChange={updatePage}
+            />
           </div>
-          {company_ratings?.data?.content?.map((item: any, index: number) => (
-            <div className="bg-white mb-8 md:p-6 p-4" key={index}>
-              <div className="flex gap-2 items-center mb-4">
-                <img src={avatar} alt="avatar" />
-                <div>
-                  <p className="font-medium">{item.ratedBy}</p>
-                  <Rating value={item.score} />
-                </div>
-              </div>
-              {item.comment && <p className="mb-4">"{item.comment}"</p>}
-              <p className="text-sm text-neutral500">
-                {formatDate(item.createdAt)}
-              </p>
-            </div>
-          ))}
-
-          <PaginationComponent
-            lastPage={company_ratings?.data?.page?.totalPages}
-            currentPage={currentPage}
-            handlePageChange={updatePage}
-          />
-        </div>
-      )}
+        )}
 
       {company_ratings &&
         company_ratings?.data?.content?.length === 0 &&

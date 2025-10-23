@@ -36,6 +36,11 @@ const Orders = ({ companyId }: { companyId: string }) => {
   const { data: bookingStats } = useGetBookingsStats({ companyId });
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [bookingStatus, packageTypeId, debouncedSearchTerm]); // Reset when filters change
+  
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({
     page: currentPage,
     companyId,

@@ -35,6 +35,11 @@ const Bookings = () => {
   const packages = packageTypes?.data;
   const userId = sessionStorage.getItem("userId") || "";
 
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [bookingStatus, packageTypeId, debouncedSearchTerm]); // Reset when filters change
+  
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({
     page: currentPage,
     bookingStatus,
