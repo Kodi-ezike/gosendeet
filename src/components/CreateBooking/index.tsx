@@ -154,9 +154,9 @@ const CreateBooking = ({
   });
 
   const saveInputData = (data: any) => {
-    // const normalized = normalizeData(data);
-    // setInputData(normalized);
-    sessionStorage.setItem("bookingInputData", JSON.stringify(data));
+    const normalized = normalizeData(data);
+    setInputData(normalized); // Update local state
+    sessionStorage.setItem("bookingInputData", JSON.stringify(normalized));
   };
 
   // ----- Rehydrate Form -----
