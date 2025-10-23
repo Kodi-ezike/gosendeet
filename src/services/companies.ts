@@ -138,3 +138,12 @@ export const getCompanyStats = async () => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const getCompanyRatings = async (id: string, page: number) => {
+  try {
+    const res = await api.get(`/ratings?companyId=${id}&page=${page}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

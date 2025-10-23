@@ -6,7 +6,7 @@
 //   SelectValue,
 // } from "@/components/ui/select";
 import { cn, formatTimestampToReadable, timeAgo } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoSearchOutline } from "react-icons/io5";
 import UpdateUserStatusModal from "./modals/UpdateUserStatusModal";
@@ -40,34 +40,23 @@ const Profiles = () => {
 
   const size = 10;
   const role = "";
-  const resetPageRef = useRef(false);
 
   const [lastPage, setLastPage] = useState(1);
-  const { currentPage, setCurrentPage, updatePage } =
-    usePaginationSync(lastPage);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
 
   const { data: profileStats } = useGetProfileStats();
 
+  // Reset pagination when status changes
   useEffect(() => {
-    resetPageRef.current = true;
-    setCurrentPage(1); // Triggers a rerender
-  }, [userStatus]);
+    updatePage(1); // Reset to page 1
+  }, [userStatus, debouncedProfileSearchTerm]); // Reset when filters change
 
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
-    resetPageRef.current ? 1 : currentPage, // 👈 Always fetch page 1 during status change
+    currentPage, // 👈 Always fetch page 1 during status change
     size,
     userStatus,
     role,
-    debouncedProfileSearchTerm,
-    {
-      enabled: currentPage === 1 || resetPageRef.current, // 👈 Force run query if resetting
-      queryKey: [
-        "profiles",
-        resetPageRef.current ? 1 : currentPage,
-        userStatus,
-        debouncedProfileSearchTerm,
-      ],
-    }
+    debouncedProfileSearchTerm
   );
 
   useEffect(() => {

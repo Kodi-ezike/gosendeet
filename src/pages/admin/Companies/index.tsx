@@ -47,10 +47,13 @@ const Companies = () => {
 
   const size = 10;
   const serviceLevelId = "";
-  // const resetPageRef = useRef(false);
-
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
+
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [companyStatus, serviceLevelId, debouncedSearchTerm]); // Reset when filters change
 
   const { data: stats } = useGetCompanyStats();
   const companyStats = stats?.data ?? {};

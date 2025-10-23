@@ -3,73 +3,113 @@ import negative from "@/assets/icons/thumbs-down.png";
 import neutral from "@/assets/icons/hand-peace.png";
 import avatar from "@/assets/images/avatar1.png";
 import Rating from "@/components/Rating";
-const Ratings = () => {
-  //   const [rating, setRating] = useState(3.5);
+import { useGetCompanyRatings } from "@/queries/admin/useGetAdminCompanies";
+import { Spinner } from "@/components/Spinner";
+import { formatDate } from "@/lib/utils";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
+import { useEffect, useState } from "react";
+import { PaginationComponent } from "@/components/Pagination";
+const Ratings = ({ companyId }: { companyId: string }) => {
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
 
+  const {
+    data: company_ratings,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useGetCompanyRatings(companyId, currentPage);
+
+  useEffect(() => {
+    const totalPages = company_ratings?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [company_ratings?.data?.page?.totalPages]);
   return (
-    <div>
-      <div className="bg-white mb-8">
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
-          <div>
-            <p className="font-medium text-sm mb-2">Responses Received</p>
-            <p className="font-semibold text-2xl font-inter">18</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            <img src={positive} alt="positive" />
-            <div>
-              <p className="font-medium text-sm mb-2">Positive</p>
-              <p className="font-semibold text-2xl font-inter">85%</p>
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            <img src={neutral} alt="neutral" />
-            <div>
-              <p className="font-medium text-sm mb-2">Neutral</p>
-              <p className="font-semibold text-2xl font-inter">10%</p>
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            <img src={negative} alt="negative" />
-            <div>
-              <p className="font-medium text-sm mb-2">Negative</p>
-              <p className="font-semibold text-2xl font-inter">5%</p>
-            </div>
-          </div>
+    <>
+      {isLoading && !isSuccess && (
+        <div className="h-[80vh] w-full flex items-center justify-center">
+          <Spinner />
         </div>
+      )}
 
-        <hr />
-      </div>
+      {isError && !isLoading && (
+        <div className="h-[80vh] w-full flex justify-center flex-col items-center">
+          <p className="font-semibold font-inter text-xl text-center">
+            There was an error getting the data
+          </p>
+        </div>
+      )}
 
-      <div className="bg-white mb-8 md:p-6 p-4">
-        <div className="flex gap-2 items-center mb-4">
-          <img src={avatar} alt="avatar" />
-          <div>
-            <p className="font-medium">Abimbola Momodu</p>
-            {/* <Rating value={rating} onChange={setRating}/> */}
-            <Rating value={4} />
+      {!isLoading && isSuccess && company_ratings && (
+        <div>
+          <div className="bg-white mb-8">
+            <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
+              <div>
+                <p className="font-medium text-sm mb-2">Responses Received</p>
+                <p className="font-semibold text-2xl font-inter">18</p>
+              </div>
+              <div className="flex gap-2 items-center">
+                <img src={positive} alt="positive" />
+                <div>
+                  <p className="font-medium text-sm mb-2">Positive</p>
+                  <p className="font-semibold text-2xl font-inter">85%</p>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <img src={neutral} alt="neutral" />
+                <div>
+                  <p className="font-medium text-sm mb-2">Neutral</p>
+                  <p className="font-semibold text-2xl font-inter">10%</p>
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <img src={negative} alt="negative" />
+                <div>
+                  <p className="font-medium text-sm mb-2">Negative</p>
+                  <p className="font-semibold text-2xl font-inter">5%</p>
+                </div>
+              </div>
+            </div>
+
+            <hr />
           </div>
+          {company_ratings?.data?.content?.map((item: any, index: number) => (
+            <div className="bg-white mb-8 md:p-6 p-4" key={index}>
+              <div className="flex gap-2 items-center mb-4">
+                <img src={avatar} alt="avatar" />
+                <div>
+                  <p className="font-medium">{item.ratedBy}</p>
+                  <Rating value={item.score} />
+                </div>
+              </div>
+              {item.comment && <p className="mb-4">"{item.comment}"</p>}
+              <p className="text-sm text-neutral500">
+                {formatDate(item.createdAt)}
+              </p>
+            </div>
+          ))}
+
+          <PaginationComponent
+            lastPage={company_ratings?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
         </div>
-        <p className="mb-4">
-          "Efficient Project Management but Limited Customer Support"
-        </p>
-        <p className="text-sm text-neutral500">Oct 23, 2024</p>
-      </div>
-      
-      <div className="bg-white mb-8 md:p-6 p-4">
-        <div className="flex gap-2 items-center mb-4">
-          <img src={avatar} alt="avatar" />
-          <div>
-            <p className="font-medium">Abimbola Momodu</p>
-            {/* <Rating value={rating} onChange={setRating}/> */}
-            <Rating value={4} />
+      )}
+
+      {company_ratings &&
+        company_ratings?.data?.content?.length === 0 &&
+        !isLoading &&
+        isSuccess && (
+          <div className="h-[50vh] w-full flex justify-center flex-col items-center">
+            <p className="font-semibold font-inter text-xl text-center">
+              There are no results
+            </p>
           </div>
-        </div>
-        <p className="mb-4">
-          "Efficient Project Management but Limited Customer Support"
-        </p>
-        <p className="text-sm text-neutral500">Oct 23, 2024</p>
-      </div>
-    </div>
+        )}
+    </>
   );
 };
 

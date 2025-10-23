@@ -5,6 +5,7 @@ import Companies from "./Companies";
 import Reports from "./Reports";
 import Settings from "./Settings";
 import { toast } from "sonner";
+import Notifications from "../dashboard/Notifications";
 // import ViewIcon from "@/assets/icons/view.svg";
 
 const AdminDashboard = () => {
@@ -19,6 +20,7 @@ const AdminDashboard = () => {
     { key: "orders", label: "Orders" },
     { key: "companies", label: "Companies" },
     { key: "reports", label: "Reports" },
+    { key: "notifications", label: "Notifications" },
     { key: "settings", label: "Settings" },
   ];
 
@@ -96,6 +98,7 @@ const AdminDashboard = () => {
         {activeTab === "orders" && <Orders />}
         {activeTab === "companies" && <Companies />}
         {activeTab === "reports" && <Reports  setActiveTab={setActiveTab}/>}
+        {activeTab === "notifications" && <Notifications />}
         {activeTab === "settings" && <Settings />}
       </div>
     </div>

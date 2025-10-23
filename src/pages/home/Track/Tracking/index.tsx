@@ -9,6 +9,7 @@ import { cn, formatDateTime, formatStatus } from "@/lib/utils";
 import { useGetTrackBookings } from "@/queries/user/useGetUserBookings";
 import { statusClasses } from "@/constants";
 import { Spinner } from "@/components/Spinner";
+import RatingModal from "./components/RatingModal";
 
 const Tracking = () => {
   const [activeTab, setActiveTab] = useState("history");
@@ -20,6 +21,22 @@ const Tracking = () => {
   const { data, isLoading, isSuccess, isError } = useGetTrackBookings(
     result?.data?.trackingNumber
   );
+
+  const [openRatingModal, setOpenRatingModal] = useState(false);
+
+  useEffect(() => {
+    if (
+      data?.data &&
+      !data?.data?.hasRating &&
+      data?.data?.status === "DELIVERED"
+    ) {
+      const timer = setTimeout(() => {
+        setOpenRatingModal(true);
+      }, 5000); // 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup timeout on unmount
+    }
+  }, [data?.data]); // Re-run when data changes
 
   const tabs = [
     { key: "history", label: "Order History" },
@@ -146,6 +163,12 @@ const Tracking = () => {
                 <p className="font-medium">Need help with delivery</p>
                 <Button variant="secondary">Contact Support</Button>
               </div>
+
+              <RatingModal
+                open={openRatingModal}
+                onOpenRatingModal={setOpenRatingModal}
+                bookingId={data?.data?.id}
+              />
             </>
           )}
         </div>

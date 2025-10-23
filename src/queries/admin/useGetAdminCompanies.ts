@@ -1,6 +1,7 @@
 import {
   getCompanyList,
   getCompanyPricing,
+  getCompanyRatings,
   getCompanyServices,
   getCompanyStats,
   getSingleCompany,
@@ -72,6 +73,19 @@ export const useGetCompanyStats = () => {
   const query = useQuery({
     queryKey: ["companies"],
     queryFn: () => getCompanyStats(),
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+  };
+};
+
+export const useGetCompanyRatings = (id: string, page: number) => {
+  const query = useQuery({
+    queryKey: ["company_ratings", id, page],
+    queryFn: () => getCompanyRatings(id, page),
   });
   return {
     isLoading: query.isPending,

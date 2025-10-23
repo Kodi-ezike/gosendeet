@@ -83,3 +83,13 @@ export const trackBookings = async (id: string) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+export const createRatings = async (data: any) => {
+  try {
+    const res = await api.post(`/ratings`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};

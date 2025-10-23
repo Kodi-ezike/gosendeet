@@ -207,7 +207,7 @@ const CompanyDetails = () => {
             <div className="mt-4">
               {activeTab === "cover" && <CoverSheet data={data?.data} />}
               {activeTab === "orders" && <Orders companyId={companyId} />}
-              {activeTab === "rating" && <Ratings />}
+              {activeTab === "rating" && <Ratings companyId={companyId}/>}
               {activeTab === "services" && (
                 <Services
                   companyId={companyId}
