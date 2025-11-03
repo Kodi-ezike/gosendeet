@@ -1,0 +1,296 @@
+/* V3 Bold & Lively Theme Styles */
+
+/* Theme Container */
+.v3-minimal-theme {
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+/* Hero Section - Bold Gradient Background */
+.v3-hero {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%);
+  position: relative;
+}
+
+/* Bold Decorative Shapes */
+.v3-blob {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  filter: blur(60px);
+  animation: v3-blobFloat 20s ease-in-out infinite;
+}
+
+.v3-blob-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+}
+
+.v3-blob-yellow {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.v3-blob-orange {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+}
+
+@keyframes v3-blobFloat {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+    border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+  }
+}
+
+/* Bold Shadows */
+.v3-shadow-soft {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.v3-shadow-hover {
+  transition: all 0.3s ease;
+}
+
+.v3-shadow-hover:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+  transform: translateY(-6px);
+}
+
+/* Bold Gradient Text */
+.v3-gradient-text {
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 50%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Bold Vibrant Buttons */
+.v3-btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 50%, #fbbf24 100%);
+  color: white;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+  transition: all 0.3s ease;
+}
+
+.v3-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(234, 179, 8, 0.5);
+}
+
+/* Card Styles */
+.v3-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  border: 2px solid #f3f4f6;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.v3-card:hover {
+  border-color: #fef3c7;
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Stats Section */
+.v3-stats-section {
+  background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
+}
+
+/* Process Flow - Dotted Lines */
+.v3-process-line {
+  border-top: 2px dashed #e5e7eb;
+  position: relative;
+}
+
+/* Icon Containers */
+.v3-icon-container {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid #f3f4f6;
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.v3-icon-container:hover {
+  transform: scale(1.1);
+  border-color: #fbbf24;
+}
+
+/* Form Styling - Minimal Variant */
+.v3-form-minimal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid #f3f4f6;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.v3-form-minimal input,
+.v3-form-minimal select {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.v3-form-minimal input:focus,
+.v3-form-minimal select:focus {
+  border-color: #fbbf24;
+  background: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+/* Trust Badges */
+.v3-trust-badge {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid #fef3c7;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.v3-trust-badge:hover {
+  transform: scale(1.05);
+  border-color: #fbbf24;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+/* FAQ Section */
+.v3-faq-section {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+.v3-faq-item {
+  background: #ffffff;
+  border: 2px solid #f3f4f6;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.v3-faq-item:hover {
+  border-color: #fef3c7;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.08);
+}
+
+.v3-faq-item.active {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+/* Smooth Animations */
+@keyframes v3-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.v3-fade-in-up {
+  animation: v3-fadeInUp 0.6s ease-out;
+}
+
+/* Floating Animation for Elements */
+@keyframes v3-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.v3-float {
+  animation: v3-float 3s ease-in-out infinite;
+}
+
+/* Pulse Animation for Icons */
+@keyframes v3-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.v3-pulse {
+  animation: v3-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth Scrolling */
+.v3-minimal-theme {
+  scroll-behavior: smooth;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .v3-blob {
+    filter: blur(30px);
+  }
+}
+
+@media (max-width: 768px) {
+  .v3-blob {
+    filter: blur(25px);
+  }
+
+  .v3-hero {
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+  }
+
+  .v3-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Testimonials Section */
+.v3-testimonials-section {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+.v3-testimonial-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  border: 2px solid #fef3c7;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.v3-testimonial-card:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Accessibility - Focus Styles */
+.v3-minimal-theme button:focus,
+.v3-minimal-theme a:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .v3-blob {
+    display: none;
+  }
+}
