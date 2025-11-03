@@ -1,0 +1,260 @@
+/* V2 Minimal Bold with Yellow/Gold Theme */
+
+/* Theme Container */
+.v2-bold-theme {
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+/* Hero Section - Clean with subtle gradient */
+.v2-hero {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%);
+  position: relative;
+}
+
+.v2-gradient-bg {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 50%, #fef3c7 100%);
+}
+
+/* Bold Gradient Text - Yellow/Gold */
+.v2-gradient-text {
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 50%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Decorative Shapes - Yellow/Gold themed */
+.v2-blob {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  filter: blur(60px);
+  animation: v2-blobFloat 20s ease-in-out infinite;
+}
+
+@keyframes v2-blobFloat {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+    border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+  }
+}
+
+/* Shadows */
+.v2-shadow-soft {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.v2-shadow-hover {
+  transition: all 0.3s ease;
+}
+
+.v2-shadow-hover:hover {
+  box-shadow: 0 25px 50px rgba(245, 158, 11, 0.15);
+  transform: translateY(-6px);
+}
+
+/* Buttons - Yellow/Gold Primary */
+.v2-btn-primary {
+  background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+  color: white;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+  transition: all 0.3s ease;
+}
+
+.v2-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(234, 179, 8, 0.5);
+  background: linear-gradient(135deg, #eab308 0%, #f59e0b 100%);
+}
+
+/* Card Styles - Clean minimal */
+.v2-card {
+  background: #ffffff;
+  border-radius: 1.5rem;
+  border: 2px solid #f3f4f6;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.v2-card:hover {
+  border-color: #fef3c7;
+  box-shadow: 0 20px 40px rgba(245, 158, 11, 0.1);
+  transform: translateY(-4px);
+}
+
+/* Stats Section */
+.v2-stats-section {
+  background: linear-gradient(180deg, #ffffff 0%, #fffbeb 100%);
+}
+
+/* Service Section */
+.v2-service-section {
+  background: #fafafa;
+}
+
+/* Testimonials Section */
+.v2-testimonials-section {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+}
+
+/* FAQ Section */
+.v2-faq-section {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+/* Form Styling */
+.v2-form-minimal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid #f3f4f6;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.v2-form-minimal input,
+.v2-form-minimal select {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.v2-form-minimal input:focus,
+.v2-form-minimal select:focus {
+  border-color: #fbbf24;
+  background: #ffffff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+/* Trust Badges */
+.v2-trust-badge {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 2px solid #fef3c7;
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.v2-trust-badge:hover {
+  transform: scale(1.05);
+  border-color: #fbbf24;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+/* FAQ Items */
+.v2-faq-item {
+  background: #ffffff;
+  border: 2px solid #f3f4f6;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.v2-faq-item:hover {
+  border-color: #fef3c7;
+  box-shadow: 0 10px 25px rgba(245, 158, 11, 0.08);
+}
+
+.v2-faq-item.active {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+}
+
+/* Floating Animation */
+@keyframes v2-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.v2-float {
+  animation: v2-float 3s ease-in-out infinite;
+}
+
+/* Pulse Animation */
+@keyframes v2-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.v2-pulse {
+  animation: v2-pulse 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar - Yellow/Gold theme */
+.v2-bold-theme ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.v2-bold-theme ::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+.v2-bold-theme ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b 0%, #eab308 100%);
+  border-radius: 5px;
+  border: 2px solid #fafafa;
+}
+
+.v2-bold-theme ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #eab308 0%, #f59e0b 100%);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .v2-blob {
+    filter: blur(30px);
+  }
+}
+
+@media (max-width: 768px) {
+  .v2-blob {
+    filter: blur(25px);
+  }
+
+  .v2-hero {
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+  }
+
+  .v2-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Accessibility - Focus Styles */
+.v2-bold-theme button:focus,
+.v2-bold-theme a:focus {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .v2-blob {
+    display: none;
+  }
+}
