@@ -22,8 +22,9 @@ export function DestinationModal({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [manualAddress, setManualAddress] = useState({
     street: '',
+    apartment: '',
     city: 'Lagos',
-    state: 'Lagos',
+    state: 'Lagos State',
     country: 'Nigeria'
   });
   const suggestionsRef = useRef<HTMLDivElement>(null!);
@@ -42,8 +43,8 @@ export function DestinationModal({
   useClickAway(suggestionsRef, () => setShowSuggestions(false));
 
   const cityStateMap: Record<string, string> = {
-    'Lagos': 'Lagos',
-    'Ibadan': 'Oyo'
+    'Lagos': 'Lagos State',
+    'Ibadan': 'Oyo State'
   };
 
   // Parse address from Google Places result
@@ -80,7 +81,7 @@ export function DestinationModal({
 
   const handleSelectLocation = (description: string) => {
     const parsed = parseAddressFromDescription(description);
-    setManualAddress(parsed);
+    setManualAddress({ ...manualAddress, ...parsed });
     clearSuggestions();
     setShowSuggestions(false);
   };
@@ -93,18 +94,27 @@ export function DestinationModal({
     });
   };
 
+  const handleStateChange = (state: string) => {
+    setManualAddress({
+      ...manualAddress,
+      state
+    });
+  };
+
   const handleSubmit = () => {
-    const { street, city, state, country } = manualAddress;
-    if (!street.trim()) {
+    const { street, apartment, city, state, country } = manualAddress;
+    if (!street.trim() || !apartment.trim() || !city.trim() || !state.trim()) {
       return;
     }
-    const formattedAddress = `${street}, ${city}, ${state}, ${country}`;
+    const apartmentPart = apartment.trim() ? `, ${apartment}` : '';
+    const formattedAddress = `${street}${apartmentPart}, ${city}, ${state}, ${country}`;
     onSelect(formattedAddress);
     onOpenChange(false);
     setManualAddress({
       street: '',
+      apartment: '',
       city: 'Lagos',
-      state: 'Lagos',
+      state: 'Lagos State',
       country: 'Nigeria'
     });
   };
@@ -161,10 +171,24 @@ export function DestinationModal({
             <p>Start typing to see suggestions, or enter your address manually below.</p>
           </div>
 
+          {/* Apartment/Unit Number */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Apartment/Unit Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={manualAddress.apartment}
+              onChange={(e) => setManualAddress({ ...manualAddress, apartment: e.target.value })}
+              placeholder="e.g., Apt 5, Unit 3B, Floor 2"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-base focus:border-amber-400 focus:outline-none transition-colors"
+            />
+          </div>
+
           {/* City Selection */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              City
+              City <span className="text-red-500">*</span>
             </label>
             <Select
               value={manualAddress.city}
@@ -180,14 +204,23 @@ export function DestinationModal({
             </Select>
           </div>
 
-          {/* State (Auto-filled) */}
+          {/* State Selection */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              State
+              State <span className="text-red-500">*</span>
             </label>
-            <div className="px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-base text-gray-600">
-              {manualAddress.state}
-            </div>
+            <Select
+              value={manualAddress.state}
+              onValueChange={handleStateChange}
+            >
+              <SelectTrigger className="w-full py-3 px-4 text-base border-2 border-gray-200 rounded-xl focus:border-amber-400">
+                <SelectValue placeholder="Select state" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Lagos State">Lagos State</SelectItem>
+                <SelectItem value="Oyo State">Oyo State</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Country (Fixed) */}
@@ -207,7 +240,7 @@ export function DestinationModal({
             variant="secondary"
             size="custom"
             className="w-full py-4 text-base font-bold"
-            disabled={!manualAddress.street.trim()}
+            disabled={!manualAddress.street.trim() || !manualAddress.apartment.trim() || !manualAddress.city.trim() || !manualAddress.state.trim()}
           >
             Confirm Destination Address
           </Button>
