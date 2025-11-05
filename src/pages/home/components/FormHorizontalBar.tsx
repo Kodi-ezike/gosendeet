@@ -19,7 +19,7 @@ import { getQuotes } from "@/services/user";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FiSearch, FiPlus } from "react-icons/fi";
+import { FiSearch, FiPlus, FiSend, FiBarChart2, FiPackage } from "react-icons/fi";
 import usePlacesAutocomplete from "use-places-autocomplete";
 import { useClickAway } from "@/hooks/useClickAway";
 
@@ -27,12 +27,14 @@ interface FormHorizontalBarProps {
   variant?: "bold" | "minimal" | "floating";
   bookingRequest?: any;
   setData?: any;
+  activeMode?: "gosendeet" | "compare" | "tracking"; // Current active mode
 }
 
 const FormHorizontalBar = ({
   variant = "bold",
   bookingRequest,
   setData,
+  activeMode = "gosendeet",
 }: FormHorizontalBarProps) => {
   const [open, setOpen] = useState(false);
   const [inputData, setInputData] = useState<any>({});
@@ -117,11 +119,10 @@ const FormHorizontalBar = ({
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      packageTypeId: bookingRequest
-        ? bookingRequest.packageTypeId
-        : inputData
-        ? inputData.packageTypeId
-        : "",
+      pickupLocation: "",
+      dropOffLocation: "",
+      packageTypeId: "",
+      weight: "",
     },
   });
 
@@ -160,15 +161,25 @@ const FormHorizontalBar = ({
 
   useEffect(() => {
     if (inputData?.packageTypeId && packages?.length > 0) {
-      reset((prevValues) => ({
-        ...prevValues,
-        packageTypeId: String(inputData.packageTypeId),
-      }));
+      setValue("packageTypeId", String(inputData.packageTypeId), {
+        shouldValidate: false,
+      });
     }
-  }, [inputData?.packageTypeId, packages, reset]);
+  }, [inputData?.packageTypeId, packages, setValue]);
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     saveInputData(data);
+  };
+
+  // Handle tracking form submission
+  const handleTrackingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trackingNumber = (e.target as any).trackingNumber.value;
+    if (!trackingNumber) {
+      toast.error("Please enter a tracking number");
+      return;
+    }
+    navigate("/track-booking", { state: { trackingNumber } });
   };
 
   // Variant-specific styling
@@ -249,9 +260,67 @@ const FormHorizontalBar = ({
 
   return (
     <div className={containerStyles}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Desktop: Horizontal Grid */}
-        <div className="hidden lg:grid lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-6 items-end">
+      {/* Tracking Mode Form */}
+      {activeMode === "tracking" ? (
+        <form onSubmit={handleTrackingSubmit}>
+          {/* Desktop: Match booking form grid layout */}
+          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-6 items-end">
+            {/* Tracking Number Input - Spans 4 columns */}
+            <div className="lg:col-span-4">
+              <label htmlFor="trackingNumber" className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={location} alt="tracking" className="w-5 h-5 opacity-90" />
+                Tracking Number
+              </label>
+              <input
+                type="text"
+                name="trackingNumber"
+                placeholder="Enter your tracking number (GOS*****)"
+                className={inputStyles}
+              />
+            </div>
+
+            {/* Track Button - Last column */}
+            <div className="flex gap-3 items-end min-w-[280px]">
+              <Button
+                type="submit"
+                variant="secondary"
+                size="custom"
+                className="flex-1 px-6 py-4 h-14 justify-center font-bold text-base whitespace-nowrap"
+              >
+                <FiSearch className="text-white mr-2" />
+                <span className="text-white">Track</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile: Simple vertical layout */}
+          <div className="lg:hidden space-y-4">
+            <div>
+              <label htmlFor="trackingNumber" className={cn(labelStyles, "flex items-center gap-2")}>
+                📦 Tracking Number
+              </label>
+              <input
+                type="text"
+                name="trackingNumber"
+                placeholder="Enter tracking number (GOS*****)"
+                className={inputStyles}
+              />
+            </div>
+            <Button
+              type="submit"
+              variant="secondary"
+              size="custom"
+              className="w-full px-8 py-4 justify-center font-bold"
+            >
+              <FiSearch className="text-white mr-2" />
+              <span className="text-white">Track Shipment</span>
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Desktop: Horizontal Grid */}
+        <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-6 items-end">
           {/* Pickup Location */}
           <div ref={pickupRef} className="relative">
             <label htmlFor="pickup" className={cn(labelStyles, "flex items-center gap-2")}>
@@ -260,14 +329,12 @@ const FormHorizontalBar = ({
             </label>
             <input
               type="text"
-              {...register("pickupLocation")}
-              onChange={(e) => {
-                setPickupValue(e.target.value);
-                setValue("pickupLocation", e.target.value, {
-                  shouldValidate: true,
-                });
-                setOpenPickupSuggestions(true);
-              }}
+              {...register("pickupLocation", {
+                onChange: (e) => {
+                  setPickupValue(e.target.value);
+                  setOpenPickupSuggestions(true);
+                }
+              })}
               placeholder="Where from?"
               className={inputStyles}
             />
@@ -303,14 +370,12 @@ const FormHorizontalBar = ({
             </label>
             <input
               type="text"
-              {...register("dropOffLocation")}
-              onChange={(e) => {
-                setDestValue(e.target.value);
-                setValue("dropOffLocation", e.target.value, {
-                  shouldValidate: true,
-                });
-                setOpenDestSuggestions(true);
-              }}
+              {...register("dropOffLocation", {
+                onChange: (e) => {
+                  setDestValue(e.target.value);
+                  setOpenDestSuggestions(true);
+                }
+              })}
               placeholder="Where to?"
               className={inputStyles}
             />
@@ -353,7 +418,7 @@ const FormHorizontalBar = ({
               value={packageTypeId}
               disabled={!packages || packages.length === 0}
             >
-              <SelectTrigger className="w-full !w-full min-w-0 h-12 border-b-2 border-[#e5e5e5] hover:border-amber-400 focus:border-amber-400 rounded-none bg-transparent [&>span]:truncate [&>span]:text-left">
+              <SelectTrigger className="w-full !w-full min-w-0 !py-3 !px-3 !text-lg h-auto !border-0 !border-b-2 border-[#e5e5e5] hover:border-amber-400 focus:border-amber-400 !rounded-none bg-transparent focus-visible:!ring-0 focus-visible:!border-amber-400 [&>span]:truncate [&>span]:text-left">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
@@ -440,14 +505,12 @@ const FormHorizontalBar = ({
             </label>
             <input
               type="text"
-              {...register("pickupLocation")}
-              onChange={(e) => {
-                setPickupValue(e.target.value);
-                setValue("pickupLocation", e.target.value, {
-                  shouldValidate: true,
-                });
-                setOpenPickupSuggestions(true);
-              }}
+              {...register("pickupLocation", {
+                onChange: (e) => {
+                  setPickupValue(e.target.value);
+                  setOpenPickupSuggestions(true);
+                }
+              })}
               placeholder="Where from?"
               className={inputStyles}
             />
@@ -483,14 +546,12 @@ const FormHorizontalBar = ({
             </label>
             <input
               type="text"
-              {...register("dropOffLocation")}
-              onChange={(e) => {
-                setDestValue(e.target.value);
-                setValue("dropOffLocation", e.target.value, {
-                  shouldValidate: true,
-                });
-                setOpenDestSuggestions(true);
-              }}
+              {...register("dropOffLocation", {
+                onChange: (e) => {
+                  setDestValue(e.target.value);
+                  setOpenDestSuggestions(true);
+                }
+              })}
               placeholder="Where to?"
               className={inputStyles}
             />
@@ -533,7 +594,7 @@ const FormHorizontalBar = ({
                 value={packageTypeId}
                 disabled={!packages || packages.length === 0}
               >
-                <SelectTrigger className="w-full !w-full min-w-0 h-12 border-b-2 border-[#e5e5e5] hover:border-amber-400 rounded-none bg-transparent [&>span]:truncate [&>span]:text-left">
+                <SelectTrigger className="w-full !w-full min-w-0 !py-3 !px-3 !text-lg h-auto !border-0 !border-b-2 border-[#e5e5e5] hover:border-amber-400 !rounded-none bg-transparent focus-visible:!ring-0 focus-visible:!border-amber-400 [&>span]:truncate [&>span]:text-left">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -609,14 +670,18 @@ const FormHorizontalBar = ({
             </Button>
           </div>
         </div>
-      </form>
+        </form>
+      )}
 
-      <SpecsModal
-        open={open}
-        setOpen={setOpen}
-        inputData={inputData}
-        setData={setData}
-      />
+      {/* Specs Modal - only show for GoSendeet and Compare modes */}
+      {activeMode !== "tracking" && (
+        <SpecsModal
+          open={open}
+          setOpen={setOpen}
+          inputData={inputData}
+          setData={setData}
+        />
+      )}
     </div>
   );
 };
