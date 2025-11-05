@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import FormHorizontalBar from "../../components/FormHorizontalBar";
+import FormHorizontalBar from "./components/FormHorizontalBar";
 import gif from "@/assets/gif/gosend-gif.gif";
 import logos from "@/assets/images/logos.png";
 import logosMastercard from "@/assets/images/logos_mastercard.png";
@@ -11,7 +10,6 @@ import { cn } from "@/lib/utils";
 type FormMode = "gosendeet" | "compare" | "tracking";
 
 const HeroOptionC = () => {
-  const navigate = useNavigate();
   const [formMode, setFormMode] = useState<FormMode>("gosendeet");
 
   const modeTabs = [

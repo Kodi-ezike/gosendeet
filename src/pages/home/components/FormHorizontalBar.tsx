@@ -19,7 +19,7 @@ import { getQuotes } from "@/services/user";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FiSearch, FiPlus, FiSend, FiBarChart2, FiPackage } from "react-icons/fi";
+import { FiSearch, FiPlus } from "react-icons/fi";
 import usePlacesAutocomplete from "use-places-autocomplete";
 import { useClickAway } from "@/hooks/useClickAway";
 
