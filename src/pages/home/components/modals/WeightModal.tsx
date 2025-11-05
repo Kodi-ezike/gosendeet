@@ -9,6 +9,8 @@ interface WeightModalProps {
   onOpenChange: (open: boolean) => void;
   value: string;
   onSelect: (weight: string) => void;
+  maxWeight?: number;
+  weightUnit?: string;
 }
 
 export function WeightModal({
@@ -16,9 +18,11 @@ export function WeightModal({
   onOpenChange,
   value,
   onSelect,
+  maxWeight,
+  weightUnit = "kg",
 }: WeightModalProps) {
   const [weight, setWeight] = useState(value || "1");
-  const [unit] = useState("kg");
+  const [unit] = useState(weightUnit);
 
   useEffect(() => {
     if (open && value) {
@@ -53,11 +57,20 @@ export function WeightModal({
   };
 
   const handleConfirm = () => {
-    if (weight && parseFloat(weight) > 0) {
+    const weightValue = parseFloat(weight);
+    if (weight && weightValue > 0) {
+      // Check max weight validation
+      if (maxWeight && weightValue > maxWeight) {
+        return; // Don't submit if exceeds max
+      }
       onSelect(weight);
       onOpenChange(false);
     }
   };
+
+  const currentWeight = parseFloat(weight) || 0;
+  const exceedsMax = maxWeight && currentWeight > maxWeight;
+  const isValidWeight = weight && currentWeight > 0 && !exceedsMax;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,6 +83,23 @@ export function WeightModal({
         </DialogDescription>
 
         <div className="space-y-6 mt-6">
+          {/* Max Weight Banner */}
+          {maxWeight && (
+            <div className={cn(
+              "p-3 border rounded-lg",
+              exceedsMax
+                ? "bg-red-50 border-red-200"
+                : "bg-blue-50 border-blue-200"
+            )}>
+              <p className={cn(
+                "text-sm font-semibold",
+                exceedsMax ? "text-red-700" : "text-blue-700"
+              )}>
+                {exceedsMax ? "⚠️ Weight exceeds maximum!" : "ℹ️ Maximum weight:"} {maxWeight}{unit}
+              </p>
+            </div>
+          )}
+
           {/* Weight Input with Controls */}
           <div className="flex items-center justify-center gap-4">
             <button
@@ -146,7 +176,7 @@ export function WeightModal({
             variant="secondary"
             size="custom"
             className="w-full py-4 text-base font-bold"
-            disabled={!weight || parseFloat(weight) <= 0}
+            disabled={!isValidWeight}
           >
             Confirm Weight
           </Button>

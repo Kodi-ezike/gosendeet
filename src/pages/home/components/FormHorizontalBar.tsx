@@ -16,7 +16,6 @@ import { FiSearch, FiChevronRight } from "react-icons/fi";
 import { PickupLocationModal } from "./modals/PickupLocationModal";
 import { DestinationModal } from "./modals/DestinationModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
-import { WeightModal } from "./modals/WeightModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
 
 interface FormHorizontalBarProps {
@@ -41,11 +40,11 @@ const FormHorizontalBar = ({
   const [pickupModalOpen, setPickupModalOpen] = useState(false);
   const [destinationModalOpen, setDestinationModalOpen] = useState(false);
   const [packageModalOpen, setPackageModalOpen] = useState(false);
-  const [weightModalOpen, setWeightModalOpen] = useState(false);
   const [dateModalOpen, setDateModalOpen] = useState(false);
 
-  // Store package name for display
+  // Store package name and data for display
   const [packageName, setPackageName] = useState("");
+  const [selectedPackageData, setSelectedPackageData] = useState<any>(null);
 
   const {
     mutate: getQuotesDirectly,
@@ -92,6 +91,12 @@ const FormHorizontalBar = ({
     weight: z
       .string({ required_error: "Weight is required" })
       .min(1, { message: "Please enter weight" }),
+    dimensions: z
+      .string()
+      .optional(),
+    itemPrice: z
+      .string({ required_error: "Item price is required" })
+      .min(1, { message: "Please enter item price" }),
     pickupDate: z
       .string()
       .optional(),
@@ -110,6 +115,8 @@ const FormHorizontalBar = ({
       dropOffLocation: "",
       packageTypeId: "",
       weight: "",
+      dimensions: "",
+      itemPrice: "",
       pickupDate: "",
     },
   });
@@ -118,6 +125,8 @@ const FormHorizontalBar = ({
   const dropOffLocation = watch("dropOffLocation");
   const packageTypeId = watch("packageTypeId");
   const weight = watch("weight");
+  const dimensions = watch("dimensions");
+  const itemPrice = watch("itemPrice");
   const pickupDate = watch("pickupDate");
 
   const normalizeData = (data: any) => ({
@@ -362,51 +371,38 @@ const FormHorizontalBar = ({
               )}
             </div>
 
-            {/* Package Type - Modal Trigger */}
+            {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <img src={size} alt="package" className="w-5 h-5 opacity-90" />
-                Package Type
+                Package Details
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
                   "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.packageTypeId ? "border-red-500" : packageTypeId ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-lg truncate", packageName ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {packageName || "Select type"}
-                </span>
+                <div className="flex-1 min-w-0">
+                  {packageName && weight && dimensions ? (
+                    <div className="space-y-1">
+                      <p className="text-lg text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-sm text-gray-600 truncate">
+                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-lg text-[#9ca3af]">Select package, dimensions & weight</span>
+                  )}
+                </div>
                 <FiChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
-              {errors.packageTypeId && (
-                <p className="text-xs text-red-500 mt-1">{errors.packageTypeId.message}</p>
-              )}
-            </div>
-
-            {/* Weight - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="weight" className="w-5 h-5 opacity-90" />
-                Weight (kg)
-              </label>
-              <button
-                type="button"
-                onClick={() => setWeightModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.weight ? "border-red-500" : weight ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
-                )}
-              >
-                <span className={cn("text-lg", weight ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {weight ? `${weight}kg` : "Enter weight"}
-                </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-500 transition-colors" />
-              </button>
-              {errors.weight && (
-                <p className="text-xs text-red-500 mt-1">{errors.weight.message}</p>
+              {(errors.packageTypeId || errors.weight) && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.packageTypeId?.message || errors.weight?.message}
+                </p>
               )}
             </div>
 
@@ -490,51 +486,38 @@ const FormHorizontalBar = ({
               )}
             </div>
 
-            {/* Package Type - Modal Trigger */}
+            {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <img src={size} alt="package" className="w-5 h-5 opacity-90" />
-                Package Type
+                Package Details
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.packageTypeId ? "border-red-500" : packageTypeId ? "border-amber-400" : "border-[#e5e5e5]"
+                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-lg", packageName ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {packageName || "Select type"}
-                </span>
+                <div className="flex-1">
+                  {packageName && weight && dimensions ? (
+                    <div className="space-y-1">
+                      <p className="text-lg text-[#1a1a1a] font-semibold">{packageName}</p>
+                      <p className="text-sm text-gray-600">
+                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-lg text-[#9ca3af]">Select package, dimensions & weight</span>
+                  )}
+                </div>
                 <FiChevronRight className="w-5 h-5 text-gray-400" />
               </button>
-              {errors.packageTypeId && (
-                <p className="text-xs text-red-500 mt-1">{errors.packageTypeId.message}</p>
-              )}
-            </div>
-
-            {/* Weight - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="weight" className="w-5 h-5 opacity-90" />
-                Weight (kg)
-              </label>
-              <button
-                type="button"
-                onClick={() => setWeightModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.weight ? "border-red-500" : weight ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                <span className={cn("text-lg", weight ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {weight ? `${weight}kg` : "Enter weight"}
-                </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400" />
-              </button>
-              {errors.weight && (
-                <p className="text-xs text-red-500 mt-1">{errors.weight.message}</p>
+              {(errors.packageTypeId || errors.weight) && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.packageTypeId?.message || errors.weight?.message}
+                </p>
               )}
             </div>
 
@@ -607,19 +590,17 @@ const FormHorizontalBar = ({
           <PackageTypeModal
             open={packageModalOpen}
             onOpenChange={setPackageModalOpen}
-            value={packageTypeId || ""}
-            onSelect={(id, name) => {
+            selectedPackageId={packageTypeId || ""}
+            currentWeight={weight || ""}
+            currentDimensions={dimensions || ""}
+            currentItemPrice={itemPrice || ""}
+            onConfirm={(id, name, weightValue, dimensionsValue, itemPriceValue, packageData) => {
               setValue("packageTypeId", id, { shouldValidate: true });
-              setPackageName(name);
-            }}
-          />
-
-          <WeightModal
-            open={weightModalOpen}
-            onOpenChange={setWeightModalOpen}
-            value={weight || ""}
-            onSelect={(weightValue) => {
               setValue("weight", weightValue, { shouldValidate: true });
+              setValue("dimensions", dimensionsValue);
+              setValue("itemPrice", itemPriceValue, { shouldValidate: true });
+              setPackageName(name);
+              setSelectedPackageData(packageData);
             }}
           />
 
