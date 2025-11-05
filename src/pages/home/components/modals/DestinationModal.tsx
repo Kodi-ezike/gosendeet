@@ -3,8 +3,8 @@ import { useClickAway } from "@/hooks/useClickAway";
 import { useRef, useState } from "react";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 import usePlacesAutocomplete from "use-places-autocomplete";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface DestinationModalProps {
   open: boolean;
@@ -166,23 +166,18 @@ export function DestinationModal({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               City
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              {['Lagos', 'Ibadan'].map((city) => (
-                <button
-                  key={city}
-                  type="button"
-                  onClick={() => handleCityChange(city)}
-                  className={cn(
-                    "py-3 px-4 rounded-xl border-2 font-semibold transition-all",
-                    manualAddress.city === city
-                      ? "border-amber-500 bg-amber-50 text-amber-700"
-                      : "border-gray-200 hover:border-amber-300 text-gray-700"
-                  )}
-                >
-                  {city}
-                </button>
-              ))}
-            </div>
+            <Select
+              value={manualAddress.city}
+              onValueChange={handleCityChange}
+            >
+              <SelectTrigger className="w-full py-3 px-4 text-base border-2 border-gray-200 rounded-xl focus:border-amber-400">
+                <SelectValue placeholder="Select city" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Lagos">Lagos</SelectItem>
+                <SelectItem value="Ibadan">Ibadan</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* State (Auto-filled) */}
