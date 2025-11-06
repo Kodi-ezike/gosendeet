@@ -66,7 +66,7 @@ export function PackageTypeModal({
   // Initialize from current values when modal opens
   useEffect(() => {
     if (open) {
-      setWeight(""); // Always start empty
+      setWeight(currentWeight || "");
       setItemPrice(currentItemPrice || "");
 
       // Parse current dimensions if exists
@@ -77,6 +77,11 @@ export function PackageTypeModal({
           setWidth(parts[1] || "");
           setHeight(parts[2] || "");
         }
+      } else {
+        // Reset dimensions if no current dimensions
+        setLength("");
+        setWidth("");
+        setHeight("");
       }
 
       // Find and set selected package
@@ -85,6 +90,8 @@ export function PackageTypeModal({
         if (pkg) {
           setSelectedPackage(pkg);
         }
+      } else {
+        setSelectedPackage(null);
       }
     }
   }, [open, currentWeight, currentDimensions, currentItemPrice, selectedPackageId, packages]);
@@ -165,7 +172,7 @@ export function PackageTypeModal({
         <div className="flex-1 overflow-y-auto mt-4 pr-2">
 
           {/* Step 1: Package & Dimensions */}
-          <div className="flex gap-3 relative">
+          <div className="flex gap-3 relative transition-opacity">
             <div className="flex flex-col items-center">
               <StepIndicator stepNumber={1} isComplete={step1Complete} isActive={true} />
               {/* Vertical connecting line */}
@@ -261,7 +268,7 @@ export function PackageTypeModal({
           </div>
 
           {/* Step 2: Weight */}
-          <div className={cn("flex gap-3 relative mt-6", !step1Complete && "opacity-50 pointer-events-none")}>
+          <div className={cn("flex gap-3 relative mt-6 transition-opacity", !step1Complete && "opacity-30 pointer-events-none")}>
             <div className="flex flex-col items-center">
               <StepIndicator stepNumber={2} isComplete={step2Complete} isActive={step1Complete && !step2Complete} />
               {/* Vertical connecting line */}
@@ -269,13 +276,13 @@ export function PackageTypeModal({
             </div>
 
             <div className="flex-1">
-              <h3 className="font-semibold text-sm text-gray-900 mb-3">How heavy is it?</h3>
+              <h3 className={cn("font-semibold text-sm mb-3", step1Complete ? "text-gray-900" : "text-gray-400")}>How heavy is it?</h3>
 
-              <label className="block text-xs text-gray-600 mb-2">
+              <label className={cn("block text-xs mb-2", step1Complete ? "text-gray-600" : "text-gray-400")}>
                 Max weight: {selectedPackage?.maxWeight}{selectedPackage?.weightUnit}
               </label>
 
-              <div className="grid grid-cols-4 gap-2 mb-2">
+              <div className="grid grid-cols-4 gap-2 mb-3">
                 {weightPresets.map((preset) => (
                   <button
                     key={preset.label}
@@ -283,10 +290,10 @@ export function PackageTypeModal({
                     onClick={() => setWeight(String(preset.value))}
                     disabled={!step1Complete}
                     className={cn(
-                      "py-1.5 px-2 rounded border text-xs",
+                      "py-2.5 px-3 rounded-lg text-xs font-semibold transition-all shadow-sm",
                       weight === String(preset.value)
-                        ? "border-amber-500 bg-amber-50 text-amber-700 font-medium"
-                        : "border-gray-300 hover:border-gray-400 text-gray-700"
+                        ? "border-2 border-amber-500 bg-amber-50 text-amber-700"
+                        : "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700"
                     )}
                   >
                     {preset.label}
@@ -294,42 +301,79 @@ export function PackageTypeModal({
                 ))}
               </div>
 
-              <input
-                type="text"
-                value={weight}
-                onChange={(e) => handleNumberInput(e.target.value, setWeight)}
-                disabled={!step1Complete}
-                className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded text-center focus:border-amber-400 focus:outline-none disabled:bg-gray-50"
-                placeholder="0"
-              />
+              {/* Bold Money-Style Weight Display */}
+              <div className={cn(
+                "relative p-4 rounded-lg border-2 transition-all overflow-hidden",
+                step1Complete
+                  ? "border-amber-400 bg-white shadow-sm"
+                  : "border-gray-200 bg-gray-50"
+              )}>
+                <label className={cn("block text-xs font-medium mb-1", step1Complete ? "text-gray-700" : "text-gray-400")}>
+                  Weight
+                </label>
+                <div className="flex items-baseline gap-2">
+                  <input
+                    type="text"
+                    value={weight}
+                    onChange={(e) => handleNumberInput(e.target.value, setWeight)}
+                    disabled={!step1Complete}
+                    style={{ width: '0' }}
+                    className={cn(
+                      "flex-1 bg-transparent outline-none font-bold text-3xl tabular-nums",
+                      step1Complete ? "text-gray-900" : "text-gray-400"
+                    )}
+                    placeholder="0"
+                  />
+                  <span className={cn("text-lg font-semibold whitespace-nowrap", step1Complete ? "text-gray-600" : "text-gray-400")}>
+                    {selectedPackage?.weightUnit || 'kg'}
+                  </span>
+                </div>
+              </div>
 
               {weight && selectedPackage?.maxWeight && parseFloat(weight) > selectedPackage.maxWeight && (
-                <p className="text-xs text-red-600 mt-1">Exceeds max weight</p>
+                <p className="text-xs text-red-600 mt-2">Exceeds max weight</p>
               )}
             </div>
           </div>
 
           {/* Step 3: Insurance Value */}
-          <div className={cn("flex gap-3 mt-6", !step2Complete && "opacity-50 pointer-events-none")}>
+          <div className={cn("flex gap-3 mt-6 transition-opacity", !step2Complete && "opacity-30 pointer-events-none")}>
             <StepIndicator stepNumber={3} isComplete={step3Complete} isActive={step2Complete && !step3Complete} />
 
             <div className="flex-1">
-              <h3 className="font-semibold text-sm text-gray-900 mb-3">How much is it worth?</h3>
+              <h3 className={cn("font-semibold text-sm mb-3", step2Complete ? "text-gray-900" : "text-gray-400")}>How much is it worth?</h3>
 
-              <label className="block text-xs text-gray-600 mb-2">
+              <label className={cn("block text-xs mb-3", step2Complete ? "text-gray-600" : "text-gray-400")}>
                 Item value for insurance coverage
               </label>
 
-              <div className="relative">
-                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-semibold">₦</span>
-                <input
-                  type="text"
-                  value={itemPrice}
-                  onChange={(e) => handleNumberInput(e.target.value, setItemPrice)}
-                  disabled={!step2Complete}
-                  placeholder="0.00"
-                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:border-amber-400 focus:outline-none disabled:bg-gray-50"
-                />
+              {/* Bold Money-Style Amount Display */}
+              <div className={cn(
+                "relative p-4 rounded-lg border-2 transition-all overflow-hidden",
+                step2Complete
+                  ? "border-amber-400 bg-white shadow-sm"
+                  : "border-gray-200 bg-gray-50"
+              )}>
+                <label className={cn("block text-xs font-medium mb-1", step2Complete ? "text-gray-700" : "text-gray-400")}>
+                  Item Value
+                </label>
+                <div className="flex items-baseline gap-2">
+                  <span className={cn("text-2xl font-bold whitespace-nowrap", step2Complete ? "text-gray-900" : "text-gray-400")}>
+                    ₦
+                  </span>
+                  <input
+                    type="text"
+                    value={itemPrice}
+                    onChange={(e) => handleNumberInput(e.target.value, setItemPrice)}
+                    disabled={!step2Complete}
+                    placeholder="0.00"
+                    style={{ width: '0' }}
+                    className={cn(
+                      "flex-1 bg-transparent outline-none font-bold text-3xl tabular-nums",
+                      step2Complete ? "text-gray-900" : "text-gray-400"
+                    )}
+                  />
+                </div>
               </div>
             </div>
           </div>
