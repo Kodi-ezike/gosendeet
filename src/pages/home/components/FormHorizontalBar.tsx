@@ -1,6 +1,5 @@
 import size from "@/assets/icons/size.png";
 import location from "@/assets/icons/location.png";
-import { SpecsModal } from "@/components/specs";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -30,7 +29,6 @@ const FormHorizontalBar = ({
   setData,
   activeMode = "gosendeet",
 }: FormHorizontalBarProps) => {
-  const [open, setOpen] = useState(false);
   const [inputData, setInputData] = useState<any>({});
   const [isHydrated, setIsHydrated] = useState(false);
   const navigate = useNavigate();
@@ -716,9 +714,22 @@ const FormHorizontalBar = ({
                 variant={"secondary"}
                 size={"custom"}
                 className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
+                loading={isQuoteLoading}
                 onClick={handleSubmit((data) => {
                   saveInputData(data);
-                  setOpen(true); // Open SpecsModal for additional details
+                  // Compare directly - get quotes immediately without opening modal
+                  getQuotesDirectly([
+                    {
+                      ...data,
+                      quantity: 1,
+                      packageDescription: {
+                        isFragile: false,
+                        isPerishable: false,
+                        isExclusive: false,
+                        isHazardous: false,
+                      },
+                    },
+                  ]);
                 })}
               >
                 <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
@@ -821,9 +832,22 @@ const FormHorizontalBar = ({
               variant={"secondary"}
               size={"custom"}
               className="w-full px-6 py-3 justify-center font-bold text-sm"
+              loading={isQuoteLoading}
               onClick={handleSubmit((data) => {
                 saveInputData(data);
-                setOpen(true); // Open SpecsModal for additional details
+                // Compare directly - get quotes immediately without opening modal
+                getQuotesDirectly([
+                  {
+                    ...data,
+                    quantity: 1,
+                    packageDescription: {
+                      isFragile: false,
+                      isPerishable: false,
+                      isExclusive: false,
+                      isHazardous: false,
+                    },
+                  },
+                ]);
               })}
             >
               <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
@@ -832,16 +856,6 @@ const FormHorizontalBar = ({
           </div>
         </form>
       ) : null}
-
-      {/* Specs Modal - only show for Compare mode */}
-      {activeMode === "compare" && (
-        <SpecsModal
-          open={open}
-          setOpen={setOpen}
-          inputData={inputData}
-          setData={setData}
-        />
-      )}
 
       {/* Modals for Direct and Compare modes */}
       {(activeMode === "gosendeet" || activeMode === "compare") && (

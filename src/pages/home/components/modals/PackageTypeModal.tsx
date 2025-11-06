@@ -169,7 +169,7 @@ export function PackageTypeModal({
         </DialogDescription>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto mt-4 pr-2">
+        <div className="flex-1 overflow-y-auto mt-4 pr-2 pb-6">
 
           {/* Step 1: Package & Dimensions */}
           <div className="flex gap-3 relative transition-opacity">
@@ -378,19 +378,19 @@ export function PackageTypeModal({
             </div>
           </div>
 
-          {/* Confirm Button */}
-          <div className="pt-4">
-            <Button
-              type="button"
-              onClick={handleConfirm}
-              variant="secondary"
-              size="custom"
-              className="w-full py-2.5 text-sm font-bold"
-              disabled={!step3Complete}
-            >
-              Confirm Package Details
-            </Button>
-          </div>
+        </div>
+        {/* Action Bar */}
+        <div className="mt-2 pt-4 border-t border-gray-200 bg-white">
+          <Button
+            type="button"
+            onClick={handleConfirm}
+            variant="secondary"
+            size="custom"
+            className="w-full py-2.5 text-sm font-bold"
+            disabled={!step3Complete}
+          >
+            Confirm Package Details
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
