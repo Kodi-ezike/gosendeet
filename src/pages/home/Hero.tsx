@@ -1,10 +1,8 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import FormHorizontalBar from "./components/FormHorizontalBar";
-import gif from "@/assets/gif/gosend-gif.gif";
-import logos from "@/assets/images/logos.png";
-import logosMastercard from "@/assets/images/logos_mastercard.png";
-import { FiSend, FiBarChart2, FiPackage } from "react-icons/fi";
+import { FiSend, FiBarChart2, FiPackage, FiBox } from "react-icons/fi";
+import { SiFedex, SiDhl, SiUps } from "react-icons/si";
 import { cn } from "@/lib/utils";
 
 type FormMode = "gosendeet" | "compare" | "tracking";
@@ -26,52 +24,84 @@ const HeroOptionC = () => {
   ];
 
   // Logo array for carousel
-  const logoArray = [
-    logos,
-    logosMastercard,
-    logos,
-    logosMastercard,
-    logos,
-    logosMastercard,
+  const partnerLogos = [
+    { name: "FedEx", icon: SiFedex },
+    { name: "FEZ" },
+    { name: "DHL", icon: SiDhl },
+    { name: "UPS", icon: SiUps },
+    { name: "GIG" },
   ];
 
   return (
     <div className="v3-hero min-h-screen flex flex-col justify-center md:px-20 px-6 pt-6 pb-12 relative overflow-hidden">
-      {/* Bold Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-yellow-50"></div>
-
-      {/* GIF Background - Subtle */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <img
-          src={gif}
-          alt="Background demo"
-          className="w-[60%] max-w-[800px] h-auto opacity-[0.04] object-contain"
-        />
-      </div>
-
-      {/* Decorative Elements - Bold */}
-      <div className="absolute top-20 right-10 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 left-10 w-80 h-80 bg-yellow-400/20 rounded-full blur-3xl"></div>
-
       {/* Main Content */}
       <div className="max-w-7xl mx-auto w-full relative z-10">
+        {/* Floating Package Icons */}
+        <motion.div
+          className="absolute top-20 left-10 md:left-20 text-amber-400/30"
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <FiBox className="w-16 h-16 md:w-20 md:h-20" />
+        </motion.div>
+
+        <motion.div
+          className="absolute top-32 right-10 md:right-24 text-orange-400/25"
+          animate={{
+            y: [0, -15, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{
+            duration: 3.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5
+          }}
+        >
+          <FiPackage className="w-12 h-12 md:w-16 md:h-16" />
+        </motion.div>
+
+        <motion.div
+          className="absolute top-60 left-16 md:left-32 text-yellow-400/20"
+          animate={{
+            y: [0, -10, 0],
+            rotate: [0, 3, 0]
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1
+          }}
+        >
+          <FiBox className="w-10 h-10 md:w-12 md:h-12" />
+        </motion.div>
+
         {/* Headline Section - Center Aligned */}
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-8 relative z-10"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <h1 className="font-clash xl:text-[72px] lg:text-[60px] text-[48px] font-bold xl:leading-[105%] leading-[100%] mb-6">
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-              Compare 50+ Carriers.
+          <h1 className="font-clash font-bold mb-6">
+            <span className="block text-[#f59e0b] xl:text-[84px] lg:text-[68px] text-[48px] xl:leading-[95%] leading-[100%]">
+              Every delivery is a promise.
             </span>
-            <br />
-            <span className="text-[#1a1a1a]">Book in 60 Seconds.</span>
+            <span className="block text-[#6b7280] xl:text-[42px] lg:text-[36px] text-[28px] xl:leading-[95%] leading-[100%]">
+              We help you keep it.
+            </span>
           </h1>
 
-          <p className="text-[#4b5563] xl:text-2xl lg:text-xl text-lg mb-6 leading-relaxed max-w-3xl mx-auto font-medium">
-            Get real-time shipping quotes from top logistics partners. No phone calls, no waiting—just instant rates and one-click booking.
+          <p className="text-[#1a1a1a] xl:text-2xl lg:text-xl text-lg leading-relaxed max-w-4xl mx-auto font-bold">
+            Ship easily from your doorstep with <span className="text-[#f59e0b]">GoSendeet</span>, or <span className="text-[#f59e0b]"> compare rates </span> from multiple carriers — <span className="text-[#f59e0b]"> all in one place. </span>
           </p>
         </motion.div>
 
@@ -162,21 +192,28 @@ const HeroOptionC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <div className="v3-carousel-track flex gap-20 items-center relative z-10">
-            {logoArray.concat(logoArray).map((logo, index) => (
-              <motion.img
-                key={index}
-                src={logo}
-                alt="partner logo"
-                className="v3-logo-item h-[32px] md:h-[40px] object-contain flex-shrink-0 filter grayscale"
-                style={{ minWidth: '80px' }}
-                whileHover={{
-                  scale: 1.15,
-                  filter: 'grayscale(0)',
-                  transition: { duration: 0.3 }
-                }}
-              />
-            ))}
+          <div className="v3-carousel-track flex gap-12 items-center relative z-10">
+            {partnerLogos.concat(partnerLogos).map((partner, index) => {
+              const Icon = partner.icon;
+              return (
+                <motion.div
+                  key={index}
+                  className="v3-logo-item group flex items-center justify-center h-[40px] md:h-[48px] min-w-[120px] text-gray-700 transition-all duration-300"
+                  whileHover={{
+                    scale: 1.05,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  {Icon ? (
+                    <Icon className="w-20 h-8 md:h-10 group-hover:text-amber-600 transition-colors duration-300" />
+                  ) : (
+                    <span className="text-base md:text-lg font-semibold uppercase tracking-wider group-hover:text-amber-600 transition-colors duration-300">
+                      {partner.name}
+                    </span>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>
