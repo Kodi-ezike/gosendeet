@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import deliveryIcon from "@/assets/icons/mdi_home-schedule.png";
 import paymentIcon from "@/assets/icons/mdi_stopwatch-start-outline.png";
 import receiveIcon from "@/assets/icons/receive.png";
+import { CTAButton } from "@/components/shared/CTAButton";
 
 const ProcessFlow = () => {
   const steps = [
@@ -113,9 +114,7 @@ const ProcessFlow = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <button className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold px-10 py-4 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-1">
-            Start Your First Delivery
-          </button>
+          <CTAButton>Start Your First Delivery</CTAButton>
         </motion.div>
       </div>
     </div>

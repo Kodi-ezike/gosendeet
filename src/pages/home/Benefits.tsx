@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import delivery from "@/assets/images/delivery.png";
+import { CTAButton } from "@/components/shared/CTAButton";
 
 const Benefits = () => {
   const benefits = [
@@ -112,9 +113,7 @@ const Benefits = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <button className="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-semibold px-10 py-4 rounded-full shadow-lg transition-all duration-300 hover:-translate-y-1">
-                Get Started Now
-              </button>
+              <CTAButton>Get Started Now</CTAButton>
             </motion.div>
           </motion.div>
         </div>
