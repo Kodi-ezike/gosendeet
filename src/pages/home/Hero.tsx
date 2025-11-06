@@ -32,57 +32,36 @@ const HeroOptionC = () => {
     { name: "GIG" },
   ];
 
+  // Floating icon configurations for cleaner rendering
+  const floatingIcons = [
+    { Icon: FiBox, position: "top-20 left-10 md:left-20", color: "text-amber-400/30", size: "w-16 h-16 md:w-20 md:h-20", duration: 4, delay: 0, yOffset: -20, rotation: 5 },
+    { Icon: FiPackage, position: "top-32 right-10 md:right-24", color: "text-orange-400/25", size: "w-12 h-12 md:w-16 md:h-16", duration: 3.5, delay: 0.5, yOffset: -15, rotation: -5 },
+    { Icon: FiBox, position: "top-60 left-16 md:left-32", color: "text-yellow-400/20", size: "w-10 h-10 md:w-12 md:h-12", duration: 3, delay: 1, yOffset: -10, rotation: 3 },
+  ];
+
   return (
     <div className="v3-hero min-h-screen flex flex-col justify-center md:px-20 px-6 pt-6 pb-12 relative overflow-hidden">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto w-full relative z-10">
-        {/* Floating Package Icons */}
-        <motion.div
-          className="absolute top-20 left-10 md:left-20 text-amber-400/30"
-          animate={{
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          <FiBox className="w-16 h-16 md:w-20 md:h-20" />
-        </motion.div>
-
-        <motion.div
-          className="absolute top-32 right-10 md:right-24 text-orange-400/25"
-          animate={{
-            y: [0, -15, 0],
-            rotate: [0, -5, 0]
-          }}
-          transition={{
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.5
-          }}
-        >
-          <FiPackage className="w-12 h-12 md:w-16 md:h-16" />
-        </motion.div>
-
-        <motion.div
-          className="absolute top-60 left-16 md:left-32 text-yellow-400/20"
-          animate={{
-            y: [0, -10, 0],
-            rotate: [0, 3, 0]
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        >
-          <FiBox className="w-10 h-10 md:w-12 md:h-12" />
-        </motion.div>
+        {/* Floating Package Icons - Optimized with config array */}
+        {floatingIcons.map((item, index) => (
+          <motion.div
+            key={index}
+            className={`absolute ${item.position} ${item.color}`}
+            animate={{
+              y: [0, item.yOffset, 0],
+              rotate: [0, item.rotation, 0]
+            }}
+            transition={{
+              duration: item.duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: item.delay
+            }}
+          >
+            <item.Icon className={item.size} />
+          </motion.div>
+        ))}
 
         {/* Headline Section - Center Aligned */}
         <motion.div

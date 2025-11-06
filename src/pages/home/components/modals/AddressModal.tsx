@@ -5,28 +5,36 @@ import { FiMapPin, FiSearch } from "react-icons/fi";
 import usePlacesAutocomplete, { getDetails } from "use-places-autocomplete";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AddressModalProps, ManualAddressData } from "@/types/forms";
+import { validateManualAddress } from "@/utils/form-validators";
 
-interface DestinationModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  value: string;
-  onSelect: (location: string) => void;
-}
+// Allowed cities and their state mapping
+const CITY_STATE_MAP: Record<string, string> = {
+  'Lagos': 'Lagos State',
+  'Ibadan': 'Oyo State'
+};
 
-export function DestinationModal({
+const ALLOWED_CITIES = Object.keys(CITY_STATE_MAP);
+const ALLOWED_STATES = Object.values(CITY_STATE_MAP);
+
+/**
+ * Unified AddressModal - Replaces PickupLocationModal and DestinationModal
+ * Handles both pickup and destination address selection with type-based customization
+ */
+export function AddressModal({
+  type,
   open,
   onOpenChange,
   value,
   onSelect,
-}: DestinationModalProps) {
+}: AddressModalProps) {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [searchValue, setSearchValue] = useState(''); // Separate search field
-  const [manualAddress, setManualAddress] = useState({
+  const [searchValue, setSearchValue] = useState('');
+  const [manualAddress, setManualAddress] = useState<ManualAddressData>({
     street: '',
     apartment: '',
     city: '',
     state: '',
-    country: 'Nigeria'
   });
   const suggestionsRef = useRef<HTMLDivElement>(null!);
 
@@ -43,15 +51,10 @@ export function DestinationModal({
 
   useClickAway(suggestionsRef, () => setShowSuggestions(false));
 
-  const cityStateMap: Record<string, string> = {
-    'Lagos': 'Lagos State',
-    'Ibadan': 'Oyo State'
-  };
-
   // Parse existing value and pre-fill form when modal opens
   useEffect(() => {
     if (open && value) {
-      // Parse the formatted address: "street, apartment, city, state, country"
+      // Parse the formatted address: "street, apartment, city, state"
       const parts = value.split(',').map(p => p.trim());
       if (parts.length >= 4) {
         const [street, apartment, city, state] = parts;
@@ -60,7 +63,6 @@ export function DestinationModal({
           apartment: apartment || '',
           city: city || '',
           state: state || '',
-          country: 'Nigeria'
         });
       }
     } else if (open && !value) {
@@ -70,13 +72,15 @@ export function DestinationModal({
         apartment: '',
         city: '',
         state: '',
-        country: 'Nigeria'
       });
     }
   }, [open, value]);
 
-  // Parse address from Google Places address_components
-  const parseAddressComponents = (components: google.maps.GeocoderAddressComponent[]) => {
+  /**
+   * Parse address from Google Places address_components
+   * Extracts structured address data from Google Places API response
+   */
+  const parseAddressComponents = (components: google.maps.GeocoderAddressComponent[]): Partial<ManualAddressData> => {
     let premise = '';
     let streetNumber = '';
     let route = '';
@@ -86,7 +90,6 @@ export function DestinationModal({
     let neighborhood = '';
     let city = '';
     let state = '';
-    let country = 'Nigeria';
 
     for (const component of components) {
       const type = component.types[0];
@@ -117,16 +120,12 @@ export function DestinationModal({
           city = component.long_name;
           break;
         case 'administrative_area_level_2':
-          // In some areas, administrative_area_level_2 might be the city
           if (!city) {
             city = component.long_name;
           }
           break;
         case 'administrative_area_level_1':
           state = component.long_name;
-          break;
-        case 'country':
-          country = component.long_name;
           break;
       }
     }
@@ -148,9 +147,8 @@ export function DestinationModal({
 
     const fullStreet = streetParts.join(', ');
 
-    // Validate that city and state are within our allowed values
-    if (city && !['Lagos', 'Ibadan'].includes(city)) {
-      // If city not in our list, try to default based on state
+    // Validate that city is within our allowed values
+    if (city && !ALLOWED_CITIES.includes(city)) {
       if (state.includes('Lagos')) {
         city = 'Lagos';
       } else if (state.includes('Oyo')) {
@@ -159,7 +157,7 @@ export function DestinationModal({
     }
 
     // Ensure state matches our format
-    if (state && !['Lagos State', 'Oyo State'].includes(state)) {
+    if (state && !ALLOWED_STATES.includes(state)) {
       if (state.includes('Lagos')) {
         state = 'Lagos State';
       } else if (state.includes('Oyo')) {
@@ -172,20 +170,18 @@ export function DestinationModal({
       apartment: '', // Leave empty for user to fill
       city,
       state,
-      country
     };
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setSearchValue(newValue); // Update separate search field
+    setSearchValue(newValue);
     setPlacesValue(newValue);
     setShowSuggestions(true);
   };
 
   const handleSelectLocation = async (placeId: string) => {
     try {
-      // Get detailed place information including address_components
       const parameter = {
         placeId: placeId,
         fields: ['address_components', 'formatted_address']
@@ -194,10 +190,9 @@ export function DestinationModal({
       const details = await getDetails(parameter);
 
       if (typeof details !== 'string' && details.address_components) {
-        // Parse the structured address components
         const parsed = parseAddressComponents(details.address_components);
         setManualAddress({ ...manualAddress, ...parsed });
-        setSearchValue(''); // Clear search after selection
+        setSearchValue('');
       }
     } catch (error) {
       console.error('Error fetching place details:', error);
@@ -211,7 +206,7 @@ export function DestinationModal({
     setManualAddress({
       ...manualAddress,
       city,
-      state: cityStateMap[city]
+      state: CITY_STATE_MAP[city]
     });
   };
 
@@ -223,12 +218,14 @@ export function DestinationModal({
   };
 
   const handleSubmit = () => {
-    const { street, apartment, city, state, country } = manualAddress;
-    if (!street.trim() || !apartment.trim() || !city.trim() || !state.trim()) {
+    const { street, apartment, city, state } = manualAddress;
+    const validation = validateManualAddress(street, apartment, city, state);
+
+    if (!validation.valid) {
       return;
     }
-    const apartmentPart = apartment.trim() ? `, ${apartment}` : '';
-    const formattedAddress = `${street}${apartmentPart}, ${city}, ${state}, ${country}`;
+
+    const formattedAddress = `${street}, ${apartment}, ${city}, ${state}, Nigeria`;
     onSelect(formattedAddress);
     onOpenChange(false);
     setManualAddress({
@@ -236,20 +233,27 @@ export function DestinationModal({
       apartment: '',
       city: '',
       state: '',
-      country: 'Nigeria'
     });
   };
+
+  const isFormValid = manualAddress.street.trim() &&
+                      manualAddress.apartment.trim() &&
+                      manualAddress.city.trim() &&
+                      manualAddress.state.trim();
+
+  // Type-specific content
+  const title = type === 'pickup' ? 'Pickup Location' : 'Destination';
+  const buttonText = type === 'pickup' ? 'Confirm Pickup Address' : 'Confirm Destination Address';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogTitle className="text-lg font-clash font-bold text-gray-900">
-          Destination
+          {title}
         </DialogTitle>
 
         <div className="space-y-3 mt-3">
-
-          {/* Google Places Search - Separate from manual entry */}
+          {/* Google Places Search */}
           <div className="relative" ref={suggestionsRef}>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
               Search Address
@@ -362,7 +366,7 @@ export function DestinationModal({
               Country
             </label>
             <div className="px-3 py-2 bg-gray-50 border-2 border-gray-200 rounded-xl text-sm text-gray-600">
-              {manualAddress.country}
+              Nigeria
             </div>
           </div>
 
@@ -373,9 +377,9 @@ export function DestinationModal({
             variant="secondary"
             size="custom"
             className="w-full py-2.5 text-sm font-bold"
-            disabled={!manualAddress.street.trim() || !manualAddress.apartment.trim() || !manualAddress.city.trim() || !manualAddress.state.trim()}
+            disabled={!isFormValid}
           >
-            Confirm Destination Address
+            {buttonText}
           </Button>
         </div>
       </DialogContent>

@@ -13,8 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { FiChevronRight, FiCalendar, FiTruck, FiBarChart2, FiSearch } from "react-icons/fi";
-import { PickupLocationModal } from "./modals/PickupLocationModal";
-import { DestinationModal } from "./modals/DestinationModal";
+import { AddressModal } from "./modals/AddressModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
 
@@ -847,7 +846,8 @@ const FormHorizontalBar = ({
       {/* Modals for Direct and Compare modes */}
       {(activeMode === "gosendeet" || activeMode === "compare") && (
         <>
-          <PickupLocationModal
+          <AddressModal
+            type="pickup"
             open={pickupModalOpen}
             onOpenChange={setPickupModalOpen}
             value={pickupLocation || ""}
@@ -856,7 +856,8 @@ const FormHorizontalBar = ({
             }}
           />
 
-          <DestinationModal
+          <AddressModal
+            type="destination"
             open={destinationModalOpen}
             onOpenChange={setDestinationModalOpen}
             value={dropOffLocation || ""}
