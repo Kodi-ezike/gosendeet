@@ -17,20 +17,31 @@ export function PickupDateModal({
   value,
   onSelect,
 }: PickupDateModalProps) {
-  const [selectedDate, setSelectedDate] = useState(value || "");
-  const [selectedTime, setSelectedTime] = useState("09:00");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState("10am-2pm");
 
   useEffect(() => {
     if (open && value) {
-      setSelectedDate(value);
+      // Parse existing value if it contains a time slot
+      const parts = value.split(' ');
+      if (parts.length >= 2) {
+        setSelectedDate(parts[0]);
+        // Check if the time slot matches our options
+        const timeSlot = parts.slice(1).join(' ');
+        if (timeSlot === "10am-2pm" || timeSlot === "2pm-6pm") {
+          setSelectedTimeSlot(timeSlot);
+        }
+      } else {
+        setSelectedDate(value);
+      }
     }
   }, [open, value]);
 
-  // Generate next 14 days
+  // Generate next 3 days (today, tomorrow, day after)
   const generateDates = () => {
     const dates = [];
     const today = new Date();
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 3; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       dates.push(date);
@@ -63,20 +74,11 @@ export function PickupDateModal({
     return "";
   };
 
-  const timeSlots = [
-    "09:00", "10:00", "11:00", "12:00",
-    "13:00", "14:00", "15:00", "16:00", "17:00"
-  ];
-
-  const handleQuickSelect = (days: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + days);
-    setSelectedDate(formatDate(date));
-  };
+  const timeSlots = ["10am-2pm", "2pm-6pm"];
 
   const handleConfirm = () => {
     if (selectedDate) {
-      const fullDateTime = `${selectedDate} ${selectedTime}`;
+      const fullDateTime = `${selectedDate} ${selectedTimeSlot}`;
       onSelect(fullDateTime);
       onOpenChange(false);
     }
@@ -84,65 +86,22 @@ export function PickupDateModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] overflow-y-auto">
-        <DialogTitle className="text-2xl font-clash font-bold text-gray-900">
-          Select Pickup Date & Time
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogTitle className="text-lg font-clash font-bold text-gray-900">
+          Pickup
         </DialogTitle>
-        <DialogDescription className="text-gray-600">
+        <DialogDescription className="text-sm text-gray-600">
           Choose when you want your package to be picked up
         </DialogDescription>
 
-        <div className="space-y-6 mt-6">
-          {/* Quick Select */}
+        <div className="space-y-4 mt-3">
+          {/* Date Selection - 3 cards */}
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-3">Quick Select</p>
-            <div className="grid grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => handleQuickSelect(0)}
-                className={cn(
-                  "py-3 px-4 rounded-xl border-2 transition-all font-semibold",
-                  selectedDate === formatDate(new Date())
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 hover:border-amber-300 hover:bg-amber-50 text-gray-700"
-                )}
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickSelect(1)}
-                className={cn(
-                  "py-3 px-4 rounded-xl border-2 transition-all font-semibold",
-                  selectedDate === formatDate(new Date(Date.now() + 86400000))
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 hover:border-amber-300 hover:bg-amber-50 text-gray-700"
-                )}
-              >
-                Tomorrow
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickSelect(2)}
-                className={cn(
-                  "py-3 px-4 rounded-xl border-2 transition-all font-semibold",
-                  selectedDate === formatDate(new Date(Date.now() + 172800000))
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 hover:border-amber-300 hover:bg-amber-50 text-gray-700"
-                )}
-              >
-                In 2 Days
-              </button>
-            </div>
-          </div>
-
-          {/* Date Grid */}
-          <div>
-            <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <FiCalendar className="w-4 h-4" />
+            <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+              <FiCalendar className="w-3.5 h-3.5" />
               Select Date
             </p>
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {dates.map((date) => {
                 const dateStr = formatDate(date);
                 const isSelected = selectedDate === dateStr;
@@ -195,19 +154,19 @@ export function PickupDateModal({
           {/* Time Slots */}
           {selectedDate && (
             <div>
-              <p className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <FiClock className="w-4 h-4" />
+              <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                <FiClock className="w-3.5 h-3.5" />
                 Select Time
               </p>
-              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {timeSlots.map((time) => (
                   <button
                     key={time}
                     type="button"
-                    onClick={() => setSelectedTime(time)}
+                    onClick={() => setSelectedTimeSlot(time)}
                     className={cn(
-                      "py-2 px-3 rounded-lg border-2 transition-all font-semibold text-sm",
-                      selectedTime === time
+                      "py-3 px-4 rounded-xl border-2 transition-all font-semibold text-sm",
+                      selectedTimeSlot === time
                         ? "border-amber-500 bg-amber-50 text-amber-700"
                         : "border-gray-200 hover:border-amber-300 hover:bg-amber-50 text-gray-700"
                     )}
@@ -221,13 +180,13 @@ export function PickupDateModal({
 
           {/* Selected Summary */}
           {selectedDate && (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <div className="flex items-center gap-2 text-sm font-semibold text-amber-700 mb-1">
-                <FiCalendar className="w-4 h-4" />
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="flex items-center gap-2 text-xs font-semibold text-amber-700 mb-1">
+                <FiCalendar className="w-3.5 h-3.5" />
                 Selected Pickup
               </div>
-              <p className="text-gray-900 font-bold text-lg">
-                {formatDisplayDate(new Date(selectedDate))} at {selectedTime}
+              <p className="text-gray-900 font-bold text-base">
+                {formatDisplayDate(new Date(selectedDate))} • {selectedTimeSlot}
               </p>
             </div>
           )}
@@ -238,17 +197,17 @@ export function PickupDateModal({
             onClick={handleConfirm}
             variant="secondary"
             size="custom"
-            className="w-full py-4 text-base font-bold"
+            className="w-full py-2.5 text-sm font-bold"
             disabled={!selectedDate}
           >
-            Confirm Pickup Date
+            Confirm Pickup
           </Button>
         </div>
 
         {/* Help Text */}
-        <div className="flex items-start gap-2 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
-          <FiCalendar className="w-4 h-4 mt-0.5 flex-shrink-0" />
-          <p>Select your preferred pickup date and time. You can schedule pickups up to 14 days in advance.</p>
+        <div className="flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-2.5 rounded-lg">
+          <FiCalendar className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <p>Select your preferred pickup date and time window.</p>
         </div>
       </DialogContent>
     </Dialog>

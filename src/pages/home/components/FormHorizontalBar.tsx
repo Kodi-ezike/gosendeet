@@ -12,7 +12,7 @@ import { getQuotes } from "@/services/user";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { FiSearch, FiChevronRight } from "react-icons/fi";
+import { FiChevronRight, FiCalendar, FiTruck, FiBarChart2, FiSearch } from "react-icons/fi";
 import { PickupLocationModal } from "./modals/PickupLocationModal";
 import { DestinationModal } from "./modals/DestinationModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
@@ -185,20 +185,20 @@ const FormHorizontalBar = ({
 
   // Variant-specific styling
   const containerStyles = cn(
-    "w-full max-w-6xl mx-auto p-6 rounded-3xl",
+    "w-full max-w-6xl mx-auto pt-10 px-6 pb-6 rounded-3xl",
     variant === "bold" && "bg-white shadow-2xl border-2 border-[#1a1f3a]",
     variant === "minimal" && "bg-white shadow-2xl border-2 border-amber-200/40 ring-1 ring-amber-100/30",
     variant === "floating" && "bg-white shadow-2xl"
   );
 
   const labelStyles = cn(
-    "font-clash font-bold text-sm mb-3 block",
+    "font-clash font-bold text-xs mb-2 block",
     variant === "bold" && "text-[#1a1a1a]",
     (variant === "minimal" || variant === "floating") && "text-[#4b5563]"
   );
 
   const inputStyles = cn(
-    "w-full outline-0 bg-transparent text-lg py-3 px-3 border-b-2 transition-colors",
+    "w-full outline-0 bg-transparent text-base py-2 px-3 border-b-2 transition-colors",
     variant === "bold" && "border-[#e5e5e5] hover:border-amber-400 focus:border-amber-400 text-[#1a1a1a] placeholder:text-[#9ca3af]",
     (variant === "minimal" || variant === "floating") && "border-[#e5e5e5] hover:border-amber-300 focus:border-amber-300 text-[#1a1a1a] placeholder:text-[#9ca3af]"
   );
@@ -281,14 +281,14 @@ const FormHorizontalBar = ({
             </div>
 
             {/* Track Button - Last column */}
-            <div className="flex gap-3 items-end min-w-[280px]">
+            <div className="flex gap-3 items-end min-w-[240px]">
               <Button
                 type="submit"
                 variant="secondary"
                 size="custom"
-                className="flex-1 px-6 py-4 h-14 justify-center font-bold text-base whitespace-nowrap"
+                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
               >
-                <FiSearch className="text-white mr-2" />
+                <FiSearch className="text-white mr-1.5 w-4 h-4" />
                 <span className="text-white">Track</span>
               </Button>
             </div>
@@ -322,25 +322,26 @@ const FormHorizontalBar = ({
         // Direct Mode with Modal Triggers
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Desktop: Horizontal Grid with Modal Triggers */}
-          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-6 items-end">
+          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-4 items-end">
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <img src={location} alt="location" className="w-5 h-5 opacity-90" />
                 Pickup Location
+                {errors.pickupLocation && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setPickupModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
                   errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-lg", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
                   {pickupLocation || "Where from?"}
                 </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.pickupLocation && (
                 <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
@@ -352,19 +353,20 @@ const FormHorizontalBar = ({
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <img src={location} alt="location" className="w-5 h-5 opacity-90" />
                 Destination
+                {errors.dropOffLocation && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setDestinationModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
                   errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-lg", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
                   {dropOffLocation || "Where to?"}
                 </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.dropOffLocation && (
                 <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
@@ -376,28 +378,29 @@ const FormHorizontalBar = ({
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <img src={size} alt="package" className="w-5 h-5 opacity-90" />
                 Package Details
+                {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
                   errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
                 <div className="flex-1 min-w-0">
                   {packageName && weight && dimensions ? (
-                    <div className="space-y-1">
-                      <p className="text-lg text-[#1a1a1a] font-semibold truncate">{packageName}</p>
-                      <p className="text-sm text-gray-600 truncate">
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-xs text-gray-600 truncate">
                         {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
                       </p>
                     </div>
                   ) : (
-                    <span className="text-lg text-[#9ca3af]">Select package, dimensions & weight</span>
+                    <span className="text-base text-[#9ca3af]">Select details</span>
                   )}
                 </div>
-                <FiChevronRight className="w-5 h-5 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {(errors.packageTypeId || errors.weight) && (
                 <p className="text-xs text-red-500 mt-1">
@@ -406,13 +409,45 @@ const FormHorizontalBar = ({
               )}
             </div>
 
+            {/* Pickup - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <FiCalendar className="w-4 h-4 opacity-90" />
+                Pickup
+              </label>
+              <button
+                type="button"
+                onClick={() => setDateModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  pickupDate ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                )}
+              >
+                {pickupDate ? (
+                  <div className="flex-1 min-w-0">
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">
+                        {new Date(pickupDate.split(' ')[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {pickupDate.split(' ').slice(1).join(' ')}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-base text-[#9ca3af]">Select pickup</span>
+                )}
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+              </button>
+            </div>
+
             {/* Buttons */}
-            <div className="flex gap-3 items-end min-w-[280px]">
+            <div className="flex gap-3 items-end min-w-[200px]">
               <Button
                 type="button"
                 variant={"secondary"}
                 size={"custom"}
-                className="flex-1 px-6 py-4 h-14 justify-center font-bold text-base whitespace-nowrap"
+                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
                 loading={isQuoteLoading}
                 onClick={handleSubmit((data) => {
                   saveInputData(data);
@@ -430,8 +465,8 @@ const FormHorizontalBar = ({
                   ]);
                 })}
               >
-                <FiSearch className="text-white mr-2" />
-                <span className="text-white">Get Quote</span>
+                <FiTruck className="text-white mr-1.5 w-4 h-4" />
+                <span className="text-white">Ship Now</span>
               </Button>
             </div>
           </div>
@@ -441,21 +476,22 @@ const FormHorizontalBar = ({
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
                 Pickup Location
+                {errors.pickupLocation && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setPickupModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
                   errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5]"
                 )}
               >
-                <span className={cn("text-lg", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
                   {pickupLocation || "Where from?"}
                 </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               </button>
               {errors.pickupLocation && (
                 <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
@@ -465,21 +501,22 @@ const FormHorizontalBar = ({
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
                 Destination
+                {errors.dropOffLocation && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setDestinationModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
                   errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5]"
                 )}
               >
-                <span className={cn("text-lg", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
                   {dropOffLocation || "Where to?"}
                 </span>
-                <FiChevronRight className="w-5 h-5 text-gray-400" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               </button>
               {errors.dropOffLocation && (
                 <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
@@ -489,30 +526,31 @@ const FormHorizontalBar = ({
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="package" className="w-5 h-5 opacity-90" />
+                <img src={size} alt="package" className="w-4 h-4 opacity-90" />
                 Package Details
+                {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
-                  "w-full text-left py-3 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
                   errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   {packageName && weight && dimensions ? (
-                    <div className="space-y-1">
-                      <p className="text-lg text-[#1a1a1a] font-semibold">{packageName}</p>
-                      <p className="text-sm text-gray-600">
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-xs text-gray-600 truncate">
                         {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
                       </p>
                     </div>
                   ) : (
-                    <span className="text-lg text-[#9ca3af]">Select package, dimensions & weight</span>
+                    <span className="text-base text-[#9ca3af]">Select details</span>
                   )}
                 </div>
-                <FiChevronRight className="w-5 h-5 text-gray-400" />
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               </button>
               {(errors.packageTypeId || errors.weight) && (
                 <p className="text-xs text-red-500 mt-1">
@@ -521,12 +559,44 @@ const FormHorizontalBar = ({
               )}
             </div>
 
+            {/* Pickup - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <FiCalendar className="w-3.5 h-3.5 opacity-90" />
+                Pickup
+              </label>
+              <button
+                type="button"
+                onClick={() => setDateModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  pickupDate ? "border-amber-400" : "border-[#e5e5e5]"
+                )}
+              >
+                {pickupDate ? (
+                  <div className="flex-1 min-w-0">
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">
+                        {new Date(pickupDate.split(' ')[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {pickupDate.split(' ').slice(1).join(' ')}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-base text-[#9ca3af]">Select pickup</span>
+                )}
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              </button>
+            </div>
+
             {/* Get Quote Button */}
             <Button
               type="button"
               variant={"secondary"}
               size={"custom"}
-              className="w-full px-8 py-4 justify-center font-bold"
+              className="w-full px-6 py-3 justify-center font-bold text-sm"
               loading={isQuoteLoading}
               onClick={handleSubmit((data) => {
                 saveInputData(data);
@@ -544,17 +614,225 @@ const FormHorizontalBar = ({
                 ]);
               })}
             >
-              <FiSearch className="text-white mr-2" />
-              <span className="text-white">Get Quote</span>
+              <FiTruck className="text-white mr-1.5 w-4 h-4" />
+              <span className="text-white">Ship Now</span>
             </Button>
           </div>
         </form>
-      ) : (
-        // Compare Mode - Keep existing inline form
-        <div className="text-center py-8 text-gray-500">
-          Compare mode - Coming soon
-        </div>
-      )}
+      ) : activeMode === "compare" ? (
+        // Compare Mode with Modal Triggers (no Pickup Date)
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Desktop: Horizontal Grid with 3 fields (no pickup date) */}
+          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
+            {/* Pickup Location - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                Pickup Location
+                {!pickupLocation && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setPickupModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                )}
+              >
+                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                  {pickupLocation || "Where from?"}
+                </span>
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+              </button>
+              {errors.pickupLocation && (
+                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
+              )}
+            </div>
+
+            {/* Destination - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                Destination
+                {!dropOffLocation && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setDestinationModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                )}
+              >
+                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                  {dropOffLocation || "Where to?"}
+                </span>
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+              </button>
+              {errors.dropOffLocation && (
+                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
+              )}
+            </div>
+
+            {/* Package Details - Single Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={size} alt="package" className="w-5 h-5 opacity-90" />
+                Package Details
+                {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setPackageModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                )}
+              >
+                <div className="flex-1 min-w-0">
+                  {packageName && weight && dimensions ? (
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-base text-[#9ca3af]">Select details</span>
+                  )}
+                </div>
+                <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
+              </button>
+              {(errors.packageTypeId || errors.weight) && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.packageTypeId?.message || errors.weight?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Compare Button */}
+            <div className="flex gap-3 items-end min-w-[240px]">
+              <Button
+                type="button"
+                variant={"secondary"}
+                size={"custom"}
+                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
+                onClick={handleSubmit((data) => {
+                  saveInputData(data);
+                  setOpen(true); // Open SpecsModal for additional details
+                })}
+              >
+                <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
+                <span className="text-white">Compare</span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile: Vertical Stack with Modal Triggers (no pickup date) */}
+          <div className="lg:hidden space-y-4">
+            {/* Pickup Location - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                Pickup Location
+                {!pickupLocation && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setPickupModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
+                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5]"
+                )}
+              >
+                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                  {pickupLocation || "Where from?"}
+                </span>
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              </button>
+              {errors.pickupLocation && (
+                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
+              )}
+            </div>
+
+            {/* Destination - Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                Destination
+                {!dropOffLocation && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setDestinationModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
+                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5]"
+                )}
+              >
+                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                  {dropOffLocation || "Where to?"}
+                </span>
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              </button>
+              {errors.dropOffLocation && (
+                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
+              )}
+            </div>
+
+            {/* Package Details - Single Modal Trigger */}
+            <div>
+              <label className={cn(labelStyles, "flex items-center gap-2")}>
+                <img src={size} alt="package" className="w-4 h-4 opacity-90" />
+                Package Details
+                {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
+              </label>
+              <button
+                type="button"
+                onClick={() => setPackageModalOpen(true)}
+                className={cn(
+                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
+                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                )}
+              >
+                <div className="flex-1 min-w-0">
+                  {packageName && weight && dimensions ? (
+                    <div className="space-y-0.5">
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-xs text-gray-600 truncate">
+                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-base text-[#9ca3af]">Select details</span>
+                  )}
+                </div>
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              </button>
+              {(errors.packageTypeId || errors.weight) && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.packageTypeId?.message || errors.weight?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Compare Button */}
+            <Button
+              type="button"
+              variant={"secondary"}
+              size={"custom"}
+              className="w-full px-6 py-3 justify-center font-bold text-sm"
+              onClick={handleSubmit((data) => {
+                saveInputData(data);
+                setOpen(true); // Open SpecsModal for additional details
+              })}
+            >
+              <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
+              <span className="text-white">Compare</span>
+            </Button>
+          </div>
+        </form>
+      ) : null}
 
       {/* Specs Modal - only show for Compare mode */}
       {activeMode === "compare" && (
@@ -566,8 +844,8 @@ const FormHorizontalBar = ({
         />
       )}
 
-      {/* Direct Mode Modals */}
-      {activeMode === "gosendeet" && (
+      {/* Modals for Direct and Compare modes */}
+      {(activeMode === "gosendeet" || activeMode === "compare") && (
         <>
           <PickupLocationModal
             open={pickupModalOpen}
@@ -604,14 +882,17 @@ const FormHorizontalBar = ({
             }}
           />
 
-          <PickupDateModal
-            open={dateModalOpen}
-            onOpenChange={setDateModalOpen}
-            value={pickupDate || ""}
-            onSelect={(date) => {
-              setValue("pickupDate", date);
-            }}
-          />
+          {/* Pickup Date Modal - Only for Direct mode */}
+          {activeMode === "gosendeet" && (
+            <PickupDateModal
+              open={dateModalOpen}
+              onOpenChange={setDateModalOpen}
+              value={pickupDate || ""}
+              onSelect={(date) => {
+                setValue("pickupDate", date);
+              }}
+            />
+          )}
         </>
       )}
     </div>

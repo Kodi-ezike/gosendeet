@@ -19,10 +19,10 @@ const HeroOptionC = () => {
   ];
 
   const trustSignals = [
-    { icon: "✓", text: "Free to use", color: "from-emerald-400 to-emerald-500", clickable: false },
-    { icon: "✓", text: "50+ Carriers", color: "from-blue-400 to-blue-500", clickable: false },
-    { icon: "✓", text: "4.9★ Rating", color: "from-amber-400 to-amber-500", clickable: false },
-    { icon: "✓", text: "Real-time tracking", color: "from-purple-400 to-purple-500", clickable: false },
+    { icon: "✓", text: "Best Pricing", color: "from-emerald-400 to-emerald-500", clickable: false },
+    { icon: "✓", text: "Predictable Pickup", color: "from-blue-400 to-blue-500", clickable: false },
+    { icon: "✓", text: "Real-Time Notifications", color: "from-amber-400 to-amber-500", clickable: false },
+    { icon: "✓", text: "Verified Partners", color: "from-purple-400 to-purple-500", clickable: false },
   ];
 
   // Logo array for carousel
