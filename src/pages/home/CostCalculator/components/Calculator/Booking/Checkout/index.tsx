@@ -118,13 +118,17 @@ const Checkout = () => {
                 <div className="flex gap-2 items-start mb-4">
                   <input
                     type="checkbox"
-                    className="mt-1 h-4 w-4 rounded
+                    className="mt-1 h-5 w-5 rounded
                       appearance-none cursor-pointer
-                      border border-purple400
+                      border-2 border-purple400 bg-white
+                      hover:border-purple500 hover:bg-purple50
+                      transition-all duration-200
                       checked:bg-purple400 checked:border-purple400
+                      checked:hover:bg-purple500 checked:hover:border-purple500
                       checked:before:content-['✔']
                       checked:before:text-white checked:before:text-xs
-                      checked:before:flex checked:before:items-center checked:before:justify-center"
+                      checked:before:flex checked:before:items-center checked:before:justify-center
+                      shadow-sm focus:ring-2 focus:ring-purple400 focus:ring-offset-1"
                     onChange={(e) => setIsChecked(e.target.checked)}
                   />
                   <p className="text-sm">

@@ -9,6 +9,7 @@ import { statusClasses } from "@/constants";
 import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
 import OrderHistory from "@/pages/home/Track/Tracking/components/OrderHistory";
+import { TaskManagementSection } from "../TaskManagement";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -202,6 +203,13 @@ const OrderDetails = () => {
               </div>
             </div>
           </div>
+
+          <TaskManagementSection
+            bookingId={bookingData.id}
+            pickupAddress={data?.data?.pickupLocation}
+            dropoffAddress={data?.data?.destination}
+            trackingNumber={data?.data?.trackingNumber}
+          />
 
           <div>
             <div className="px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">

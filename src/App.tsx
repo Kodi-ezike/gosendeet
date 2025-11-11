@@ -26,6 +26,7 @@ import PrivateRoutes from "./lib/PrivateRoutes";
 import PublicRoutes from "./lib/PublicRoutes";
 import AdminRoutes from "./lib/AdminRoutes";
 import ErrorPage from "./pages/home/CostCalculator/components/Calculator/Booking/ErrorPage";
+import PublicDispatchPage from "./pages/dispatch/PublicDispatchPage";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
           <Route path="/success-page" element={<Confirmation />} />
           <Route path="/error-page" element={<ErrorPage />} />
           <Route path="/track-booking" element={<Tracking />} />
+          <Route path="/dispatch/:trackingId/:token" element={<PublicDispatchPage />} />
 
         <Route element={<PublicRoutes />}>
           <Route path="/signup" element={<Signup />} />
