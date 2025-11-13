@@ -69,13 +69,13 @@ const Login = () => {
   return (
     <AuthLayout>
       <div className="md:px-20 px-6 md:py-20 py-8">
-        <div className="xl:w-1/2 md:w-[80%] mx-auto bg-purple300 py-12 md:px-10 px-4">
+        <div className="xl:w-1/2 md:w-[80%] mx-auto bg-orange-50 py-12 md:px-10 px-4">
           <h1 className="lg:text-[40px] text-[30px] font-semibold font-clash mb-1">
             Welcome {username}
           </h1>
           <Link
             to={"/signin"}
-            className="text-purple500 border-b border-b-purple500 text-base"
+            className="text-orange500 border-b border-b-orange500 text-base"
           >
             Not you?
           </Link>
@@ -83,7 +83,7 @@ const Login = () => {
           <div className="py-4 text-sm mt-8">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <MdOutlineMailOutline className="text-purple400 text-2xl" />
+                <MdOutlineMailOutline className="text-orange400 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="email" className="font-clash font-semibold">
                     Email Address
@@ -105,7 +105,7 @@ const Login = () => {
               </div>
 
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <TbLockPassword className="text-purple400 text-2xl" />
+                <TbLockPassword className="text-orange400 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
                   <label
                     htmlFor="password"
@@ -122,7 +122,7 @@ const Login = () => {
                     />
 
                     <span
-                      className="cursor-pointer text-purple400 text-xl"
+                      className="cursor-pointer text-orange500 text-xl"
                       onClick={() => setToggle(!toggle)}
                     >
                       {toggle ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -136,22 +136,22 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex  items-center justify-between lg:text-base text-xs">
-                <div className="flex items-center md:gap-2 gap-1">
+              <div className="flex items-center justify-between lg:text-base text-xs">
+                {/* <div className="flex items-center md:gap-2 gap-1">
                   <input type="checkbox" name="" id="" className="mt-[1px]" />
                   <span>Remember me</span>
-                </div>
+                </div> */}
 
                 <Link
                   to={"/forgot-password"}
-                  className="text-purple500 border-b border-b-purple500"
+                  className="text-orange500 border-b border-b-orange500"
                 >
                   Forgot Password?
                 </Link>
               </div>
 
               <Button
-                variant={"secondary"}
+                // variant={"secondary"}
                 loading={isPending}
                 className=" w-full my-5"
               >

@@ -262,6 +262,7 @@
   --color-orange200: #ffd9b4;
   --color-orange300: #fe9b0e;
   --color-orange400: #ff8c1a;
+  --color-orange500: #f59e0b;
   --color-brown100: #573312;
   --color-green100: #F2FAF6;
   --color-green200: #C0E5D1;
@@ -290,4 +291,9 @@
 /* box-shadow: 0px 2px 20px 0px #0000000A; */
 
 
+}
+
+.bg-about{
+  background-image: url(/public/about-orange-bg.png);
+  background-size: cover;
 }

@@ -33,7 +33,7 @@ const Navbar = () => {
   // }, [userId]);
   return (
     <nav className="w-full z-20">
-      <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-white border-b border-b-neutral300">
+      <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-transparent">
         {/* Logo or Brand Name */}
         <div>
           <Link to="/">

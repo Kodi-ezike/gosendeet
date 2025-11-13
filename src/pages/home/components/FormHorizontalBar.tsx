@@ -1,5 +1,3 @@
-import size from "@/assets/icons/size.png";
-import location from "@/assets/icons/location.png";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -15,6 +13,8 @@ import { FiChevronRight, FiCalendar, FiTruck, FiBarChart2, FiSearch } from "reac
 import { AddressModal } from "./modals/AddressModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
+import { SlLocationPin } from "react-icons/sl";
+import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 
 interface FormHorizontalBarProps {
   variant?: "bold" | "minimal" | "floating";
@@ -266,7 +266,7 @@ const FormHorizontalBar = ({
             {/* Tracking Number Input - Spans 4 columns */}
             <div className="lg:col-span-4">
               <label htmlFor="trackingNumber" className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="tracking" className="w-5 h-5 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Tracking Number
               </label>
               <input
@@ -323,7 +323,7 @@ const FormHorizontalBar = ({
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Pickup Location
                 {errors.pickupLocation && <span className="text-red-500">*</span>}
               </label>
@@ -348,7 +348,7 @@ const FormHorizontalBar = ({
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Destination
                 {errors.dropOffLocation && <span className="text-red-500">*</span>}
               </label>
@@ -373,7 +373,7 @@ const FormHorizontalBar = ({
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="package" className="w-5 h-5 opacity-90" />
+                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
                 Package Details
                 {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
               </label>
@@ -473,7 +473,7 @@ const FormHorizontalBar = ({
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Pickup Location
                 {errors.pickupLocation && <span className="text-red-500">*</span>}
               </label>
@@ -498,7 +498,7 @@ const FormHorizontalBar = ({
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Destination
                 {errors.dropOffLocation && <span className="text-red-500">*</span>}
               </label>
@@ -523,7 +523,7 @@ const FormHorizontalBar = ({
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="package" className="w-4 h-4 opacity-90" />
+                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
                 Package Details
                 {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
               </label>
@@ -624,7 +624,7 @@ const FormHorizontalBar = ({
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Pickup Location
                 {!pickupLocation && <span className="text-red-500">*</span>}
               </label>
@@ -649,7 +649,7 @@ const FormHorizontalBar = ({
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-5 h-5 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Destination
                 {!dropOffLocation && <span className="text-red-500">*</span>}
               </label>
@@ -674,7 +674,7 @@ const FormHorizontalBar = ({
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="package" className="w-5 h-5 opacity-90" />
+                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
                 Package Details
                 {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
               </label>
@@ -743,7 +743,7 @@ const FormHorizontalBar = ({
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Pickup Location
                 {!pickupLocation && <span className="text-red-500">*</span>}
               </label>
@@ -768,7 +768,7 @@ const FormHorizontalBar = ({
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={location} alt="location" className="w-4 h-4 opacity-90" />
+                <SlLocationPin size={18} className="text-orange500"/>
                 Destination
                 {!dropOffLocation && <span className="text-red-500">*</span>}
               </label>
@@ -793,7 +793,7 @@ const FormHorizontalBar = ({
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <img src={size} alt="package" className="w-4 h-4 opacity-90" />
+                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
                 Package Details
                 {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
               </label>
