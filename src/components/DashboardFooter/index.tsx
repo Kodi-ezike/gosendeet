@@ -1,4 +1,4 @@
-import logo from "@/assets/images/gosendeet-black-logo.png";
+import logo from "@/assets/images/sendeet-black-logo.png";
 
 const DashboardFooter = () => {
   const currentYear = new Date().getFullYear();

@@ -268,7 +268,7 @@ export function PackageTypeModal({
           </div>
 
           {/* Step 2: Weight */}
-          <div className={cn("flex gap-3 relative mt-6 transition-opacity", !step1Complete && "opacity-30 pointer-events-none")}>
+          <div className={cn("flex gap-3 relative mt-6 transition-opacity", !step1Complete && "opacity-80 pointer-events-none")}>
             <div className="flex flex-col items-center">
               <StepIndicator stepNumber={2} isComplete={step2Complete} isActive={step1Complete && !step2Complete} />
               {/* Vertical connecting line */}
@@ -337,7 +337,7 @@ export function PackageTypeModal({
           </div>
 
           {/* Step 3: Insurance Value */}
-          <div className={cn("flex gap-3 mt-6 transition-opacity", !step2Complete && "opacity-30 pointer-events-none")}>
+          <div className={cn("flex gap-3 mt-6 transition-opacity", !step2Complete && "opacity-80 pointer-events-none")}>
             <StepIndicator stepNumber={3} isComplete={step3Complete} isActive={step2Complete && !step3Complete} />
 
             <div className="flex-1">

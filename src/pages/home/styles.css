@@ -334,6 +334,15 @@
   }
 }
 
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* Carousel Container with Shimmer Effect */
 .v3-carousel-container {
   position: relative;
@@ -406,7 +415,6 @@
 .v3-carousel-glow {
   animation: v3-carouselGlow 4s ease-in-out infinite;
   border-radius: 1rem;
-  padding: 1.5rem 0;
 }
 
 /* Responsive adjustments for carousel */

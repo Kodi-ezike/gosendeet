@@ -53,13 +53,20 @@ const CreateBooking = ({
   useClickAway(pickupRef, () => setOpenPickupSuggestions(false));
   useClickAway(destRef, () => setOpenDestSuggestions(false));
 
+  const nigeriaAutocompleteOptions = {
+    requestOptions: {
+      componentRestrictions: { country: "ng" as const },
+    },
+    debounce: 300,
+  };
+
   const {
     // ready,
     // value: pickupValue,
     suggestions: { status: pickupStatus, data: pickupSuggestions },
     setValue: setPickupValue,
     clearSuggestions: clearPickupSuggestions,
-  } = usePlacesAutocomplete();
+  } = usePlacesAutocomplete(nigeriaAutocompleteOptions);
 
   const {
     // ready: destReady,
@@ -67,7 +74,7 @@ const CreateBooking = ({
     suggestions: { status: destStatus, data: destSuggestions },
     setValue: setDestValue,
     clearSuggestions: clearDestSuggestions,
-  } = usePlacesAutocomplete();
+  } = usePlacesAutocomplete(nigeriaAutocompleteOptions);
 
   const {
     mutate: getQuotesDirectly,

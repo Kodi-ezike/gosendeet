@@ -4,18 +4,134 @@ import { useRef, useState, useEffect } from "react";
 import { FiMapPin, FiSearch } from "react-icons/fi";
 import usePlacesAutocomplete, { getDetails } from "use-places-autocomplete";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { AddressModalProps, ManualAddressData } from "@/types/forms";
 import { validateManualAddress } from "@/utils/form-validators";
+import { NIGERIAN_STATES_AND_CITIES } from "@/constants/nigeriaLocations";
+import { toast } from "sonner";
 
-// Allowed cities and their state mapping
-const CITY_STATE_MAP: Record<string, string> = {
-  'Lagos': 'Lagos State',
-  'Ibadan': 'Oyo State'
+const normalizeStateKey = (value: string) =>
+  value.toLowerCase().replace(/\s+/g, " ").replace(/\s*state$/, "").trim();
+
+const normalizeCityKey = (value: string) =>
+  value.toLowerCase().replace(/\s+/g, " ").trim();
+
+const STATE_CITY_MAP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string[]>>(
+  (acc, { state, cities }) => {
+    acc[state] = [...cities].sort((a, b) => a.localeCompare(b));
+    return acc;
+  },
+  {}
+);
+
+const STATE_LOOKUP = Object.keys(STATE_CITY_MAP).reduce<Record<string, string>>(
+  (acc, state) => {
+    acc[normalizeStateKey(state)] = state;
+    return acc;
+  },
+  {}
+);
+
+const CITY_STATE_MAP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string>>(
+  (acc, { state, cities }) => {
+    cities.forEach((city) => {
+      acc[city] = state;
+    });
+    return acc;
+  },
+  {}
+);
+
+const NORMALIZED_CITY_LOOKUP = Object.keys(CITY_STATE_MAP).reduce<
+  Record<string, string>
+>((acc, city) => {
+  acc[normalizeCityKey(city)] = city;
+  return acc;
+}, {});
+
+const STATE_OPTIONS = Object.keys(STATE_CITY_MAP).sort((a, b) =>
+  a.localeCompare(b)
+);
+
+const ALL_CITIES = Object.keys(CITY_STATE_MAP).sort((a, b) =>
+  a.localeCompare(b)
+);
+
+const DELIVERY_RESTRICTION_MESSAGE =
+  "We currently only available in  Lagos State and Ibadan, Oyo.";
+
+const isLagosState = (state?: string) =>
+  normalizeStateKey(state || "") === "lagos";
+
+const isOyoState = (state?: string) =>
+  normalizeStateKey(state || "") === "oyo";
+
+const isIbadanCity = (city?: string) =>
+  normalizeCityKey(city || "").startsWith("ibadan");
+
+const resolveStateForValidation = (state?: string, city?: string) => {
+  if (state) return state;
+  if (!city) return "";
+  const normalizedCity = normalizeCityKey(city);
+  const canonicalCity = NORMALIZED_CITY_LOOKUP[normalizedCity];
+  return canonicalCity ? CITY_STATE_MAP[canonicalCity] : "";
 };
 
-const ALLOWED_CITIES = Object.keys(CITY_STATE_MAP);
-const ALLOWED_STATES = Object.values(CITY_STATE_MAP);
+const isDeliveryLocationAllowed = (state?: string, city?: string) => {
+  const resolvedState = resolveStateForValidation(state, city);
+
+  if (isLagosState(resolvedState)) {
+    return true;
+  }
+
+  if (isOyoState(resolvedState)) {
+    return isIbadanCity(city);
+  }
+
+  return false;
+};
+
+const resolveStateValue = (value?: string) => {
+  if (!value) return "";
+  return STATE_LOOKUP[normalizeStateKey(value)] || "";
+};
+
+const resolveCityValue = (city?: string, state?: string) => {
+  if (!city) return "";
+  const normalizedCity = normalizeCityKey(city);
+  const canonical = NORMALIZED_CITY_LOOKUP[normalizedCity];
+
+  if (canonical) {
+    return canonical;
+  }
+
+  const canonicalState = state ? STATE_LOOKUP[normalizeStateKey(state)] : undefined;
+
+  if (canonicalState && STATE_CITY_MAP[canonicalState]) {
+    const fromState = STATE_CITY_MAP[canonicalState].find(
+      (stateCity) => normalizeCityKey(stateCity) === normalizedCity
+    );
+
+    if (fromState) {
+      return fromState;
+    }
+  }
+
+  return city;
+};
+
+const getCityOptions = (state?: string) => {
+  if (state && STATE_CITY_MAP[state]) {
+    return [...STATE_CITY_MAP[state]];
+  }
+  return [...ALL_CITIES];
+};
 
 /**
  * Unified AddressModal - Replaces PickupLocationModal and DestinationModal
@@ -146,30 +262,18 @@ export function AddressModal({
     if (neighborhood) streetParts.push(neighborhood);
 
     const fullStreet = streetParts.join(', ');
-
-    // Validate that city is within our allowed values
-    if (city && !ALLOWED_CITIES.includes(city)) {
-      if (state.includes('Lagos')) {
-        city = 'Lagos';
-      } else if (state.includes('Oyo')) {
-        city = 'Ibadan';
-      }
-    }
-
-    // Ensure state matches our format
-    if (state && !ALLOWED_STATES.includes(state)) {
-      if (state.includes('Lagos')) {
-        state = 'Lagos State';
-      } else if (state.includes('Oyo')) {
-        state = 'Oyo State';
-      }
-    }
+    const canonicalState = resolveStateValue(state);
+    const normalizedCity = resolveCityValue(city, canonicalState || state);
+    const resolvedState =
+      canonicalState ||
+      (normalizedCity ? CITY_STATE_MAP[normalizedCity] : '') ||
+      state;
 
     return {
       street: fullStreet,
       apartment: '', // Leave empty for user to fill
-      city,
-      state,
+      city: normalizedCity,
+      state: resolvedState,
     };
   };
 
@@ -191,7 +295,13 @@ export function AddressModal({
 
       if (typeof details !== 'string' && details.address_components) {
         const parsed = parseAddressComponents(details.address_components);
-        setManualAddress({ ...manualAddress, ...parsed });
+
+        if (!isDeliveryLocationAllowed(parsed.state, parsed.city)) {
+          toast.error(DELIVERY_RESTRICTION_MESSAGE);
+        } else {
+          setManualAddress((prev) => ({ ...prev, ...parsed }));
+        }
+
         setSearchValue('');
       }
     } catch (error) {
@@ -203,17 +313,50 @@ export function AddressModal({
   };
 
   const handleCityChange = (city: string) => {
-    setManualAddress({
-      ...manualAddress,
+    const resolvedState = CITY_STATE_MAP[city] || manualAddress.state;
+
+    if (!isDeliveryLocationAllowed(resolvedState, city)) {
+      toast.error(DELIVERY_RESTRICTION_MESSAGE);
+      return;
+    }
+
+    setManualAddress((prev) => ({
+      ...prev,
       city,
-      state: CITY_STATE_MAP[city]
-    });
+      state: CITY_STATE_MAP[city] || prev.state,
+    }));
   };
 
   const handleStateChange = (state: string) => {
-    setManualAddress({
-      ...manualAddress,
-      state
+    if (!isLagosState(state) && !isOyoState(state)) {
+      toast.error(DELIVERY_RESTRICTION_MESSAGE);
+      return;
+    }
+
+    setManualAddress((prev) => {
+      if (isOyoState(state)) {
+        const ibadanOption =
+          (STATE_CITY_MAP[state] || []).find((city) => isIbadanCity(city)) ||
+          prev.city ||
+          "Ibadan";
+
+        return {
+          ...prev,
+          state,
+          city: isIbadanCity(prev.city) ? prev.city : ibadanOption,
+        };
+      }
+
+      const canonicalCityKey = NORMALIZED_CITY_LOOKUP[normalizeCityKey(prev.city)] || "";
+      const cityState = canonicalCityKey ? CITY_STATE_MAP[canonicalCityKey] : "";
+      const cityBelongsToLagos =
+        cityState && normalizeStateKey(cityState) === "lagos";
+
+      return {
+        ...prev,
+        state,
+        city: cityBelongsToLagos || !prev.city ? prev.city : "",
+      };
     });
   };
 
@@ -236,14 +379,33 @@ export function AddressModal({
     });
   };
 
-  const isFormValid = manualAddress.street.trim() &&
-                      manualAddress.apartment.trim() &&
-                      manualAddress.city.trim() &&
-                      manualAddress.state.trim();
+  const hasRequiredFields =
+    manualAddress.street.trim() &&
+    manualAddress.apartment.trim() &&
+    manualAddress.city.trim() &&
+    manualAddress.state.trim();
+
+  const isLocationServiceable = isDeliveryLocationAllowed(
+    manualAddress.state,
+    manualAddress.city
+  );
+
+  const isFormValid = Boolean(hasRequiredFields) && isLocationServiceable;
 
   // Type-specific content
   const title = type === 'pickup' ? 'Pickup Location' : 'Destination';
   const buttonText = type === 'pickup' ? 'Confirm Pickup Address' : 'Confirm Destination Address';
+
+  const stateOptions =
+    manualAddress.state && !STATE_OPTIONS.includes(manualAddress.state)
+      ? [...STATE_OPTIONS, manualAddress.state]
+      : STATE_OPTIONS;
+
+  const baseCityOptions = getCityOptions(manualAddress.state);
+  const cityOptions =
+    manualAddress.city && !baseCityOptions.includes(manualAddress.city)
+      ? [...baseCityOptions, manualAddress.city]
+      : baseCityOptions;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -308,10 +470,10 @@ export function AddressModal({
             />
           </div>
 
-          {/* Apartment/Unit Number */}
+          {/* Apartment/House Number */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-              Apartment/Unit Number <span className="text-red-500">*</span>
+              Apartment/House Number <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -334,9 +496,12 @@ export function AddressModal({
               <SelectTrigger className="w-full py-2 px-3 text-sm border-2 border-gray-200 rounded-xl focus:border-amber-400">
                 <SelectValue placeholder="Select city" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Lagos">Lagos</SelectItem>
-                <SelectItem value="Ibadan">Ibadan</SelectItem>
+              <SelectContent className="max-h-64">
+                {cityOptions.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -353,9 +518,12 @@ export function AddressModal({
               <SelectTrigger className="w-full py-2 px-3 text-sm border-2 border-gray-200 rounded-xl focus:border-amber-400">
                 <SelectValue placeholder="Select state" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Lagos State">Lagos State</SelectItem>
-                <SelectItem value="Oyo State">Oyo State</SelectItem>
+              <SelectContent className="max-h-64">
+                {stateOptions.map((state) => (
+                  <SelectItem key={state} value={state}>
+                    {state}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

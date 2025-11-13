@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MENU } from "../../constants";
-import logo from "@/assets/images/gosendeet-logo.png";
+import logo from "@/assets/images/sendeet-logo.png";
 import { HiBars3 } from "react-icons/hi2";
 import { GoX } from "react-icons/go";
 // import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
@@ -33,11 +33,11 @@ const Navbar = () => {
   // }, [userId]);
   return (
     <nav className="w-full z-20">
-      <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-transparent">
+      <div className="flex justify-between items-center py-3 lg:py-5 xl:px-30 md:px-20 px-6 bg-transparent">
         {/* Logo or Brand Name */}
         <div>
           <Link to="/">
-            <img src={logo} alt="logo" className="" />
+            <img src={logo} alt="logo" className="h-8 md:h-10 lg:h-12 w-auto" />
           </Link>
         </div>
 
@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="lg:hidden flex items-center gap-4">
           {authToken === null ? (
             <Link to="/signin">
-              <button className="bg-neutral200  hover:bg-black hover:text-white border px-5 py-2 text-black rounded-3xl">
+              <button className="bg-neutral200 hover:bg-black hover:text-white border px-3 py-1.5 md:px-5 md:py-2 text-sm text-black rounded-3xl">
                 Log In
               </button>
             </Link>
