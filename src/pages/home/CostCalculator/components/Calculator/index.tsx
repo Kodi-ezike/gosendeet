@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import FormHorizontalBar from "@/pages/home/components/FormHorizontalBar";
 import empty from "@/assets/images/white-empty.png";
 import Rating from "@/components/Rating";
-import { FiCalendar, FiTruck, FiMapPin, FiFilter, FiX, FiPackage } from "react-icons/fi";
+import { FiCalendar, FiTruck, FiFilter, FiX, FiPackage } from "react-icons/fi";
 import { SiFedex, SiDhl, SiUps } from "react-icons/si";
 import { cn } from "@/lib/utils";
 import {
@@ -183,7 +183,7 @@ const Calculator = () => {
         </SelectContent>
       </Select> */}
       {(!data?.data || data?.data?.length === 0) && (
-        <div className="flex flex-col items-center justify-center mt-4 max-w-2xl mx-auto">
+        <div className="flex flex-col items-center justify-center mt-20 max-w-2xl mx-auto">
           <img src={empty} alt="empty quotes" className="h-[200px]" />
 
           <p className="text-center font-bold text-amber-600 text-lg mb-1">

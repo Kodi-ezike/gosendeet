@@ -1,21 +1,19 @@
-import admission from "@/assets/icons/admission.png";
-import simple from "@/assets/icons/simple.png";
 import phone from "@/assets/images/phone-delivery.png";
 import box from "@/assets/images/logistics-box.png";
 import close from "@/assets/images/close-delivery.png";
-import purple from "@/assets/icons/purple-checkmark.png";
+import { LuFileCheck } from "react-icons/lu";
+import { SiPrivatedivision } from "react-icons/si";
+import { FaCircleCheck } from "react-icons/fa6";
+import { motion } from "framer-motion";
 
 const Mission = () => {
   return (
     <div className="md:px-20 px-6 py-10">
       <div className="flex lg:flex-row flex-col lg:gap-4 gap-8 justify-between items-center mb-8">
         <div className="lg:w-1/2">
-          <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
-            <img
-              src={admission}
-              alt="admission"
-              className="w-[18px] h-[18px]"
-            />
+          <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-orange-50 text-orange500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
+          
+            <LuFileCheck size={18}/>
             <span>Our Mission</span>
           </p>
           <p className="leading-[140%] lg:w-[90%]">
@@ -32,8 +30,9 @@ const Mission = () => {
       </div>
       <div className="flex lg:flex-row-reverse flex-col lg:gap-4 gap-8 justify-between items-center">
         <div className="lg:w-1/2">
-          <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-purple300 text-purple500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
-            <img src={simple} alt="simple" className="w-[18px] h-[18px]" />
+          <p className="flex items-center gap-2 rounded-full font-clash font-semibold bg-orange-50 text-orange500 w-fit px-4 py-2 mb-6 text-[18px] leading-[140%]">
+            <SiPrivatedivision />
+
             <span>Our Vision</span>
           </p>
           <p className="leading-[140%] lg:w-[90%]">
@@ -49,8 +48,8 @@ const Mission = () => {
         </div>
       </div>
       <div className="grid md:grid-cols-2 lg:gap-8 gap-6 py-20">
-        <div className="text-center bg-purple300 lg:p-12 p-4">
-          <img src={purple} alt="purple" className="mx-auto mb-3" />
+        <div className="text-center bg-orange-50 lg:p-12 p-4 rounded-3xl">
+          <FaCircleCheck size={40} className="text-orange500 mx-auto mb-3"/>
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             Wide Range of Courier Service
           </p>
@@ -59,8 +58,8 @@ const Mission = () => {
             delivery organizations.
           </p>
         </div>
-        <div className="text-center bg-purple300 lg:p-12 p-4">
-          <img src={purple} alt="purple" className="mx-auto mb-3" />
+        <div className="text-center bg-orange-50 lg:p-12 p-4 rounded-3xl">
+          <FaCircleCheck size={40} className="text-orange500 mx-auto mb-3"/>
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             Competitive Price at a View{" "}
           </p>
@@ -69,8 +68,8 @@ const Mission = () => {
             you always get the best deal.
           </p>
         </div>
-        <div className="text-center bg-purple300 lg:p-12 p-4">
-          <img src={purple} alt="purple" className="mx-auto mb-3" />
+        <div className="text-center bg-orange-50 lg:p-12 p-4 rounded-3xl">
+          <FaCircleCheck size={40} className="text-orange500 mx-auto mb-3"/>
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             No More Multiple Registrations
           </p>
@@ -79,8 +78,8 @@ const Mission = () => {
             accounts.
           </p>
         </div>
-        <div className="text-center bg-purple300 lg:p-12 p-4">
-          <img src={purple} alt="purple" className="mx-auto mb-3" />
+        <div className="text-center bg-orange-50 lg:p-12 p-4 rounded-3xl">
+          <FaCircleCheck size={40} className="text-orange500 mx-auto mb-3"/>
           <p className="text-[18px] leading-[140%] font-semibold font-clash mb-2">
             All-in-One Convenience
           </p>
@@ -94,7 +93,7 @@ const Mission = () => {
         <div className="lg:w-1/2">
           <img src={phone} alt="phone" />
         </div>
-        <div className="lg:w-1/2 min-h-full p-8 bg-purple300 flex flex-col justify-center">
+        <div className="lg:w-1/2 min-h-full p-8 bg-orange-50 flex flex-col justify-center rounded-3xl">
           <p className=" font-clash font-semibold mb-2 md:text-[32px] text-2xl leading-[130%]">
             We are committed to
           </p>
@@ -103,9 +102,17 @@ const Mission = () => {
             services you need into one easy-to-use platform. Join us as we
             simplify logistics and help you focus on what truly matters.
           </p>
-          <button className="w-fit mt-8 bg-black hover:bg-black/80 hover:text-white px-5 py-2 text-white rounded-full">
-            Get started now
-          </button>
+        
+          <motion.div
+          className="mt-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <button className="px-10 py-3 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold text-lg shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-amber-500/40">
+Get started now          </button>
+        </motion.div>
         </div>
       </div>
     </div>

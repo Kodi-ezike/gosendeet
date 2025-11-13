@@ -79,7 +79,7 @@ const Signup = () => {
   return (
     <AuthLayout>
       <div className="md:px-20 px-6 md:py-20 py-8">
-        <div className="xl:w-1/2 md:w-[80%] mx-auto bg-purple300 py-12 md:px-10 px-4">
+        <div className="xl:w-1/2 md:w-[80%] mx-auto bg-orange-50 py-12 md:px-10 px-4 rounded-3xl">
           <h1 className="lg:text-[40px] text-[30px] font-semibold font-clash mb-1">
             Sign up
           </h1>
@@ -87,7 +87,7 @@ const Signup = () => {
           <div className="py-4 text-sm mt-8">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <MdOutlinePersonOutline className="text-purple400 text-[25px]" />
+                <MdOutlinePersonOutline className="text-orange500 text-[25px]" />
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="details" className="font-clash font-semibold">
                     Username
@@ -107,7 +107,7 @@ const Signup = () => {
               </div>
 
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <MdOutlineMailOutline className="text-purple400 text-2xl" />
+                <MdOutlineMailOutline className="text-orange500 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
                   <label htmlFor="details" className="font-clash font-semibold">
                     Email Address
@@ -127,7 +127,7 @@ const Signup = () => {
               </div>
 
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <TbLockPassword className="text-purple400 text-2xl" />
+                <TbLockPassword className="text-orange500 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
                   <label
                     htmlFor="password"
@@ -144,7 +144,7 @@ const Signup = () => {
                     />
 
                     <span
-                      className="cursor-pointer text-purple400 text-xl"
+                      className="cursor-pointer text-orange500 text-xl"
                       onClick={() => setToggle(!toggle)}
                     >
                       {toggle ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -159,7 +159,7 @@ const Signup = () => {
               </div>
 
               <div className="flex gap-3 items-center py-3 md:px-4 border-b mb-5">
-                <TbLockPassword className="text-purple400 text-2xl" />
+                <TbLockPassword className="text-orange500 text-2xl" />
                 <div className="flex flex-col gap-2 w-full">
                   <label
                     htmlFor="confirm_password"
@@ -176,7 +176,7 @@ const Signup = () => {
                     />
 
                     <span
-                      className="cursor-pointer text-purple400 text-xl"
+                      className="cursor-pointer text-orange500 text-xl"
                       onClick={() => setToggle(!toggle)}
                     >
                       {toggle ? <FaRegEye /> : <FaRegEyeSlash />}
@@ -191,7 +191,7 @@ const Signup = () => {
               </div>
 
               <Button
-                variant={"secondary"}
+                // variant={"secondary"}
                 loading={isPending}
                 className=" w-full my-1"
               >
@@ -200,7 +200,7 @@ const Signup = () => {
             </form>
             <Button
               variant={"outline"}
-              className="border-neutral500 bg-transparent w-full mt-5 mb-4 hover:bg-purple200"
+              className="border-neutral500 bg-transparent w-full mt-5 mb-4 hover:bg-white hover:border-0"
               onClick={() => googleMutation()}
             >
               <img src={google} alt="google" className="w-[20px]" />
