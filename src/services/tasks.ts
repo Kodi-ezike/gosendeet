@@ -1,4 +1,5 @@
 import { api } from "./axios";
+import { throwApiError } from "@/lib/errorHandling";
 
 export type TaskType = "PICKUP" | "DROPOFF" | "IN_HUB";
 export type TaskStatus =
@@ -127,26 +128,6 @@ type BasicResponse = {
   [key: string]: unknown;
 };
 
-const unwrapError = (error: unknown): never => {
-  if (typeof error === "object" && error !== null) {
-    const withResponse = error as { response?: { data?: unknown } };
-    if (withResponse.response?.data) {
-      throw withResponse.response.data;
-    }
-
-    const withMessage = error as { message?: unknown };
-    if (typeof withMessage.message === "string" && withMessage.message.trim()) {
-      throw { message: withMessage.message };
-    }
-  }
-
-  if (typeof error === "string" && error.trim()) {
-    throw { message: error };
-  }
-
-  throw { message: "Something went wrong" };
-};
-
 export const getTasksByBooking = async (
   bookingId: string
 ): Promise<ApiEnvelope<TaskDto[]>> => {
@@ -156,7 +137,7 @@ export const getTasksByBooking = async (
     );
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -169,7 +150,7 @@ export const getTasksByCompany = async (
     );
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -180,7 +161,7 @@ export const createTasks = async (
     const res = await api.post<ApiEnvelope<TaskDto[]>>(`/tasks`, payload);
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -191,7 +172,7 @@ export const assignTasks = async (
     const res = await api.post<BasicResponse>(`/tasks/assign`, payload);
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -206,7 +187,7 @@ export const updateTask = async (
     );
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -215,7 +196,7 @@ export const deleteTask = async (taskId: string): Promise<BasicResponse> => {
     const res = await api.delete<BasicResponse>(`/tasks/${taskId}`);
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -228,7 +209,7 @@ export const previewDispatch = async (
     );
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
 
@@ -241,6 +222,6 @@ export const dispatchBooking = async (
     );
     return res.data;
   } catch (error: unknown) {
-    unwrapError(error);
+    return throwApiError(error);
   }
 };
