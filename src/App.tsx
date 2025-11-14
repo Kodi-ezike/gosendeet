@@ -26,9 +26,15 @@ import PrivateRoutes from "./lib/PrivateRoutes";
 import PublicRoutes from "./lib/PublicRoutes";
 import AdminRoutes from "./lib/AdminRoutes";
 import ErrorPage from "./pages/home/CostCalculator/components/Calculator/Booking/ErrorPage";
+import PublicDispatchPage from "./pages/dispatch/PublicDispatchPage";
+import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
 
 function App() {
   return (
+    <>
+    <TawkMessengerReact
+                propertyId="69160ce5a373f9195a3a09e0"
+                widgetId="1j9v24p05"/>
     <Router>
       <Routes>
           <Route path="/" element={<Home />} />
@@ -41,6 +47,7 @@ function App() {
           <Route path="/success-page" element={<Confirmation />} />
           <Route path="/error-page" element={<ErrorPage />} />
           <Route path="/track-booking" element={<Tracking />} />
+          <Route path="/dispatch/:trackingId/:token" element={<PublicDispatchPage />} />
 
         <Route element={<PublicRoutes />}>
           <Route path="/signup" element={<Signup />} />
@@ -70,6 +77,7 @@ function App() {
 
       </Routes>
     </Router>
+    </>
   );
 }
 

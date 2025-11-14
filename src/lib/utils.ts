@@ -192,3 +192,51 @@ export function formatStatus(status: string) {
     .replace(/_/g, " ") // replace underscores with spaces
     .replace(/\b\w/g, (char) => char.toUpperCase()); // capitalize each word
 }
+
+export const toDateTimeLocalInput = (value?: string | null) => {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "";
+
+  const offset = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - offset * 60000);
+
+  return local.toISOString().slice(0, 16);
+};
+
+export const toISOFromLocalInput = (value?: string | null) => {
+  if (!value) return undefined;
+
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return undefined;
+
+  return date.toISOString();
+};
+
+export const getErrorMessage = (
+  error: unknown,
+  fallback = "Something went wrong"
+) => {
+  if (typeof error === "string" && error.trim().length > 0) {
+    return error;
+  }
+
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const maybeMessage = (error as { message?: unknown }).message;
+    if (typeof maybeMessage === "string" && maybeMessage.trim().length > 0) {
+      return maybeMessage;
+    }
+  }
+
+  return fallback;
+};
+
+export const formatToDatetimeLocal = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
