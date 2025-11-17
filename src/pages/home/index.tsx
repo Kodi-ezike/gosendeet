@@ -1,21 +1,25 @@
-import Layout from "@/layouts/HomePageLayout"
-import Header from "./landing/Header"
-import Tracking from "./landing/Tracking"
-import Schedule from "./landing/Schedule"
-import CarouselPage from "./landing/ScheduleCarousel"
-import FAQ from "./landing/FAQ"
+import Layout from "@/layouts/HomePageLayout";
+import Hero from "./Hero";
+import ProcessFlow from "./ProcessFlow";
+import ServicesMinimal from "./ServicesMinimal";
+import Benefits from "./Benefits";
+import TestimonialsV3 from "./TestimonialsV3";
+import FAQMinimal from "./FAQMinimal";
+import "./styles.css";
 
 const Home = () => {
   return (
-    
-    <Layout>
-        <Header/>
-        <Tracking/>
-        <Schedule/>
-        <CarouselPage/>
-        <FAQ/>
-    </Layout>
-  )
-}
+    <div className="v3-minimal-theme">
+      <Layout>
+        <Hero />
+        <ProcessFlow />
+        <ServicesMinimal />
+        <Benefits />
+        <TestimonialsV3 />
+        <FAQMinimal />
+      </Layout>
+    </div>
+  );
+};
 
-export default Home
+export default Home;

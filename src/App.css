@@ -1,10 +1,4 @@
-.homepage-header {
-  background: linear-gradient(0deg, #f9f8ff, #f9f8ff),
-    linear-gradient(89.75deg, #f9f8ff 0.3%, #fdf4f2 99.86%);
-}
-.bg-line {
-  background-image: url("../public/line.png");
-}
-.bg-about {
-  background-image: url("../public/about-bg.png");
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
 }

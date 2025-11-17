@@ -133,7 +133,7 @@ const Checkout = () => {
                   />
                   <p className="text-sm">
                     By clicking this, I acknowledge that I have read and agree
-                    with GoSendeet terms.
+                    with Sendeet terms.
                   </p>
                 </div>
 

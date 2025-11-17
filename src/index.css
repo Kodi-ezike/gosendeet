@@ -143,6 +143,88 @@
   input:-webkit-autofill:focus {
     box-shadow: 0 0 0 1000px transparent inset !important;
   }
+
+  /* Micro-interaction utilities */
+  .hover-lift {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .hover-lift-subtle {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .hover-lift-subtle:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover-light);
+  }
+
+  .hover-glow {
+    transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 0 3px rgba(113, 78, 255, 0.1);
+    border-color: var(--color-purple400);
+  }
+
+  .hover-scale {
+    transition: transform var(--transition-base);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-scale-sm {
+    transition: transform var(--transition-fast);
+  }
+
+  .hover-scale-sm:hover {
+    transform: scale(1.01);
+  }
+
+  .transition-smooth {
+    transition: all var(--transition-base);
+  }
+
+  .transition-fast {
+    transition: all var(--transition-fast);
+  }
+
+  /* Button icon slide animation */
+  .btn-icon-slide {
+    transition: transform var(--transition-base);
+  }
+
+  button:hover .btn-icon-slide,
+  a:hover .btn-icon-slide {
+    transform: translateX(4px);
+  }
+
+  /* Card hover effect */
+  .card-interactive {
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+
+  .card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  /* Input focus animation */
+  .input-focus {
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .input-focus:focus {
+    border-color: var(--color-purple400);
+    box-shadow: 0 0 0 3px rgba(113, 78, 255, 0.1);
+  }
 }
 
 
@@ -180,6 +262,7 @@
   --color-orange200: #ffd9b4;
   --color-orange300: #fe9b0e;
   --color-orange400: #ff8c1a;
+  --color-orange500: #f59e0b;
   --color-brown100: #573312;
   --color-green100: #F2FAF6;
   --color-green200: #C0E5D1;
@@ -192,13 +275,26 @@
   --shadow-deliveryShadow: 2px 4px 44.7px 0px #e0d8ffb2;
   --shadow-scheduleShadow: 0px 1px 20.9px 0px #714eff1a;
   --shadow-faqShadow: 0px 8px 32px 0px #00000014;
+  --shadow-hover: 0 10px 30px rgba(67, 47, 156, 0.2);
+  --shadow-hover-light: 0 4px 20px rgba(67, 47, 156, 0.15);
 
-  --spacing-130: 130%; 
-  --spacing-140: 140%; 
+  --spacing-130: 130%;
+  --spacing-140: 140%;
 
-  --text-md: 18px
+  --text-md: 18px;
+
+  /* Transition timing variables for micro-interactions */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 300ms ease-out;
+  --transition-slow: 500ms ease-out;
 
 /* box-shadow: 0px 2px 20px 0px #0000000A; */
 
 
+}
+
+.bg-about{
+  background-image: url(/public/about-bg.png);
+  background-size: cover;
+  background-position: center;
 }

@@ -53,13 +53,20 @@ const CreateBooking = ({
   useClickAway(pickupRef, () => setOpenPickupSuggestions(false));
   useClickAway(destRef, () => setOpenDestSuggestions(false));
 
+  const nigeriaAutocompleteOptions = {
+    requestOptions: {
+      componentRestrictions: { country: "ng" as const },
+    },
+    debounce: 300,
+  };
+
   const {
     // ready,
     // value: pickupValue,
     suggestions: { status: pickupStatus, data: pickupSuggestions },
     setValue: setPickupValue,
     clearSuggestions: clearPickupSuggestions,
-  } = usePlacesAutocomplete();
+  } = usePlacesAutocomplete(nigeriaAutocompleteOptions);
 
   const {
     // ready: destReady,
@@ -67,7 +74,7 @@ const CreateBooking = ({
     suggestions: { status: destStatus, data: destSuggestions },
     setValue: setDestValue,
     clearSuggestions: clearDestSuggestions,
-  } = usePlacesAutocomplete();
+  } = usePlacesAutocomplete(nigeriaAutocompleteOptions);
 
   const {
     mutate: getQuotesDirectly,
@@ -246,7 +253,7 @@ const CreateBooking = ({
             )}
           >
             <div className="w-full">
-              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full transition-colors hover:border-purple300">
                 <img src={location} alt="location" className="w-[18px]" />
                 <div
                   ref={pickupRef}
@@ -299,7 +306,7 @@ const CreateBooking = ({
               )}
             </div>
             <div className="w-full">
-              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full transition-colors hover:border-purple300">
                 <img src={location} alt="location" className="w-[18px]" />
                 <div
                   ref={destRef}
@@ -354,7 +361,7 @@ const CreateBooking = ({
               )}
             </div>
             <div className="w-full">
-              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full transition-colors hover:border-purple300">
                 <img src={size} alt="size" className="w-[18px]" />
                 <div className="flex flex-col gap-2 w-full">
                   <label
@@ -393,7 +400,7 @@ const CreateBooking = ({
               )}
             </div>
             <div className="w-full">
-              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full">
+              <div className="flex gap-3 items-center py-2 md:px-4 border-b w-full transition-colors hover:border-purple300">
                 <img src={size} alt="size" className="w-[18px]" />
                 <div className="flex flex-col gap-2 w-full">
                   <label
@@ -420,12 +427,12 @@ const CreateBooking = ({
             </div>
           </div>
 
-          <div className="flex md:gap-4 gap-3 mt-4">
+          <div className="flex flex-col gap-3 mt-4">
             <Button
               type="button"
               variant={"secondary"}
               size={"custom"}
-              className=" md:px-6 px-2 "
+              className="w-full md:px-6 px-2"
               loading={isQuoteLoading}
               onClick={handleSubmit((data) => {
                 // form is valid ✅ - get quote directly
@@ -444,21 +451,21 @@ const CreateBooking = ({
                 ]);
               })}
             >
-              <FiSearch className="text-white" />
+              <FiSearch className="text-white transition-transform" />
               <span className="text-white">Quick Quote</span>
             </Button>
 
             <Button
               type="button"
               size={"custom"}
-              className="bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
+              className="w-full bg-gray-200 hover:bg-gray-300 md:px-6 px-2 outline-gray-200"
               onClick={handleSubmit((data) => {
                 // form is valid ✅ - open modal for additional options
                 saveInputData(data);
                 setOpen(true);
               })}
             >
-              <FiPlus className="text-gray-700" />
+              <FiPlus className="text-gray-700 transition-transform" />
               <span className="text-gray-700">More Options</span>
             </Button>
           </div>
