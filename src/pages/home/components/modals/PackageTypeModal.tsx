@@ -212,7 +212,15 @@ export function PackageTypeModal({
                         "w-8 h-8 rounded mb-1 flex items-center justify-center",
                         isSelected ? "bg-amber-100" : "bg-gray-100"
                       )}>
-                        <img src={packageIcon} alt={pkg.name} className="w-5 h-5 object-contain" />
+                        <img
+                          src={pkg.imageUrl || packageIcon}
+                          alt={pkg.name}
+                          className="w-5 h-5 object-contain"
+                          onError={(e) => {
+                            // Fallback to default icon if custom image fails to load
+                            (e.target as HTMLImageElement).src = packageIcon;
+                          }}
+                        />
                       </div>
 
                       <h4 className={cn(
