@@ -36,23 +36,16 @@ const DispatchPreviewDialog = ({
     DispatchResponse["summary"] | null
   >(null);
 
-  const { data, isLoading, isError, refetch } = useDispatchPreview(
+  const { data, isPending: isLoadingPreview, isError, refetch } = useDispatchPreview(
     bookingId,
     { enabled: open }
   );
 
-  const preview: DispatchPreviewData | undefined = (() => {
-    if (!data) return undefined;
-    if (typeof data === "object" && "data" in data) {
-      const maybeEnvelope = data as { data?: DispatchPreviewData };
-      if (maybeEnvelope.data) {
-        return maybeEnvelope.data;
-      }
-    }
-    return data as DispatchPreviewData;
-  })();
+  // Handle both wrapped and unwrapped API responses
+  const preview: DispatchPreviewData | undefined =
+    data?.data ?? (data as DispatchPreviewData | undefined);
 
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending: isDispatching } = useMutation({
     mutationFn: () => dispatchBooking(bookingId),
     onSuccess: (response) => {
       toast.success(response?.message ?? "Dispatch completed");
@@ -79,7 +72,7 @@ const DispatchPreviewDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {isLoading && (
+        {isLoadingPreview && (
           <div className="py-10 flex justify-center">
             <Spinner />
           </div>
@@ -91,7 +84,7 @@ const DispatchPreviewDialog = ({
           </div>
         )}
 
-        {!isLoading && !isError && preview && (
+        {!isLoadingPreview && !isError && preview && (
           <div className="space-y-6">
             {/* Single Column Summary List */}
             <div className="border-2 border-neutral-300 rounded-xl p-5 bg-white shadow-sm space-y-0 divide-y divide-neutral-200">
@@ -258,15 +251,15 @@ const DispatchPreviewDialog = ({
                 variant="outline"
                 className="border-neutral300 text-neutral800"
                 onClick={() => refetch()}
-                disabled={isLoading}
+                disabled={isLoadingPreview || isDispatching}
               >
                 <RefreshCw className="size-4" />
                 Refresh Preview
               </Button>
               <Button
                 onClick={() => mutate()}
-                disabled={hasBlockingErrors || isLoading || !preview}
-                loading={isPending}
+                disabled={hasBlockingErrors || isLoadingPreview || isDispatching || !preview}
+                loading={isDispatching}
                 size="lg"
                 className="md:min-w-[160px]"
               >
@@ -281,13 +274,6 @@ const DispatchPreviewDialog = ({
     </Dialog>
   );
 };
-
-const SummaryCard = ({ label, value }: { label: string; value: string }) => (
-  <div className="border border-neutral200 rounded-xl p-4">
-    <p className="text-xs uppercase text-neutral500">{label}</p>
-    <p className="text-lg font-semibold mt-1">{value}</p>
-  </div>
-);
 
 const CompanyPreviewCard = ({
   company,

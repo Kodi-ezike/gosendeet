@@ -294,6 +294,7 @@
 }
 
 .bg-about{
-  background-image: url(/public/about-orange-bg.png);
+  background-image: url(/public/about-bg.png);
   background-size: cover;
+  background-position: center;
 }

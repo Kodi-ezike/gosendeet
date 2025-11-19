@@ -1,5 +1,6 @@
 import { api } from "./axios";
 import { TaskDto } from "./tasks";
+import { throwApiError } from "@/lib/errorHandling";
 
 export interface DispatchView {
   bookingId: string;
@@ -17,26 +18,6 @@ export interface DispatchActionResponse {
   message: string;
 }
 
-const throwFormattedError = (error: unknown, fallback: string): never => {
-  if (typeof error === "object" && error !== null) {
-    const withResponse = error as { response?: { data?: unknown } };
-    if (withResponse.response?.data) {
-      throw withResponse.response.data;
-    }
-
-    const withMessage = error as { message?: unknown };
-    if (typeof withMessage.message === "string" && withMessage.message.trim()) {
-      throw { message: withMessage.message };
-    }
-  }
-
-  if (typeof error === "string" && error.trim()) {
-    throw { message: error };
-  }
-
-  throw { message: fallback };
-};
-
 export const viewDispatch = async (token: string): Promise<DispatchView> => {
   try {
     const res = await api.get<DispatchView | { data: DispatchView }>(
@@ -44,7 +25,7 @@ export const viewDispatch = async (token: string): Promise<DispatchView> => {
     );
     return "data" in res.data ? res.data.data : res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to load dispatch");
+    return throwApiError(error, "Unable to load dispatch");
   }
 };
 
@@ -59,7 +40,7 @@ export const acceptDispatch = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to accept dispatch");
+    return throwApiError(error, "Unable to accept dispatch");
   }
 };
 
@@ -74,7 +55,7 @@ export const declineDispatch = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to decline dispatch");
+    return throwApiError(error, "Unable to decline dispatch");
   }
 };
 
@@ -90,7 +71,7 @@ export const startTask = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to start task");
+    return throwApiError(error, "Unable to start task");
   }
 };
 
@@ -137,7 +118,7 @@ export const completeTask = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to complete task");
+    return throwApiError(error, "Unable to complete task");
   }
 };
 
@@ -154,7 +135,7 @@ export const updateTaskEtaWindow = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to update ETA window");
+    return throwApiError(error, "Unable to update ETA window");
   }
 };
 
@@ -170,6 +151,6 @@ export const terminateTask = async (
     );
     return res.data;
   } catch (error) {
-    throwFormattedError(error, "Unable to terminate task");
+    return throwApiError(error, "Unable to terminate task");
   }
 };

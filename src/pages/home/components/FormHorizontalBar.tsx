@@ -15,6 +15,121 @@ import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
 import { SlLocationPin } from "react-icons/sl";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
+import { NIGERIAN_STATES_AND_CITIES } from "@/constants/nigeriaLocations";
+
+const normalizeStateKey = (value: string) =>
+  value.toLowerCase().replace(/\s+/g, " ").replace(/\s*state$/, "").trim();
+
+const normalizeCityKey = (value: string) =>
+  value.toLowerCase().replace(/\s+/g, " ").trim();
+
+const STATE_LOOKUP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string>>(
+  (acc, { state }) => {
+    acc[normalizeStateKey(state)] = state;
+    return acc;
+  },
+  {}
+);
+
+const CITY_STATE_MAP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string>>(
+  (acc, { state, cities }) => {
+    cities.forEach((city) => {
+      acc[city] = state;
+    });
+    return acc;
+  },
+  {}
+);
+
+const NORMALIZED_CITY_LOOKUP = Object.keys(CITY_STATE_MAP).reduce<
+  Record<string, string>
+>((acc, city) => {
+  acc[normalizeCityKey(city)] = city;
+  return acc;
+}, {});
+
+const extractLocationFromAddress = (
+  address?: string
+): { city: string; state: string } => {
+  if (!address) return { city: "", state: "" };
+
+  const parts = address
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+
+  if (parts.length === 0) {
+    return { city: "", state: "" };
+  }
+
+  let detectedState = "";
+  let stateIndex = -1;
+
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const normalized = normalizeStateKey(parts[i]);
+    if (STATE_LOOKUP[normalized]) {
+      detectedState = STATE_LOOKUP[normalized];
+      stateIndex = i;
+      break;
+    }
+  }
+
+  if (!detectedState) {
+    const lagosPartIndex = parts.findIndex((part) =>
+      normalizeStateKey(part).includes("lagos")
+    );
+    if (lagosPartIndex !== -1) {
+      detectedState = "Lagos State";
+      stateIndex = lagosPartIndex;
+    } else {
+      const oyoPartIndex = parts.findIndex((part) =>
+        normalizeStateKey(part).includes("oyo")
+      );
+      if (oyoPartIndex !== -1) {
+        detectedState = "Oyo State";
+        stateIndex = oyoPartIndex;
+      }
+    }
+  }
+
+  let detectedCity = "";
+  const searchStart = stateIndex !== -1 ? stateIndex - 1 : parts.length - 1;
+  for (let i = searchStart; i >= 0; i--) {
+    const normalized = normalizeCityKey(parts[i]);
+    if (NORMALIZED_CITY_LOOKUP[normalized]) {
+      detectedCity = NORMALIZED_CITY_LOOKUP[normalized];
+      break;
+    }
+  }
+
+  if (!detectedCity && searchStart >= 0) {
+    detectedCity = parts[searchStart];
+  }
+
+  if (!detectedState && detectedCity && CITY_STATE_MAP[detectedCity]) {
+    detectedState = CITY_STATE_MAP[detectedCity];
+  }
+
+  return { city: detectedCity, state: detectedState };
+};
+
+const isServiceableAddress = (address?: string) => {
+  if (!address) return false;
+
+  const { city, state } = extractLocationFromAddress(address);
+  const normalizedState = normalizeStateKey(state);
+  const normalizedCity = normalizeCityKey(city);
+
+  if (normalizedState === "lagos") {
+    return true;
+  }
+
+  if (normalizedState === "oyo") {
+    return normalizedCity.startsWith("ibadan");
+  }
+
+  return false;
+};
 
 interface FormHorizontalBarProps {
   variant?: "bold" | "minimal" | "floating";
@@ -148,6 +263,9 @@ const FormHorizontalBar = ({
         dropOffLocation: storedData.dropOffLocation ?? "",
         packageTypeId: storedData.packageTypeId ?? "",
         weight: storedData.weight ?? "",
+        dimensions: storedData.dimensions ?? "",
+        itemPrice: storedData.itemPrice ?? "",
+        pickupDate: storedData.pickupDate ?? "",
       });
     } else if (bookingRequest) {
       const normalized = normalizeData(bookingRequest);
@@ -162,6 +280,13 @@ const FormHorizontalBar = ({
       setValue("packageTypeId", String(inputData.packageTypeId), {
         shouldValidate: false,
       });
+
+      // Restore package display state (name and data)
+      const pkg = packages.find((p: any) => String(p.id) === String(inputData.packageTypeId));
+      if (pkg) {
+        setPackageName(pkg.name);
+        setSelectedPackageData(pkg);
+      }
     }
   }, [inputData?.packageTypeId, packages, setValue]);
 
@@ -182,7 +307,7 @@ const FormHorizontalBar = ({
 
   // Variant-specific styling
   const containerStyles = cn(
-    "w-full max-w-6xl mx-auto pt-10 px-6 pb-6 rounded-3xl",
+    "w-full max-w-6xl mx-auto pt-16 px-6 pb-10 rounded-3xl",
     variant === "bold" && "bg-white shadow-2xl border-2 border-[#1a1f3a]",
     variant === "minimal" && "bg-white shadow-2xl border-2 border-amber-200/40 ring-1 ring-amber-100/30",
     variant === "floating" && "bg-white shadow-2xl"
@@ -447,6 +572,28 @@ const FormHorizontalBar = ({
                 className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
                 loading={isQuoteLoading}
                 onClick={handleSubmit((data) => {
+                  const invalidFields: string[] = [];
+
+                  if (!isServiceableAddress(data.pickupLocation)) {
+                    invalidFields.push("pickup");
+                  }
+
+                  if (!isServiceableAddress(data.dropOffLocation)) {
+                    invalidFields.push("destination");
+                  }
+
+                  if (invalidFields.length > 0) {
+                    const fieldText =
+                      invalidFields.length === 2
+                        ? "pickup and destination addresses"
+                        : `${invalidFields[0]} address`;
+
+                    toast.error(
+                      `We currently only operate in Lagos and Ibadan. Please update your ${fieldText}.`
+                    );
+                    return;
+                  }
+
                   saveInputData(data);
                   getQuotesDirectly([
                     {
@@ -867,6 +1014,9 @@ const FormHorizontalBar = ({
             value={pickupLocation || ""}
             onSelect={(location) => {
               setValue("pickupLocation", location, { shouldValidate: true });
+              // Immediately save to sessionStorage to ensure persistence
+              const currentData = watch();
+              saveInputData({ ...currentData, pickupLocation: location });
             }}
           />
 
@@ -877,6 +1027,9 @@ const FormHorizontalBar = ({
             value={dropOffLocation || ""}
             onSelect={(location) => {
               setValue("dropOffLocation", location, { shouldValidate: true });
+              // Immediately save to sessionStorage to ensure persistence
+              const currentData = watch();
+              saveInputData({ ...currentData, dropOffLocation: location });
             }}
           />
 
@@ -894,6 +1047,15 @@ const FormHorizontalBar = ({
               setValue("itemPrice", itemPriceValue, { shouldValidate: true });
               setPackageName(name);
               setSelectedPackageData(packageData);
+              // Immediately save to sessionStorage to ensure persistence
+              const currentData = watch();
+              saveInputData({
+                ...currentData,
+                packageTypeId: id,
+                weight: weightValue,
+                dimensions: dimensionsValue,
+                itemPrice: itemPriceValue
+              });
             }}
           />
 
@@ -905,6 +1067,9 @@ const FormHorizontalBar = ({
               value={pickupDate || ""}
               onSelect={(date) => {
                 setValue("pickupDate", date);
+                // Immediately save to sessionStorage to ensure persistence
+                const currentData = watch();
+                saveInputData({ ...currentData, pickupDate: date });
               }}
             />
           )}

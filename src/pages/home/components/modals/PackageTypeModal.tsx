@@ -212,7 +212,15 @@ export function PackageTypeModal({
                         "w-8 h-8 rounded mb-1 flex items-center justify-center",
                         isSelected ? "bg-amber-100" : "bg-gray-100"
                       )}>
-                        <img src={packageIcon} alt={pkg.name} className="w-5 h-5 object-contain" />
+                        <img
+                          src={pkg.imageUrl || packageIcon}
+                          alt={pkg.name}
+                          className="w-5 h-5 object-contain"
+                          onError={(e) => {
+                            // Fallback to default icon if custom image fails to load
+                            (e.target as HTMLImageElement).src = packageIcon;
+                          }}
+                        />
                       </div>
 
                       <h4 className={cn(
@@ -268,7 +276,7 @@ export function PackageTypeModal({
           </div>
 
           {/* Step 2: Weight */}
-          <div className={cn("flex gap-3 relative mt-6 transition-opacity", !step1Complete && "opacity-30 pointer-events-none")}>
+          <div className={cn("flex gap-3 relative mt-6 transition-opacity", !step1Complete && "opacity-80 pointer-events-none")}>
             <div className="flex flex-col items-center">
               <StepIndicator stepNumber={2} isComplete={step2Complete} isActive={step1Complete && !step2Complete} />
               {/* Vertical connecting line */}
@@ -337,7 +345,7 @@ export function PackageTypeModal({
           </div>
 
           {/* Step 3: Insurance Value */}
-          <div className={cn("flex gap-3 mt-6 transition-opacity", !step2Complete && "opacity-30 pointer-events-none")}>
+          <div className={cn("flex gap-3 mt-6 transition-opacity", !step2Complete && "opacity-80 pointer-events-none")}>
             <StepIndicator stepNumber={3} isComplete={step3Complete} isActive={step2Complete && !step3Complete} />
 
             <div className="flex-1">

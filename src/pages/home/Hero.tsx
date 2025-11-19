@@ -40,10 +40,9 @@ const HeroOptionC = () => {
   ];
 
   return (
-    <div className="v3-hero min-h-screen flex flex-col justify-center md:px-20 px-6 pt-6 pb-12 relative overflow-hidden">
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto w-full relative z-10">
-        {/* Floating Package Icons - Optimized with config array */}
+    <div className="v3-hero min-h-[90vh] flex flex-col justify-between md:px-20 px-6 pt-6 md:pt-10 lg:pt-12 pb-8 md:pb-10 lg:pb-12 relative overflow-hidden">
+      {/* Floating Package Icons Container - Matches content area for correct positioning */}
+      <div className="absolute inset-0 max-w-7xl mx-auto w-full pointer-events-none">
         {floatingIcons.map((item, index) => (
           <motion.div
             key={index}
@@ -62,31 +61,35 @@ const HeroOptionC = () => {
             <item.Icon className={item.size} />
           </motion.div>
         ))}
+      </div>
 
-        {/* Headline Section - Center Aligned */}
-        <motion.div
-          className="text-center mb-8 relative z-10"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <h1 className="font-clash font-bold mb-6">
-            <span className="block text-[#f59e0b] xl:text-[84px] lg:text-[68px] text-[48px] xl:leading-[95%] leading-[100%]">
-              Every delivery is a promise.
-            </span>
-            <span className="block text-[#6b7280] xl:text-[42px] lg:text-[36px] text-[28px] xl:leading-[95%] leading-[100%]">
-              We help you keep it.
-            </span>
-          </h1>
+      {/* Headline Section - Center Aligned */}
+      <motion.div
+        className="text-center relative z-10 max-w-7xl mx-auto w-full"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <h1 className="font-clash font-bold mb-4">
+          <span className="block text-[#f59e0b] xl:text-[56px] lg:text-[44px] text-[32px] xl:leading-[95%] leading-[100%]">
+            Every delivery is a promise.
+          </span>
+          <span className="block text-[#6b7280] xl:text-[28px] lg:text-[24px] text-[20px] xl:leading-[95%] leading-[100%]">
+            We help you keep it.
+          </span>
+        </h1>
 
-          <p className="text-[#1a1a1a] xl:text-2xl lg:text-xl text-lg leading-relaxed max-w-4xl mx-auto font-bold">
-            Ship easily from your doorstep with <span className="text-[#f59e0b]">GoSendeet</span>, or <span className="text-[#f59e0b]"> compare rates </span> from multiple carriers — <span className="text-[#f59e0b]"> all in one place. </span>
-          </p>
-        </motion.div>
+        <p className="text-[#1a1a1a] xl:text-lg lg:text-base text-sm leading-relaxed max-w-4xl mx-auto mb-6 md:mb-0">
+          Ship easily from your doorstep with <span className="text-[#f59e0b]">GoSendeet</span>, or <span className="text-[#f59e0b]"> compare rates </span> from multiple carriers — <span className="text-[#f59e0b]"> all in one place. </span>
+        </p>
+      </motion.div>
+
+      {/* Form Section - Centered in available space */}
+      <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full relative z-10 -mt-4 md:-mt-12 lg:-mt-16">
 
         {/* Mode Tabs - Combined Card Above Form */}
         <motion.div
-          className="max-w-6xl mx-auto relative z-10 mb-[-20px]"
+          className="max-w-6xl mx-auto relative z-10 mb-[-40px]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -104,7 +107,7 @@ const HeroOptionC = () => {
                     type="button"
                     onClick={() => setFormMode(tab.key)}
                     className={cn(
-                      "flex flex-col items-center gap-1 px-8 py-4 transition-all duration-300 group relative",
+                      "flex flex-col items-center gap-0.5 px-4 py-2 md:gap-1 md:px-6 md:py-3 lg:px-8 lg:py-4 transition-all duration-300 group relative",
                       !isLast && "border-r border-gray-200",
                       isActive
                         ? "border-b-4 border-b-amber-500 bg-amber-50 -mb-[2px]"
@@ -113,13 +116,13 @@ const HeroOptionC = () => {
                   >
                     <Icon
                       className={cn(
-                        "w-6 h-6 transition-colors",
+                        "w-5 h-5 md:w-6 md:h-6 transition-colors",
                         isActive ? "text-amber-500" : "text-gray-500 group-hover:text-gray-700"
                       )}
                     />
                     <span
                       className={cn(
-                        "text-xs font-bold transition-colors",
+                        "text-[10px] md:text-xs font-bold transition-colors",
                         isActive ? "text-amber-600" : "text-gray-600 group-hover:text-gray-800"
                       )}
                     >
@@ -134,7 +137,7 @@ const HeroOptionC = () => {
 
         {/* Horizontal Form Bar */}
         <motion.div
-          className="mb-10"
+          className="mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
@@ -144,17 +147,17 @@ const HeroOptionC = () => {
 
         {/* Combined Trust Bar - All trust signals + key stats in one row */}
         <motion.div
-          className="flex flex-wrap justify-center items-center gap-6 md:gap-8 max-w-5xl mx-auto mb-32"
+          className="hidden md:flex flex-wrap justify-center items-center gap-6 md:gap-8 max-w-5xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           {trustSignals.map((signal, index) => (
             <div key={index} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${signal.color} flex items-center justify-center shadow-md`}>
-                <span className="text-white font-bold text-sm">{signal.icon}</span>
+              <div className={`w-6 h-6 rounded-xl bg-gradient-to-br ${signal.color} flex items-center justify-center shadow-md`}>
+                <span className="text-white font-bold text-xs">{signal.icon}</span>
               </div>
-              <span className="text-[#1f2937] font-semibold text-base whitespace-nowrap">
+              <span className="text-[#1f2937] font-medium text-sm whitespace-nowrap">
                 {signal.text}
               </span>
               {index < trustSignals.length - 1 && (
@@ -163,39 +166,39 @@ const HeroOptionC = () => {
             </div>
           ))}
         </motion.div>
-
-        {/* Logo Carousel - Enhanced with Animations */}
-        <motion.div
-          className="v3-carousel-container v3-carousel-glow overflow-hidden w-full max-w-5xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <div className="v3-carousel-track flex gap-12 items-center relative z-10">
-            {partnerLogos.concat(partnerLogos).map((partner, index) => {
-              const Icon = partner.icon;
-              return (
-                <motion.div
-                  key={index}
-                  className="v3-logo-item group flex items-center justify-center h-[40px] md:h-[48px] min-w-[120px] text-gray-700 transition-all duration-300"
-                  whileHover={{
-                    scale: 1.05,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  {Icon ? (
-                    <Icon className="w-20 h-8 md:h-10 group-hover:text-amber-600 transition-colors duration-300" />
-                  ) : (
-                    <span className="text-base md:text-lg font-semibold uppercase tracking-wider group-hover:text-amber-600 transition-colors duration-300">
-                      {partner.name}
-                    </span>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </motion.div>
       </div>
+
+      {/* Logo Carousel - Enhanced with Animations */}
+      <motion.div
+        className="v3-carousel-container overflow-hidden w-full max-w-7xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <div className="v3-carousel-track flex gap-12 items-center relative z-10">
+          {partnerLogos.concat(partnerLogos).map((partner, index) => {
+            const Icon = partner.icon;
+            return (
+              <motion.div
+                key={index}
+                className="v3-logo-item group flex items-center justify-center h-[40px] md:h-[48px] min-w-[120px] text-gray-700 transition-all duration-300"
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.3 }
+                }}
+              >
+                {Icon ? (
+                  <Icon className="w-20 h-8 md:h-10 group-hover:text-amber-600 transition-colors duration-300" />
+                ) : (
+                  <span className="text-base md:text-lg font-semibold uppercase tracking-wider group-hover:text-amber-600 transition-colors duration-300">
+                    {partner.name}
+                  </span>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
+      </motion.div>
     </div>
   );
 };

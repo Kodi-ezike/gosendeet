@@ -18,7 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPackageType, updatePackageType } from "@/services/adminSettings";
-import { useEffect } from "react";
+import { uploadImage } from "@/services/documents";
+import { useEffect, useState, useRef } from "react";
 import { Switch } from "@/components/ui/switch";
 import {
   useGetAdminDimensionUnits,
@@ -70,6 +71,10 @@ export function PackageTypeModal({
       // .string().optional(),
       .string({ required_error: "Description is required" })
       .min(1, { message: "Please enter a description" }),
+    imageUrl: z
+      .string({ required_error: "Image URL is required" })
+      .min(1, { message: "Please upload an image" })
+      .url({ message: "Please provide a valid image URL" }),
     active: z.boolean().optional(),
   });
 
@@ -86,6 +91,13 @@ export function PackageTypeModal({
 
   const weightUnit = watch("weightUnit");
   const dimensionUnit = watch("dimensionUnit");
+  const imageUrl = watch("imageUrl");
+
+  // Image upload state
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ✅ Reset form with incoming info when modal opens
   useEffect(() => {
@@ -96,6 +108,7 @@ export function PackageTypeModal({
         width: info.width?.toString() ?? "",
         height: info.height?.toString() ?? "",
         maxWeight: info.maxWeight?.toString() ?? "",
+        imageUrl: info.imageUrl ?? "",
         active: info.active ?? false,
       });
     } else if (open && type === "create") {
@@ -109,6 +122,7 @@ export function PackageTypeModal({
         dimensionUnit: "",
         code: "",
         description: "",
+        imageUrl: "",
         active: false,
       });
     }
@@ -148,6 +162,76 @@ export function PackageTypeModal({
       toast.error(error?.message || "Something went wrong");
     },
   });
+
+  // Handle file selection
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle image upload
+  const handleImageUpload = async () => {
+    if (!selectedFile) {
+      toast.error("Please select an image first");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64 = (reader.result as string).split(",")[1]; // Remove data:image/jpeg;base64, prefix
+          const response = await uploadImage(base64, selectedFile.name);
+
+          // Extract URL from nested response structure
+          const imageUrl = response.data?.data?.url ||
+                           response.data?.data?.image?.url ||
+                           response.data?.data?.display_url;
+
+          if (imageUrl) {
+            setValue("imageUrl", imageUrl, { shouldValidate: true });
+            toast.success("Image uploaded successfully");
+            setSelectedFile(null);
+            setPreviewUrl(imageUrl);
+          } else {
+            toast.error("Failed to get image URL from response");
+            console.error("Unexpected response structure:", response);
+          }
+        } catch (error: any) {
+          toast.error(error?.message || "Failed to upload image");
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      reader.readAsDataURL(selectedFile);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to upload image");
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     type === "create" && createType(data);
@@ -377,6 +461,82 @@ export function PackageTypeModal({
                   {errors.description && (
                     <p className="error text-xs text-[#FF0000]">
                       {errors.description.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex md:flex-row flex-col gap-4 items-center">
+                <div className="flex flex-col w-full">
+                  <label htmlFor="image" className="font-inter font-semibold">
+                    Package Image <span className="text-red-500">*</span>
+                  </label>
+
+                  {/* Image Preview */}
+                  {(previewUrl || imageUrl) && (
+                    <div className="mt-2 mb-3">
+                      <div className="relative w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden">
+                        <img
+                          src={previewUrl || imageUrl}
+                          alt="Package preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* File Input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+
+                  <div className="flex gap-2 items-center mt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="text-xs"
+                    >
+                      Choose Image
+                    </Button>
+
+                    {selectedFile && (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleImageUpload}
+                        loading={isUploading}
+                        className="text-xs"
+                      >
+                        Upload
+                      </Button>
+                    )}
+                  </div>
+
+                  {selectedFile && !isUploading && (
+                    <p className="text-xs text-gray-600 mt-1">
+                      Selected: {selectedFile.name}
+                    </p>
+                  )}
+
+                  {imageUrl && (
+                    <p className="text-xs text-green-600 mt-1 break-all">
+                      ✓ Image uploaded successfully
+                    </p>
+                  )}
+
+                  {errors.imageUrl && (
+                    <p className="error text-xs text-[#FF0000] mt-1">
+                      {errors.imageUrl.message}
                     </p>
                   )}
                 </div>
