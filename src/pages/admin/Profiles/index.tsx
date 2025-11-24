@@ -23,6 +23,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateRangePicker } from "@/components/DateRangePicker.tsx";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 const Profiles = () => {
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
@@ -46,17 +49,23 @@ const Profiles = () => {
 
   const { data: profileStats } = useGetProfileStats();
 
+  const [range, setRange] = useState<DateRange | undefined>();
+  const startStr = range?.from ? format(range.from, "yyyy-MM-dd") : null;
+  const endStr = range?.to ? format(range.to, "yyyy-MM-dd") : null;
+
   // Reset pagination when status changes
   useEffect(() => {
     updatePage(1); // Reset to page 1
-  }, [userStatus, debouncedProfileSearchTerm]); // Reset when filters change
+  }, [userStatus, debouncedProfileSearchTerm, startStr, endStr]); // Reset when filters change
 
   const { data, isLoading, isSuccess, isError } = useGetProfiles(
     currentPage, // 👈 Always fetch page 1 during status change
     size,
     userStatus,
     role,
-    debouncedProfileSearchTerm
+    debouncedProfileSearchTerm,
+    startStr || "",
+    endStr || ""
   );
 
   useEffect(() => {
@@ -194,7 +203,7 @@ const Profiles = () => {
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex xl:flex-row flex-col xl:items-center gap-4">
           <div className="flex items-center gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
             <IoSearchOutline className="text-neutral500" />
             <input
@@ -207,17 +216,7 @@ const Profiles = () => {
               }}
             />
           </div>
-          {/* <div>
-            <Select>
-              <SelectTrigger className="h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Date Created" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
+          <DateRangePicker value={range} onChange={setRange} />
         </div>
       </div>
 

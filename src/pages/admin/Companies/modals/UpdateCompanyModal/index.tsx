@@ -35,32 +35,41 @@ export function UpdateCompanyModal({
   const schema = z.object({
     name: z
       .string({ required_error: "Company name is required" })
-      .min(1, { message: "Please enter company name" }),
+      .min(3, { message: "Please enter company name" }),
+
     website: z
       .string({ required_error: "Company website is required" })
       .url({ message: "Please enter valid url with https://" })
-      .min(1, { message: "Please enter company website" }),
+      .regex(
+        /^https?:\/\/[^\s]+\.[a-zA-Z]{2,}(\/.*)?$/,
+        "Please enter a valid website domain"
+      ),
     email: z
       .string({ required_error: "Company email is required" })
-      .email({ message: "Please enter valid email" })
-      .min(1, { message: "Please enter company email" }),
+      .email({ message: "Please enter valid email" }),
     phone: z
       .string({ required_error: "Company number is required" })
-      .regex(/^\+?[0-9]{11,15}$/, {
+      .regex(/^(?:\+?[1-9]\d{10,14}|0\d{10})$/, {
         message: "Invalid phone number",
       }),
     address: z
       .string({ required_error: "Company address is required" })
-      .min(1, { message: "Please enter company address" }),
+      .min(3, { message: "Please enter company address" }),
     city: z
       .string({ required_error: "City is required" })
-      .min(1, { message: "Please enter city" }),
+      .min(3, { message: "Please enter a valid city" })
+      .regex(/^[A-Za-z\s'-]+$/, {
+        message: "Please enter a valid city",
+      }),
     state: z
       .string({ required_error: "State is required" })
-      .min(1, { message: "Please enter state" }),
+      .min(3, { message: "Please enter state" })
+      .regex(/^[A-Za-z\s'-]+$/, {
+        message: "Please enter a valid state",
+      }),
     country: z
       .string({ required_error: "Country is required" })
-      .min(1, { message: "Please enter country" }),
+      .min(3, { message: "Please enter country" }),
   });
 
   const {

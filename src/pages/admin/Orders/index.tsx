@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/popover";
 import { TbBellRinging } from "react-icons/tb";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
+import { DateRangePicker } from "@/components/DateRangePicker.tsx";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 const Orders = () => {
   const [lastPage, setLastPage] = useState(1);
@@ -41,16 +44,22 @@ const Orders = () => {
   const { data: bookingStats } = useGetBookingsStats();
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
+  const [range, setRange] = useState<DateRange | undefined>();
+  const startStr = range?.from ? format(range.from, "yyyy-MM-dd") : "";
+  const endStr = range?.to ? format(range.to, "yyyy-MM-dd") : "";
+
   // Reset pagination when status changes
   useEffect(() => {
     updatePage(1); // Reset to page 1
-  }, [bookingStatus, packageTypeId, debouncedSearchTerm]); // Reset when filters change
-  
+  }, [bookingStatus, packageTypeId, debouncedSearchTerm, startStr, endStr]); // Reset when filters change
+
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({
     page: currentPage,
     bookingStatus,
     search: debouncedSearchTerm,
     packageTypeId,
+    startDate: startStr,
+    endDate: endStr,
   });
 
   useEffect(() => {
@@ -194,7 +203,7 @@ const Orders = () => {
                 value === "all" ? setPackageTypeId("") : setPackageTypeId(value)
               }
             >
-              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[150px] max-w-[300px]">
+              <SelectTrigger className="h-[40px] rounded-lg border-2 min-w-[200px] max-w-[300px]">
                 <SelectValue placeholder="Package Type" />
               </SelectTrigger>
               <SelectContent>
@@ -207,17 +216,7 @@ const Orders = () => {
               </SelectContent>
             </Select>
           </div>
-          {/* <div>
-            <Select>
-              <SelectTrigger className="h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Date Created" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
+          <DateRangePicker value={range} onChange={setRange} />
         </div>
       </div>
 

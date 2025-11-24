@@ -12,11 +12,23 @@ export const useGetProfiles = (
   userStatus: string,
   role: string,
   search: string,
+  startDate: string,
+  endDate: string,
   options?: UseQueryOptions<any>
 ) => {
   const query = useQuery({
-    queryKey: ["profiles", page, size, userStatus, role, search],
-    queryFn: () => getProfiles(page, size, userStatus, role, search),
+    queryKey: [
+      "profiles",
+      page,
+      size,
+      userStatus,
+      role,
+      search,
+      startDate,
+      endDate,
+    ],
+    queryFn: () =>
+      getProfiles(page, size, userStatus, role, search, startDate, endDate),
     ...options, // spread options last to allow overriding defaults
   });
   return {
@@ -40,10 +52,15 @@ export const useGetSingleProfile = (id: string) => {
   };
 };
 
-export const useGetLoginHistory = (id: string) => {
+export const useGetLoginHistory = (
+  id: string,
+  startDate: string,
+  endDate: string,
+  page: number
+) => {
   const query = useQuery({
-    queryKey: ["login_history", id],
-    queryFn: () => getLoginHistory(id),
+    queryKey: ["login_history", id, startDate, endDate, page],
+    queryFn: () => getLoginHistory(id, startDate, endDate, page),
   });
   return {
     isLoading: query.isPending,
