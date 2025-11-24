@@ -1,22 +1,38 @@
+import { useEffect, useState } from "react";
 import { formatTimestampToReadable } from "@/lib/utils";
-import { IoSearchOutline } from "react-icons/io5";
+import { useGetLoginHistory } from "@/queries/admin/useGetAdminProfiles";
+import { DateRangePicker } from "@/components/DateRangePicker.tsx";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import { usePaginationSync } from "@/hooks/usePaginationSync";
+import { PaginationComponent } from "@/components/Pagination";
+const LoginHistory = ({ userId }: { userId: string }) => {
+  const [lastPage, setLastPage] = useState(1);
+  const { currentPage, updatePage } = usePaginationSync(lastPage);
 
-const LoginHistory = ({ data }: { data: any }) => {
+  const [range, setRange] = useState<DateRange | undefined>();
+  const startStr = range?.from ? format(range.from, "yyyy-MM-dd") : "";
+  const endStr = range?.to ? format(range.to, "yyyy-MM-dd") : "";
+
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [startStr, endStr]); // Reset when filters change
+
+  const { data } = useGetLoginHistory(userId, startStr, endStr, currentPage);
 
   const login = data?.data?.content;
-  
+
+  useEffect(() => {
+    const totalPages = data?.data?.page?.totalPages;
+    if (totalPages && totalPages !== lastPage) {
+      setLastPage(totalPages);
+    }
+  }, [data?.data?.page?.totalPages]);
   return (
     <div>
       <div className="flex flex-row md:justify-end gap-4 mb-6">
-        <div className="flex items-center  gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
-          <IoSearchOutline className="text-neutral500" />
-          <input
-            type="text"
-            role="search"
-            className="border-0 outline-0 w-[200px] text-sm text-neutral600"
-            placeholder="Search date"
-          />
-        </div>
+        <DateRangePicker value={range} onChange={setRange} />
       </div>
       {login && login?.length > 0 && (
         <div className="overflow-x-auto">
@@ -48,6 +64,12 @@ const LoginHistory = ({ data }: { data: any }) => {
               );
             })}
           </div>
+
+          <PaginationComponent
+            lastPage={data?.data?.page?.totalPages}
+            currentPage={currentPage}
+            handlePageChange={updatePage}
+          />
         </div>
       )}
 

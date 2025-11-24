@@ -28,6 +28,8 @@ export const useGetAllBookings = (
     companyId?: string;
     senderId?: string;
     search?: string;
+    startDate?: string;
+    endDate?: string;
   },
   options?: UseQueryOptions<any>
 ) => {

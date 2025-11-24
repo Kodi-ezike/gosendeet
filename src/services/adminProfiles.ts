@@ -5,11 +5,13 @@ export const getProfiles = async (
   size: number,
   userStatus: string,
   role: string,
-  search: string
+  search: string,
+  startDate: string,
+  endDate: string
 ) => {
   try {
     const res = await api.get(
-      `/users?page=${page}&size=${size}&status=${userStatus}&role=${role}&search=${search}`
+      `/users?page=${page}&size=${size}&status=${userStatus}&role=${role}&search=${search}&startDate=${startDate}&endDate=${endDate}`
     );
     return res.data;
   } catch (error: any) {
@@ -28,16 +30,25 @@ export const getSingleProfile = async (id: string) => {
 
 export const updateProfileStatus = async (userId: string, status: string) => {
   try {
-    const res = await api.post(`users/status?userId=${userId}&status=${status}`);
+    const res = await api.post(
+      `users/status?userId=${userId}&status=${status}`
+    );
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
 
-export const getLoginHistory = async (id: string) => {
+export const getLoginHistory = async (
+  id: string,
+  startDate: string,
+  endDate: string,
+  page: number,
+) => {
   try {
-    const res = await api.get(`/login-history?userId=${id}`);
+    const res = await api.get(
+      `/login-history?userId=${id}&startDate=${startDate}&endDate=${endDate}&page=${page}`
+    );
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

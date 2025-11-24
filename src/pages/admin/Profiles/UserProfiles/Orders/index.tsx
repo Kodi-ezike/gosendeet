@@ -25,6 +25,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { DateRangePicker } from "@/components/DateRangePicker.tsx";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 
 const Orders = ({ userId }: { userId: any }) => {
   const [lastPage, setLastPage] = useState(1);
@@ -36,12 +39,24 @@ const Orders = ({ userId }: { userId: any }) => {
   const { data: bookingStats } = useGetBookingsStats({ senderId: userId });
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
+
+  const [range, setRange] = useState<DateRange | undefined>();
+  const startStr = range?.from ? format(range.from, "yyyy-MM-dd") : null;
+  const endStr = range?.to ? format(range.to, "yyyy-MM-dd") : null;
+
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [bookingStatus, debouncedSearchTerm, startStr, endStr]); // Reset when filters change
+
   const { data, isLoading, isSuccess, isError } = useGetAllBookings({
     page: currentPage,
     senderId: userId,
     bookingStatus,
     search: debouncedSearchTerm,
     packageTypeId,
+    startDate: startStr || "",
+    endDate: endStr || "",
   });
 
   useEffect(() => {
@@ -143,17 +158,7 @@ const Orders = ({ userId }: { userId: any }) => {
               </SelectContent>
             </Select>
           </div>
-          {/* <div>
-            <Select>
-              <SelectTrigger className="h-[40px] rounded-lg border-2">
-                <SelectValue placeholder="Date Created" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">This month</SelectItem>
-                <SelectItem value="2">This week</SelectItem>
-              </SelectContent>
-            </Select>
-          </div> */}
+          <DateRangePicker value={range} onChange={setRange} />
         </div>
       </div>
 
@@ -192,9 +197,8 @@ const Orders = ({ userId }: { userId: any }) => {
               return (
                 <div
                   key={index}
-                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center ${
-                    index === 0 ? "border-b-0" : "border-b border-b-neutral300"
-                  } hover:bg-purple300`}
+                  className={`relative h-[60px] bg-white px-3 xl:px-4 text-sm flex items-center border-b border-b-neutral300 
+                    hover:bg-purple300`}
                 >
                   <span className="w-[1%] mr-4">
                     <input type="checkbox" name="" id="" className="mt-1" />

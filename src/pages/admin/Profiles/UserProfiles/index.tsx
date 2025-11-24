@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
 import Orders from "./Orders";
 import LoginHistory from "./LoginHistory";
-import { useGetLoginHistory, useGetSingleProfile } from "@/queries/admin/useGetAdminProfiles";
+import { useGetSingleProfile } from "@/queries/admin/useGetAdminProfiles";
 import { cn, formatTimestampToReadable, timeAgo } from "@/lib/utils";
 import { Spinner } from "@/components/Spinner";
 import { BiEditAlt } from "react-icons/bi";
@@ -16,7 +16,7 @@ const UserProfiles = () => {
   const [openUpdateStatus, setOpenUpdateStatus] = useState(false);
 
   const { data, isLoading, isSuccess, isError } = useGetSingleProfile(userId);
-  const { data: login } = useGetLoginHistory(userId);
+  
 
   const userData = data?.data ?? {};
 
@@ -157,11 +157,11 @@ const UserProfiles = () => {
                         ? "text-purple500"
                         : "text-neutral500"
                     }`}
-                    onMouseEnter={() => {
-                      updateUnderline(index);
-                      setActiveTab(tab.key);
-                      sessionStorage.setItem("profileTab", tab.key);
-                    }}
+                    // onMouseEnter={() => {
+                    //   updateUnderline(index);
+                    //   setActiveTab(tab.key);
+                    //   sessionStorage.setItem("profileTab", tab.key);
+                    // }}
                     onClick={() =>  {
                       updateUnderline(index);
                       setActiveTab(tab.key);
@@ -188,7 +188,7 @@ const UserProfiles = () => {
           {/* Tab Content */}
           <div className="mt-6">
           {activeTab === "orders" && <Orders userId={userId} />}
-            {activeTab === "login" && <LoginHistory data={login}/>}
+            {activeTab === "login" && <LoginHistory userId={userId}/>}
             {/* {activeTab === "settings" && <Settings />} */}
           </div>
         </div>

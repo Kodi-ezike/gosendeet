@@ -16,6 +16,8 @@ export const getAllBookings = async ({
   companyId,
   senderId,
   search,
+  startDate,
+  endDate,
 }: {
   page: number;
   bookingStatus?: string;
@@ -23,6 +25,8 @@ export const getAllBookings = async ({
   companyId?: string;
   senderId?: string;
   search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 ) => {
   try {
@@ -34,6 +38,8 @@ export const getAllBookings = async ({
     if (companyId) params.append("companyId", companyId);
     if (senderId) params.append("senderId", senderId);
     if (search) params.append("searchTerm", search);
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
 
     const res = await api.get(`/bookings?${params.toString()}`);
     return res.data;
