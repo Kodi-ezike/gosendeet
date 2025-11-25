@@ -211,11 +211,11 @@ const OrderDetails = () => {
             trackingNumber={data?.data?.trackingNumber}
           />
 
-          <div>
+          <div className="mt-12">
             <div className="px-3 xl:px-4 py-4 text-md font-inter font-semibold bg-purple200 w-full">
               <p>Delivery Progress</p>
             </div>
-            <div className="grid xl:grid-cols-3 gap-4 text-sm px-3 xl:px-4 py-4 bg-white mb-6">
+            <div className="grid gap-4 text-sm px-3 xl:px-4 py-4 bg-white mb-6">
               <OrderHistory data={data} />
             </div>
           </div>

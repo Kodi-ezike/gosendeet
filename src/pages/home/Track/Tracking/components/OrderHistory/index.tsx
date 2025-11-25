@@ -4,7 +4,7 @@ const OrderHistory = ({ data }: any) => {
   return (
     <>
       {data?.data?.trackingHistories?.length > 0 ? (
-        <div className="grid md:grid-cols-2">
+        <div className="grid">
           {data?.data?.trackingHistories?.map((item: any) => (
             <div className="flex gap-4 py-4" key={item?.id}>
               <div className="flex flex-col gap-1 justify-center items-center">
