@@ -713,6 +713,7 @@ const FormHorizontalBar = ({
                   getQuotesDirectly([
                     {
                       ...data,
+                      itemValue: Number(data.itemPrice),
                       quantity: 1,
                       packageDescription: {
                         isFragile: false,
@@ -877,6 +878,7 @@ const FormHorizontalBar = ({
                   getQuotesDirectly([
                     {
                       ...data,
+                      itemValue: Number(data.itemPrice),
                       quantity: 1,
                       packageDescription: {
                         isFragile: false,

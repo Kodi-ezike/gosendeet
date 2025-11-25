@@ -65,12 +65,16 @@ const Calculator = () => {
 
     // Filter by pickup date
     if (filterPickupDate) {
-      filtered = filtered.filter((item: any) => item?.pickUpdateDate === filterPickupDate);
+      filtered = filtered.filter(
+        (item: any) => item?.pickUpdateDate === filterPickupDate
+      );
     }
 
     // Filter by delivery date
     if (filterDeliveryDate) {
-      filtered = filtered.filter((item: any) => item?.estimatedDeliveryDate === filterDeliveryDate);
+      filtered = filtered.filter(
+        (item: any) => item?.estimatedDeliveryDate === filterDeliveryDate
+      );
     }
 
     // Filter by price range
@@ -79,7 +83,8 @@ const Calculator = () => {
         const price = parseFloat(item?.price?.replace(/[^\d.]/g, ""));
         if (priceRange === "0-5000") return price <= 5000;
         if (priceRange === "5000-10000") return price > 5000 && price <= 10000;
-        if (priceRange === "10000-20000") return price > 10000 && price <= 20000;
+        if (priceRange === "10000-20000")
+          return price > 10000 && price <= 20000;
         if (priceRange === "20000+") return price > 20000;
         return true;
       });
@@ -101,7 +106,10 @@ const Calculator = () => {
     } else if (sortBy === "delivery-fastest") {
       // Sort by delivery date (earliest first)
       filtered.sort((a: any, b: any) => {
-        return new Date(a?.estimatedDeliveryDate).getTime() - new Date(b?.estimatedDeliveryDate).getTime();
+        return (
+          new Date(a?.estimatedDeliveryDate).getTime() -
+          new Date(b?.estimatedDeliveryDate).getTime()
+        );
       });
     }
 
@@ -111,13 +119,17 @@ const Calculator = () => {
   // Get unique pickup dates for filter
   const uniquePickupDates = useMemo(() => {
     if (!data?.data) return [];
-    return [...new Set(data.data.map((item: any) => item?.pickUpdateDate))].filter(Boolean);
+    return [
+      ...new Set(data.data.map((item: any) => item?.pickUpdateDate)),
+    ].filter(Boolean);
   }, [data]);
 
   // Get unique delivery dates for filter
   const uniqueDeliveryDates = useMemo(() => {
     if (!data?.data) return [];
-    return [...new Set(data.data.map((item: any) => item?.estimatedDeliveryDate))].filter(Boolean);
+    return [
+      ...new Set(data.data.map((item: any) => item?.estimatedDeliveryDate)),
+    ].filter(Boolean);
   }, [data]);
 
   const clearFilters = () => {
@@ -127,7 +139,11 @@ const Calculator = () => {
     setSortBy("price-asc");
   };
 
-  const activeFiltersCount = [filterPickupDate, filterDeliveryDate, priceRange !== "all"].filter(Boolean).length;
+  const activeFiltersCount = [
+    filterPickupDate,
+    filterDeliveryDate,
+    priceRange !== "all",
+  ].filter(Boolean).length;
 
   // Get courier logo based on name
   const getCourierLogo = (courierName: string) => {
@@ -158,12 +174,14 @@ const Calculator = () => {
 
   return (
     <div className="md:px-20 px-6 py-4 bg-white min-h-screen">
-      <FormHorizontalBar
-        variant="minimal"
-        activeMode="compare"
-        bookingRequest={bookingRequest}
-        setData={setData}
-      />
+      <div className="w-full mb-12">
+        <FormHorizontalBar
+          variant="minimal"
+          activeMode="compare"
+          bookingRequest={bookingRequest}
+          setData={setData}
+        />
+      </div>
 
       {/* Select options */}
       {/* <Select>
@@ -190,7 +208,8 @@ const Calculator = () => {
             No courier services available
           </p>
           <p className="text-center text-gray-600 text-sm">
-            Use the form above to search for courier services by entering your pickup location, destination, and package details.
+            Use the form above to search for courier services by entering your
+            pickup location, destination, and package details.
           </p>
         </div>
       )}
@@ -204,10 +223,16 @@ const Calculator = () => {
                 Available Courier Services
               </h2>
               <p className="text-gray-600 text-sm md:text-base">
-                Found <span className="font-bold text-amber-600">{filteredAndSortedData.length}</span> courier{filteredAndSortedData.length !== 1 ? 's' : ''} for your route
+                Found{" "}
+                <span className="font-bold text-amber-600">
+                  {filteredAndSortedData.length}
+                </span>{" "}
+                courier{filteredAndSortedData.length !== 1 ? "s" : ""} for your
+                route
                 {activeFiltersCount > 0 && (
                   <span className="ml-2 text-xs text-gray-500">
-                    ({activeFiltersCount} filter{activeFiltersCount !== 1 ? 's' : ''} active)
+                    ({activeFiltersCount} filter
+                    {activeFiltersCount !== 1 ? "s" : ""} active)
                   </span>
                 )}
               </p>
@@ -215,10 +240,12 @@ const Calculator = () => {
           </div>
 
           {/* Filters & Sort Section */}
-          <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+          <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
               <FiFilter className="w-4 h-4 text-gray-600" />
-              <h3 className="font-semibold text-sm text-gray-700">Filter & Sort Results</h3>
+              <h3 className="font-semibold text-sm text-gray-700">
+                Filter & Sort Results
+              </h3>
               {activeFiltersCount > 0 && (
                 <button
                   onClick={clearFilters}
@@ -241,9 +268,15 @@ const Calculator = () => {
                     <SelectValue placeholder="Sort by..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                    <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                    <SelectItem value="delivery-fastest">Fastest Delivery</SelectItem>
+                    <SelectItem value="price-asc">
+                      Price: Low to High
+                    </SelectItem>
+                    <SelectItem value="price-desc">
+                      Price: High to Low
+                    </SelectItem>
+                    <SelectItem value="delivery-fastest">
+                      Fastest Delivery
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -253,7 +286,12 @@ const Calculator = () => {
                 <label className="text-xs font-semibold text-gray-600 mb-1.5 block">
                   Pickup Date
                 </label>
-                <Select value={filterPickupDate || "all"} onValueChange={(val) => setFilterPickupDate(val === "all" ? "" : val)}>
+                <Select
+                  value={filterPickupDate || "all"}
+                  onValueChange={(val) =>
+                    setFilterPickupDate(val === "all" ? "" : val)
+                  }
+                >
                   <SelectTrigger className="h-9 text-sm bg-white border-gray-300">
                     <SelectValue placeholder="All dates" />
                   </SelectTrigger>
@@ -273,7 +311,12 @@ const Calculator = () => {
                 <label className="text-xs font-semibold text-gray-600 mb-1.5 block">
                   Delivery Date
                 </label>
-                <Select value={filterDeliveryDate || "all"} onValueChange={(val) => setFilterDeliveryDate(val === "all" ? "" : val)}>
+                <Select
+                  value={filterDeliveryDate || "all"}
+                  onValueChange={(val) =>
+                    setFilterDeliveryDate(val === "all" ? "" : val)
+                  }
+                >
                   <SelectTrigger className="h-9 text-sm bg-white border-gray-300">
                     <SelectValue placeholder="All dates" />
                   </SelectTrigger>
@@ -301,7 +344,9 @@ const Calculator = () => {
                     <SelectItem value="all">All prices</SelectItem>
                     <SelectItem value="0-5000">₦0 - ₦5,000</SelectItem>
                     <SelectItem value="5000-10000">₦5,000 - ₦10,000</SelectItem>
-                    <SelectItem value="10000-20000">₦10,000 - ₦20,000</SelectItem>
+                    <SelectItem value="10000-20000">
+                      ₦10,000 - ₦20,000
+                    </SelectItem>
                     <SelectItem value="20000+">₦20,000+</SelectItem>
                   </SelectContent>
                 </Select>
@@ -312,19 +357,21 @@ const Calculator = () => {
       )}
 
       <div className="flex flex-col gap-4 mb-6 max-w-5xl mx-auto">
-        {filteredAndSortedData.length === 0 && data?.data && data?.data?.length > 0 && (
-          <div className="flex flex-col items-center justify-center py-12">
-            <p className="text-center font-bold text-gray-600 text-lg mb-2">
-              No results match your filters
-            </p>
-            <button
-              onClick={clearFilters}
-              className="text-amber-600 hover:text-amber-700 font-semibold text-sm underline"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
+        {filteredAndSortedData.length === 0 &&
+          data?.data &&
+          data?.data?.length > 0 && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <p className="text-center font-bold text-gray-600 text-lg mb-2">
+                No results match your filters
+              </p>
+              <button
+                onClick={clearFilters}
+                className="text-amber-600 hover:text-amber-700 font-semibold text-sm underline"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         {filteredAndSortedData.map((item: any, index: number) => (
           <div
             className={cn(
@@ -368,13 +415,19 @@ const Calculator = () => {
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <FiCalendar className="w-4 h-4 text-blue-500" />
                       <span>
-                        Pickup Date: <span className="font-semibold text-[#1a1a1a]">{item?.pickUpdateDate}</span>
+                        Pickup Date:{" "}
+                        <span className="font-semibold text-[#1a1a1a]">
+                          {item?.pickUpdateDate}
+                        </span>
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <FiTruck className="w-4 h-4 text-emerald-500" />
                       <span>
-                        Estimated Delivery: <span className="font-semibold text-[#1a1a1a]">{item?.estimatedDeliveryDate}</span>
+                        Estimated Delivery:{" "}
+                        <span className="font-semibold text-[#1a1a1a]">
+                          {item?.estimatedDeliveryDate}
+                        </span>
                       </span>
                     </div>
                   </div>
@@ -388,7 +441,9 @@ const Calculator = () => {
                       Starting From
                     </p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xs font-semibold text-gray-500">₦</span>
+                      <span className="text-xs font-semibold text-gray-500">
+                        ₦
+                      </span>
                       <p className="text-2xl md:text-3xl font-clash font-bold text-amber-600">
                         {item.price.replace(/^NGN\s?/, "")}
                       </p>
@@ -403,7 +458,9 @@ const Calculator = () => {
                         alt="check"
                         className="w-[16px] h-[16px] rounded-full"
                       />
-                      <p className="text-xs font-bold text-emerald-700">Next Day</p>
+                      <p className="text-xs font-bold text-emerald-700">
+                        Next Day
+                      </p>
                     </div>
                   )}
                 </div>
@@ -424,7 +481,9 @@ const Calculator = () => {
                         alt="check"
                         className="w-[16px] h-[16px] rounded-full"
                       />
-                      <p className="text-xs font-semibold text-gray-700">{option}</p>
+                      <p className="text-xs font-semibold text-gray-700">
+                        {option}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -463,7 +522,12 @@ const Calculator = () => {
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      />
                     </svg>
                   </span>
                   {/* Hover effect overlay */}
