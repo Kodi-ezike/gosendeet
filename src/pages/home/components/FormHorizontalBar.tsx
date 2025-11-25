@@ -160,6 +160,13 @@ const FormHorizontalBar = ({
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Detect dashboard route early so we can adjust styles/layout
+  const isDashboard = location.pathname.includes("dashboard");
+  const [currentMode, setCurrentMode] = useState<
+    "gosendeet" | "compare" | "tracking"
+  >(activeMode);
+  const mode = isDashboard ? currentMode : activeMode;
+
   // Modal states for Direct mode
   const [pickupModalOpen, setPickupModalOpen] = useState(false);
   const [destinationModalOpen, setDestinationModalOpen] = useState(false);
@@ -316,11 +323,17 @@ const FormHorizontalBar = ({
 
   // Variant-specific styling
   const containerStyles = cn(
-    "w-full max-w-6xl mx-auto pt-16 px-6 pb-10 rounded-3xl",
-    variant === "bold" && "bg-white shadow-2xl border-2 border-[#1a1f3a]",
-    variant === "minimal" &&
+    // Dashboard uses a tighter, card-like container with subtle border
+    isDashboard
+      ? "w-full max-w-3xl mx-auto pt-10 px-6 pb-8 rounded-2xl bg-white border border-amber-100 shadow-sm relative"
+      : "w-full max-w-6xl mx-auto pt-16 px-6 pb-10 rounded-3xl",
+    !isDashboard &&
+      variant === "bold" &&
+      "bg-white shadow-2xl border-2 border-[#1a1f3a]",
+    !isDashboard &&
+      variant === "minimal" &&
       "bg-white shadow-2xl border-2 border-amber-200/40 ring-1 ring-amber-100/30",
-    variant === "floating" && "bg-white shadow-2xl"
+    !isDashboard && variant === "floating" && "bg-white shadow-2xl"
   );
 
   const labelStyles = cn(
@@ -338,9 +351,8 @@ const FormHorizontalBar = ({
   );
 
   // Determine if form should be vertical (dashboard route)
-  const isDashboard = location.pathname.includes("dashboard");
   const containerClass = isDashboard
-    ? `space-y-4`
+    ? `space-y-8`
     : "grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-4 items-end grid-cols-1 space-y-4 lg:space-y-0";
 
   // Show loading skeleton while hydrating
@@ -401,13 +413,59 @@ const FormHorizontalBar = ({
 
   return (
     <div className={containerStyles}>
+      {isDashboard && (
+        <div className="absolute left-1/2 transform -translate-x-1/2 top-[-20px]">
+          <div className="inline-flex items-center bg-white rounded-full shadow-sm border border-amber-100">
+            <button
+              type="button"
+              onClick={() => setCurrentMode("gosendeet")}
+              className={cn(
+                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
+                mode === "gosendeet"
+                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+                  : "text-gray-600"
+              )}
+            >
+              <FiTruck className="w-4 h-4" />
+              Direct
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentMode("compare")}
+              className={cn(
+                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
+                mode === "compare"
+                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+                  : "text-gray-600"
+              )}
+            >
+              <FiBarChart2 className="w-4 h-4" />
+              Compare
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentMode("tracking")}
+              className={cn(
+                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
+                mode === "tracking"
+                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+                  : "text-gray-600"
+              )}
+            >
+              <FiSearch className="w-4 h-4" />
+              Track
+            </button>
+          </div>
+        </div>
+      )}
       {/* Tracking Mode Form */}
-      {activeMode === "tracking" ? (
+      {mode === "tracking" ? (
         <form onSubmit={handleTrackingSubmit}>
           <div
             className={cn(
-              "flex flex-col lg:flex-row lg:items-end gap-4",
-              isDashboard ? "flex-col" : ""
+              isDashboard
+                ? "flex flex-col gap-4"
+                : "flex flex-col lg:flex-row lg:items-end gap-4"
             )}
           >
             <div className={isDashboard ? "w-full" : "flex-1"}>
@@ -446,7 +504,7 @@ const FormHorizontalBar = ({
             </Button>
           </div>
         </form>
-      ) : activeMode === "gosendeet" ? (
+      ) : mode === "gosendeet" ? (
         // Direct Mode with Modal Triggers
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={containerClass}>
@@ -674,7 +732,7 @@ const FormHorizontalBar = ({
             </div>
           </div>
         </form>
-      ) : activeMode === "compare" ? (
+      ) : mode === "compare" ? (
         // Compare Mode with Modal Triggers (no Pickup Date)
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className={containerClass}>
@@ -839,7 +897,7 @@ const FormHorizontalBar = ({
       ) : null}
 
       {/* Modals for Direct and Compare modes */}
-      {(activeMode === "gosendeet" || activeMode === "compare") && (
+      {(mode === "gosendeet" || mode === "compare") && (
         <>
           <AddressModal
             type="pickup"
@@ -901,7 +959,7 @@ const FormHorizontalBar = ({
           />
 
           {/* Pickup Date Modal - Only for Direct mode */}
-          {activeMode === "gosendeet" && (
+          {mode === "gosendeet" && (
             <PickupDateModal
               open={dateModalOpen}
               onOpenChange={setDateModalOpen}

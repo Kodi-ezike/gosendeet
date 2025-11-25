@@ -10,7 +10,7 @@ const Overview = ({ data }: { data: any }) => {
 
   return (
     <div>
-      <div className="flex justify-between md:items-center mb-4 md:px-4">
+      <div className="flex justify-between md:items-center lg:mb-8 mb-12 md:px-4">
         <h2 className="font-clash font-semibold text-[20px]">
           Hello {username},
         </h2>
@@ -28,10 +28,10 @@ const Overview = ({ data }: { data: any }) => {
       </div>
 
       <div className="flex lg:flex-row flex-col gap-8 mb-10">
-        <div className="lg:w-[60%] bg-white xl:p-10 py-6 px-2 rounded-3xl text-sm">
-          <h3 className="text-md font-clash font-semibold mb-4">
+        <div className="lg:w-[60%] rounded-3xl text-sm">
+          {/* <h3 className="text-md font-clash font-semibold lg:mb-8 mb-12 py-6 px-4">
             Add New Shipment
-          </h3>
+          </h3> */}
           <FormHorizontalBar />
         </div>
         <div className="lg:w-[40%] bg-white xl:p-10 py-6 px-2 rounded-3xl">
