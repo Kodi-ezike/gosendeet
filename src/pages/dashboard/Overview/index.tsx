@@ -1,7 +1,8 @@
 import { RxExternalLink } from "react-icons/rx";
 import Bookings from "../Bookings";
 import { cn } from "@/lib/utils";
-import CreateBooking from "@/components/CreateBooking";
+// import CreateBooking from "@/components/CreateBooking";
+import FormHorizontalBar from "@/pages/home/components/FormHorizontalBar";
 
 const Overview = ({ data }: { data: any }) => {
   const username = data?.data?.username;
@@ -31,7 +32,7 @@ const Overview = ({ data }: { data: any }) => {
           <h3 className="text-md font-clash font-semibold mb-4">
             Add New Shipment
           </h3>
-          <CreateBooking />
+          <FormHorizontalBar />
         </div>
         <div className="lg:w-[40%] bg-white xl:p-10 py-6 px-2 rounded-3xl">
           <h3 className="text-md font-clash font-semibold">Customer Support</h3>

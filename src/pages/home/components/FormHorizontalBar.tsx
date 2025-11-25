@@ -7,18 +7,29 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { getQuotes } from "@/services/user";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { FiChevronRight, FiCalendar, FiTruck, FiBarChart2, FiSearch } from "react-icons/fi";
+import {
+  FiChevronRight,
+  FiCalendar,
+  FiTruck,
+  FiBarChart2,
+  FiSearch,
+} from "react-icons/fi";
 import { AddressModal } from "./modals/AddressModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
 import { SlLocationPin } from "react-icons/sl";
 import { HiOutlineAdjustmentsHorizontal } from "react-icons/hi2";
 import { NIGERIAN_STATES_AND_CITIES } from "@/constants/nigeriaLocations";
+import { trackBookingsHandler } from "@/hooks/useTrackBookings";
 
 const normalizeStateKey = (value: string) =>
-  value.toLowerCase().replace(/\s+/g, " ").replace(/\s*state$/, "").trim();
+  value
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/\s*state$/, "")
+    .trim();
 
 const normalizeCityKey = (value: string) =>
   value.toLowerCase().replace(/\s+/g, " ").trim();
@@ -31,15 +42,14 @@ const STATE_LOOKUP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string>>(
   {}
 );
 
-const CITY_STATE_MAP = NIGERIAN_STATES_AND_CITIES.reduce<Record<string, string>>(
-  (acc, { state, cities }) => {
-    cities.forEach((city) => {
-      acc[city] = state;
-    });
-    return acc;
-  },
-  {}
-);
+const CITY_STATE_MAP = NIGERIAN_STATES_AND_CITIES.reduce<
+  Record<string, string>
+>((acc, { state, cities }) => {
+  cities.forEach((city) => {
+    acc[city] = state;
+  });
+  return acc;
+}, {});
 
 const NORMALIZED_CITY_LOOKUP = Object.keys(CITY_STATE_MAP).reduce<
   Record<string, string>
@@ -145,8 +155,10 @@ const FormHorizontalBar = ({
   activeMode = "gosendeet",
 }: FormHorizontalBarProps) => {
   const [inputData, setInputData] = useState<any>({});
+  const [trackingNumber, setTrackingNumber] = useState("");
   const [isHydrated, setIsHydrated] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Modal states for Direct mode
   const [pickupModalOpen, setPickupModalOpen] = useState(false);
@@ -203,15 +215,11 @@ const FormHorizontalBar = ({
     weight: z
       .string({ required_error: "Weight is required" })
       .min(1, { message: "Please enter weight" }),
-    dimensions: z
-      .string()
-      .optional(),
+    dimensions: z.string().optional(),
     itemPrice: z
       .string({ required_error: "Item price is required" })
       .min(1, { message: "Please enter item price" }),
-    pickupDate: z
-      .string()
-      .optional(),
+    pickupDate: z.string().optional(),
   });
 
   const {
@@ -282,7 +290,9 @@ const FormHorizontalBar = ({
       });
 
       // Restore package display state (name and data)
-      const pkg = packages.find((p: any) => String(p.id) === String(inputData.packageTypeId));
+      const pkg = packages.find(
+        (p: any) => String(p.id) === String(inputData.packageTypeId)
+      );
       if (pkg) {
         setPackageName(pkg.name);
         setSelectedPackageData(pkg);
@@ -293,23 +303,23 @@ const FormHorizontalBar = ({
   const onSubmit = (data: z.infer<typeof schema>) => {
     saveInputData(data);
   };
-
+  const [loading, setLoading] = useState(false);
   // Handle tracking form submission
   const handleTrackingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const trackingNumber = (e.target as any).trackingNumber.value;
-    if (!trackingNumber) {
+    if (!trackingNumber.trim()) {
       toast.error("Please enter a tracking number");
       return;
     }
-    navigate("/track-booking", { state: { trackingNumber } });
+    trackBookingsHandler(trackingNumber, navigate, setLoading);
   };
 
   // Variant-specific styling
   const containerStyles = cn(
     "w-full max-w-6xl mx-auto pt-16 px-6 pb-10 rounded-3xl",
     variant === "bold" && "bg-white shadow-2xl border-2 border-[#1a1f3a]",
-    variant === "minimal" && "bg-white shadow-2xl border-2 border-amber-200/40 ring-1 ring-amber-100/30",
+    variant === "minimal" &&
+      "bg-white shadow-2xl border-2 border-amber-200/40 ring-1 ring-amber-100/30",
     variant === "floating" && "bg-white shadow-2xl"
   );
 
@@ -321,9 +331,17 @@ const FormHorizontalBar = ({
 
   const inputStyles = cn(
     "w-full outline-0 bg-transparent text-base py-2 px-3 border-b-2 transition-colors",
-    variant === "bold" && "border-[#e5e5e5] hover:border-amber-400 focus:border-amber-400 text-[#1a1a1a] placeholder:text-[#9ca3af]",
-    (variant === "minimal" || variant === "floating") && "border-[#e5e5e5] hover:border-amber-300 focus:border-amber-300 text-[#1a1a1a] placeholder:text-[#9ca3af]"
+    variant === "bold" &&
+      "border-[#e5e5e5] hover:border-amber-400 focus:border-amber-400 text-[#1a1a1a] placeholder:text-[#9ca3af]",
+    (variant === "minimal" || variant === "floating") &&
+      "border-[#e5e5e5] hover:border-amber-300 focus:border-amber-300 text-[#1a1a1a] placeholder:text-[#9ca3af]"
   );
+
+  // Determine if form should be vertical (dashboard route)
+  const isDashboard = location.pathname.includes("dashboard");
+  const containerClass = isDashboard
+    ? `space-y-4`
+    : "grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-4 items-end grid-cols-1 space-y-4 lg:space-y-0";
 
   // Show loading skeleton while hydrating
   if (!isHydrated) {
@@ -386,140 +404,167 @@ const FormHorizontalBar = ({
       {/* Tracking Mode Form */}
       {activeMode === "tracking" ? (
         <form onSubmit={handleTrackingSubmit}>
-          {/* Desktop: Match booking form grid layout */}
-          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-6 items-end">
-            {/* Tracking Number Input - Spans 4 columns */}
-            <div className="lg:col-span-4">
-              <label htmlFor="trackingNumber" className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
+          <div
+            className={cn(
+              "flex flex-col lg:flex-row lg:items-end gap-4",
+              isDashboard ? "flex-col" : ""
+            )}
+          >
+            <div className={isDashboard ? "w-full" : "flex-1"}>
+              <label
+                htmlFor="trackingNumber"
+                className={cn(labelStyles, "flex items-center gap-2")}
+              >
+                <SlLocationPin size={18} className="text-orange500" />
                 Tracking Number
               </label>
               <input
                 type="text"
-                name="trackingNumber"
-                placeholder="Enter your tracking number (GOS*****)"
-                className={inputStyles}
-              />
-            </div>
-
-            {/* Track Button - Last column */}
-            <div className="flex gap-3 items-end min-w-[240px]">
-              <Button
-                type="submit"
-                variant="secondary"
-                size="custom"
-                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
-              >
-                <FiSearch className="text-white mr-1.5 w-4 h-4" />
-                <span className="text-white">Track</span>
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile: Simple vertical layout */}
-          <div className="lg:hidden space-y-4">
-            <div>
-              <label htmlFor="trackingNumber" className={cn(labelStyles, "flex items-center gap-2")}>
-                📦 Tracking Number
-              </label>
-              <input
-                type="text"
-                name="trackingNumber"
+                value={trackingNumber}
+                onChange={(e) => setTrackingNumber(e.target.value)}
                 placeholder="Enter tracking number (GOS*****)"
                 className={inputStyles}
               />
             </div>
+
             <Button
               type="submit"
+              loading={loading}
               variant="secondary"
               size="custom"
-              className="w-full px-8 py-4 justify-center font-bold"
+              className={cn(
+                "font-bold",
+                isDashboard
+                  ? "w-full px-6 py-3 justify-center"
+                  : "px-5 py-2.5 h-auto justify-center text-sm whitespace-nowrap"
+              )}
             >
-              <FiSearch className="text-white mr-2" />
-              <span className="text-white">Track Shipment</span>
+              <FiSearch className="text-white mr-1.5 w-4 h-4" />
+              <span className="text-white">
+                {isDashboard ? "Track Shipment" : "Track"}
+              </span>
             </Button>
           </div>
         </form>
       ) : activeMode === "gosendeet" ? (
         // Direct Mode with Modal Triggers
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Desktop: Horizontal Grid with Modal Triggers */}
-          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,0.8fr)_auto] gap-4 items-end">
+          <div className={containerClass}>
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
+                <SlLocationPin size={18} className="text-orange500" />
                 Pickup Location
-                {errors.pickupLocation && <span className="text-red-500">*</span>}
+                {errors.pickupLocation && (
+                  <span className="text-red-500">*</span>
+                )}
               </label>
               <button
                 type="button"
                 onClick={() => setPickupModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.pickupLocation
+                    ? "border-red-500"
+                    : pickupLocation
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span
+                  className={cn(
+                    "text-base truncate",
+                    pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]"
+                  )}
+                >
                   {pickupLocation || "Where from?"}
                 </span>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.pickupLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.pickupLocation.message}
+                </p>
               )}
             </div>
 
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
+                <SlLocationPin size={18} className="text-orange500" />
                 Destination
-                {errors.dropOffLocation && <span className="text-red-500">*</span>}
+                {errors.dropOffLocation && (
+                  <span className="text-red-500">*</span>
+                )}
               </label>
               <button
                 type="button"
                 onClick={() => setDestinationModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.dropOffLocation
+                    ? "border-red-500"
+                    : dropOffLocation
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span
+                  className={cn(
+                    "text-base truncate",
+                    dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]"
+                  )}
+                >
                   {dropOffLocation || "Where to?"}
                 </span>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.dropOffLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.dropOffLocation.message}
+                </p>
               )}
             </div>
 
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
+                <HiOutlineAdjustmentsHorizontal
+                  size={18}
+                  className="text-blue-500"
+                />
                 Package Details
-                {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
+                {(errors.packageTypeId || errors.weight) && (
+                  <span className="text-red-500">*</span>
+                )}
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.packageTypeId || errors.weight
+                    ? "border-red-500"
+                    : packageTypeId && weight && dimensions
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
                 <div className="flex-1 min-w-0">
                   {packageName && weight && dimensions ? (
                     <div className="space-y-0.5">
-                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">
+                        {packageName}
+                      </p>
                       <p className="text-xs text-gray-600 truncate">
-                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                        {dimensions} • {weight}
+                        {selectedPackageData?.weightUnit || "kg"}
                       </p>
                     </div>
                   ) : (
-                    <span className="text-base text-[#9ca3af]">Select details</span>
+                    <span className="text-base text-[#9ca3af]">
+                      Select details
+                    </span>
                   )}
                 </div>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
@@ -531,7 +576,7 @@ const FormHorizontalBar = ({
               )}
             </div>
 
-            {/* Pickup - Modal Trigger */}
+            {/* Pickup - Modal Trigger (Only for gosendeet mode) */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
                 <FiCalendar className="w-4 h-4 opacity-90" />
@@ -542,34 +587,46 @@ const FormHorizontalBar = ({
                 onClick={() => setDateModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  pickupDate ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  pickupDate
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
                 {pickupDate ? (
                   <div className="flex-1 min-w-0">
                     <div className="space-y-0.5">
                       <p className="text-base text-[#1a1a1a] font-semibold truncate">
-                        {new Date(pickupDate.split(' ')[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {new Date(pickupDate.split(" ")[0]).toLocaleDateString(
+                          "en-US",
+                          { month: "short", day: "numeric" }
+                        )}
                       </p>
                       <p className="text-xs text-gray-600 truncate">
-                        {pickupDate.split(' ').slice(1).join(' ')}
+                        {pickupDate.split(" ").slice(1).join(" ")}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-base text-[#9ca3af]">Select pickup</span>
+                  <span className="text-base text-[#9ca3af]">
+                    Select pickup
+                  </span>
                 )}
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-3 items-end min-w-[200px]">
+            <div className={isDashboard ? "w-full" : "flex gap-3 items-end"}>
               <Button
                 type="button"
                 variant={"secondary"}
                 size={"custom"}
-                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
+                className={cn(
+                  "font-bold whitespace-nowrap",
+                  isDashboard
+                    ? "w-full px-6 py-3 justify-center"
+                    : "flex-1 px-5 py-2.5 h-auto justify-center text-sm"
+                )}
                 loading={isQuoteLoading}
                 onClick={handleSubmit((data) => {
                   const invalidFields: string[] = [];
@@ -610,168 +667,21 @@ const FormHorizontalBar = ({
                 })}
               >
                 <FiTruck className="text-white mr-1.5 w-4 h-4" />
-                <span className="text-white">Ship Now</span>
+                <span className="text-white">
+                  {isDashboard ? "Ship Now" : "Ship Now"}
+                </span>
               </Button>
             </div>
-          </div>
-
-          {/* Mobile: Vertical Stack with Modal Triggers */}
-          <div className="lg:hidden space-y-4">
-            {/* Pickup Location - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
-                Pickup Location
-                {errors.pickupLocation && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setPickupModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {pickupLocation || "Where from?"}
-                </span>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {errors.pickupLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
-              )}
-            </div>
-
-            {/* Destination - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
-                Destination
-                {errors.dropOffLocation && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setDestinationModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {dropOffLocation || "Where to?"}
-                </span>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {errors.dropOffLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
-              )}
-            </div>
-
-            {/* Package Details - Single Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
-                Package Details
-                {(errors.packageTypeId || errors.weight) && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setPackageModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
-                )}
-              >
-                <div className="flex-1 min-w-0">
-                  {packageName && weight && dimensions ? (
-                    <div className="space-y-0.5">
-                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
-                      <p className="text-xs text-gray-600 truncate">
-                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
-                      </p>
-                    </div>
-                  ) : (
-                    <span className="text-base text-[#9ca3af]">Select details</span>
-                  )}
-                </div>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {(errors.packageTypeId || errors.weight) && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.packageTypeId?.message || errors.weight?.message}
-                </p>
-              )}
-            </div>
-
-            {/* Pickup - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <FiCalendar className="w-3.5 h-3.5 opacity-90" />
-                Pickup
-              </label>
-              <button
-                type="button"
-                onClick={() => setDateModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  pickupDate ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                {pickupDate ? (
-                  <div className="flex-1 min-w-0">
-                    <div className="space-y-0.5">
-                      <p className="text-base text-[#1a1a1a] font-semibold truncate">
-                        {new Date(pickupDate.split(' ')[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </p>
-                      <p className="text-xs text-gray-600 truncate">
-                        {pickupDate.split(' ').slice(1).join(' ')}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-base text-[#9ca3af]">Select pickup</span>
-                )}
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-            </div>
-
-            {/* Get Quote Button */}
-            <Button
-              type="button"
-              variant={"secondary"}
-              size={"custom"}
-              className="w-full px-6 py-3 justify-center font-bold text-sm"
-              loading={isQuoteLoading}
-              onClick={handleSubmit((data) => {
-                saveInputData(data);
-                getQuotesDirectly([
-                  {
-                    ...data,
-                    quantity: 1,
-                    packageDescription: {
-                      isFragile: false,
-                      isPerishable: false,
-                      isExclusive: false,
-                      isHazardous: false,
-                    },
-                  },
-                ]);
-              })}
-            >
-              <FiTruck className="text-white mr-1.5 w-4 h-4" />
-              <span className="text-white">Ship Now</span>
-            </Button>
           </div>
         </form>
       ) : activeMode === "compare" ? (
         // Compare Mode with Modal Triggers (no Pickup Date)
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* Desktop: Horizontal Grid with 3 fields (no pickup date) */}
-          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] gap-4 items-end">
+          <div className={containerClass}>
             {/* Pickup Location - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
+                <SlLocationPin size={18} className="text-orange500" />
                 Pickup Location
                 {!pickupLocation && <span className="text-red-500">*</span>}
               </label>
@@ -780,23 +690,34 @@ const FormHorizontalBar = ({
                 onClick={() => setPickupModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.pickupLocation
+                    ? "border-red-500"
+                    : pickupLocation
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span
+                  className={cn(
+                    "text-base truncate",
+                    pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]"
+                  )}
+                >
                   {pickupLocation || "Where from?"}
                 </span>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.pickupLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.pickupLocation.message}
+                </p>
               )}
             </div>
 
             {/* Destination - Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
+                <SlLocationPin size={18} className="text-orange500" />
                 Destination
                 {!dropOffLocation && <span className="text-red-500">*</span>}
               </label>
@@ -805,44 +726,69 @@ const FormHorizontalBar = ({
                 onClick={() => setDestinationModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.dropOffLocation
+                    ? "border-red-500"
+                    : dropOffLocation
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
-                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
+                <span
+                  className={cn(
+                    "text-base truncate",
+                    dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]"
+                  )}
+                >
                   {dropOffLocation || "Where to?"}
                 </span>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
               </button>
               {errors.dropOffLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.dropOffLocation.message}
+                </p>
               )}
             </div>
 
             {/* Package Details - Single Modal Trigger */}
             <div>
               <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
+                <HiOutlineAdjustmentsHorizontal
+                  size={18}
+                  className="text-blue-500"
+                />
                 Package Details
-                {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
+                {(!packageTypeId || !weight || !itemPrice) && (
+                  <span className="text-red-500">*</span>
+                )}
               </label>
               <button
                 type="button"
                 onClick={() => setPackageModalOpen(true)}
                 className={cn(
                   "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
+                  errors.packageTypeId || errors.weight
+                    ? "border-red-500"
+                    : packageTypeId && weight && dimensions
+                    ? "border-amber-400"
+                    : "border-[#e5e5e5] hover:border-amber-400"
                 )}
               >
                 <div className="flex-1 min-w-0">
                   {packageName && weight && dimensions ? (
                     <div className="space-y-0.5">
-                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
+                      <p className="text-base text-[#1a1a1a] font-semibold truncate">
+                        {packageName}
+                      </p>
                       <p className="text-xs text-gray-600 truncate">
-                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
+                        {dimensions} • {weight}
+                        {selectedPackageData?.weightUnit || "kg"}
                       </p>
                     </div>
                   ) : (
-                    <span className="text-base text-[#9ca3af]">Select details</span>
+                    <span className="text-base text-[#9ca3af]">
+                      Select details
+                    </span>
                   )}
                 </div>
                 <FiChevronRight className="w-4 h-4 text-gray-400 group-hover:text-amber-500 transition-colors flex-shrink-0" />
@@ -855,12 +801,17 @@ const FormHorizontalBar = ({
             </div>
 
             {/* Compare Button */}
-            <div className="flex gap-3 items-end min-w-[240px]">
+            <div className={isDashboard ? "w-full" : "flex gap-3 items-end"}>
               <Button
                 type="button"
                 variant={"secondary"}
                 size={"custom"}
-                className="flex-1 px-5 py-2.5 h-auto justify-center font-bold text-sm whitespace-nowrap"
+                className={cn(
+                  "font-bold whitespace-nowrap",
+                  isDashboard
+                    ? "w-full px-6 py-3 justify-center"
+                    : "flex-1 px-5 py-2.5 h-auto justify-center text-sm"
+                )}
                 loading={isQuoteLoading}
                 onClick={handleSubmit((data) => {
                   saveInputData(data);
@@ -883,123 +834,6 @@ const FormHorizontalBar = ({
                 <span className="text-white">Compare</span>
               </Button>
             </div>
-          </div>
-
-          {/* Mobile: Vertical Stack with Modal Triggers (no pickup date) */}
-          <div className="lg:hidden space-y-4">
-            {/* Pickup Location - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
-                Pickup Location
-                {!pickupLocation && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setPickupModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.pickupLocation ? "border-red-500" : pickupLocation ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                <span className={cn("text-base truncate", pickupLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {pickupLocation || "Where from?"}
-                </span>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {errors.pickupLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.pickupLocation.message}</p>
-              )}
-            </div>
-
-            {/* Destination - Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <SlLocationPin size={18} className="text-orange500"/>
-                Destination
-                {!dropOffLocation && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setDestinationModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between",
-                  errors.dropOffLocation ? "border-red-500" : dropOffLocation ? "border-amber-400" : "border-[#e5e5e5]"
-                )}
-              >
-                <span className={cn("text-base truncate", dropOffLocation ? "text-[#1a1a1a]" : "text-[#9ca3af]")}>
-                  {dropOffLocation || "Where to?"}
-                </span>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {errors.dropOffLocation && (
-                <p className="text-xs text-red-500 mt-1">{errors.dropOffLocation.message}</p>
-              )}
-            </div>
-
-            {/* Package Details - Single Modal Trigger */}
-            <div>
-              <label className={cn(labelStyles, "flex items-center gap-2")}>
-                <HiOutlineAdjustmentsHorizontal size={18} className="text-blue-500"/>
-                Package Details
-                {(!packageTypeId || !weight || !itemPrice) && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => setPackageModalOpen(true)}
-                className={cn(
-                  "w-full text-left py-2 px-3 border-b-2 transition-colors flex items-center justify-between group",
-                  errors.packageTypeId || errors.weight ? "border-red-500" : (packageTypeId && weight && dimensions) ? "border-amber-400" : "border-[#e5e5e5] hover:border-amber-400"
-                )}
-              >
-                <div className="flex-1 min-w-0">
-                  {packageName && weight && dimensions ? (
-                    <div className="space-y-0.5">
-                      <p className="text-base text-[#1a1a1a] font-semibold truncate">{packageName}</p>
-                      <p className="text-xs text-gray-600 truncate">
-                        {dimensions} • {weight}{selectedPackageData?.weightUnit || 'kg'}
-                      </p>
-                    </div>
-                  ) : (
-                    <span className="text-base text-[#9ca3af]">Select details</span>
-                  )}
-                </div>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </button>
-              {(errors.packageTypeId || errors.weight) && (
-                <p className="text-xs text-red-500 mt-1">
-                  {errors.packageTypeId?.message || errors.weight?.message}
-                </p>
-              )}
-            </div>
-
-            {/* Compare Button */}
-            <Button
-              type="button"
-              variant={"secondary"}
-              size={"custom"}
-              className="w-full px-6 py-3 justify-center font-bold text-sm"
-              loading={isQuoteLoading}
-              onClick={handleSubmit((data) => {
-                saveInputData(data);
-                // Compare directly - get quotes immediately without opening modal
-                getQuotesDirectly([
-                  {
-                    ...data,
-                    quantity: 1,
-                    packageDescription: {
-                      isFragile: false,
-                      isPerishable: false,
-                      isExclusive: false,
-                      isHazardous: false,
-                    },
-                  },
-                ]);
-              })}
-            >
-              <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
-              <span className="text-white">Compare</span>
-            </Button>
           </div>
         </form>
       ) : null}
@@ -1040,7 +874,14 @@ const FormHorizontalBar = ({
             currentWeight={weight || ""}
             currentDimensions={dimensions || ""}
             currentItemPrice={itemPrice || ""}
-            onConfirm={(id, name, weightValue, dimensionsValue, itemPriceValue, packageData) => {
+            onConfirm={(
+              id,
+              name,
+              weightValue,
+              dimensionsValue,
+              itemPriceValue,
+              packageData
+            ) => {
               setValue("packageTypeId", id, { shouldValidate: true });
               setValue("weight", weightValue, { shouldValidate: true });
               setValue("dimensions", dimensionsValue);
@@ -1054,7 +895,7 @@ const FormHorizontalBar = ({
                 packageTypeId: id,
                 weight: weightValue,
                 dimensions: dimensionsValue,
-                itemPrice: itemPriceValue
+                itemPrice: itemPriceValue,
               });
             }}
           />
