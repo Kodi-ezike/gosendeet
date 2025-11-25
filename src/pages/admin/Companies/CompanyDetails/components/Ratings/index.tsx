@@ -3,7 +3,10 @@ import negative from "@/assets/icons/thumbs-down.png";
 import neutral from "@/assets/icons/hand-peace.png";
 import avatar from "@/assets/images/avatar1.png";
 import Rating from "@/components/Rating";
-import { useGetCompanyRatings } from "@/queries/admin/useGetAdminCompanies";
+import {
+  useGetCompanyRatings,
+  useGetCompanyRatingStats,
+} from "@/queries/admin/useGetAdminCompanies";
 import { Spinner } from "@/components/Spinner";
 import { formatDate } from "@/lib/utils";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
@@ -19,6 +22,11 @@ const Ratings = ({ companyId }: { companyId: string }) => {
     isSuccess,
     isError,
   } = useGetCompanyRatings(companyId, currentPage);
+
+  const { data: stats, isLoading: statsLoading } =
+    useGetCompanyRatingStats(companyId);
+  const ratingStats = stats?.data;
+  console.log(stats);
 
   useEffect(() => {
     const totalPages = company_ratings?.data?.page?.totalPages;
@@ -43,35 +51,51 @@ const Ratings = ({ companyId }: { companyId: string }) => {
       )}
 
       {!isLoading &&
+        !statsLoading &&
         isSuccess &&
         company_ratings &&
         company_ratings?.data?.content?.length > 0 && (
           <div>
             <div className="bg-white mb-8">
-              <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
+              <div className="grid lg:grid-cols-5 grid-cols-2 md:gap-6 gap-6 md:p-6 p-4">
                 <div>
-                  <p className="font-medium text-sm mb-2">Responses Received</p>
-                  <p className="font-semibold text-2xl font-inter">18</p>
+                  <p className="font-medium text-sm mb-2">Total Responses</p>
+                  <p className="font-semibold md:text-2xl text-xl font-inter">
+                    {ratingStats.totalRatings}
+                  </p>
                 </div>
+                <div>
+                  <p className="font-medium text-sm mb-2">Average Ratings</p>
+                  <p className="font-semibold md:text-2xl text-xl font-inter">
+                    {ratingStats.averageRatingScore}/5
+                  </p>
+                </div>
+
                 <div className="flex gap-2 items-center">
                   <img src={positive} alt="positive" />
                   <div>
                     <p className="font-medium text-sm mb-2">Positive</p>
-                    <p className="font-semibold text-2xl font-inter">85%</p>
+                    <p className="font-semibold md:text-2xl text-xl font-inter">
+                      {ratingStats.percentagePositiveRatings}%
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-2 items-center">
                   <img src={neutral} alt="neutral" />
                   <div>
                     <p className="font-medium text-sm mb-2">Neutral</p>
-                    <p className="font-semibold text-2xl font-inter">10%</p>
+                    <p className="font-semibold md:text-2xl text-xl font-inter">
+                      {ratingStats.percentageNeutralRatings}%
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-2 items-center">
                   <img src={negative} alt="negative" />
                   <div>
                     <p className="font-medium text-sm mb-2">Negative</p>
-                    <p className="font-semibold text-2xl font-inter">5%</p>
+                    <p className="font-semibold md:text-2xl text-xl font-inter">
+                      {ratingStats.percentageNegativeRatings}%
+                    </p>
                   </div>
                 </div>
               </div>

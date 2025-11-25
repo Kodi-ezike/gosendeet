@@ -265,9 +265,6 @@ const Orders = ({ companyId }: { companyId: string }) => {
                         >
                           Update progress
                         </p>
-                        <p className="flex items-center gap-2 py-2 px-4 hover:bg-purple200 rounded-md cursor-pointer">
-                          Refund
-                        </p>
                       </PopoverContent>
                     </Popover>
                   </div>

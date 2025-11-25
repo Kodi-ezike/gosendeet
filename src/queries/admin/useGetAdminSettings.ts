@@ -66,7 +66,7 @@ export const useGetDeliveryProgress = (options?: { page?: number; minimize?: boo
   };
 };
 
-export const useGetPackageType = (options?: { page?: number; minimize?: boolean }) => {
+export const useGetPackageType = (options?: { page?: number; minimize?: boolean; search?:string }) => {
   const query = useQuery({
     queryKey: ["package_types", options],
     queryFn: () => getPackageType(options),

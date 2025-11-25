@@ -38,26 +38,25 @@ export function PackageTypeModal({
   type: string;
   info: any;
 }) {
-  
   const { data: weightUnits } = useGetAdminWeightUnits();
   const { data: dimensionUnits } = useGetAdminDimensionUnits();
 
   const schema = z.object({
     name: z
       .string({ required_error: "Name is required" })
-      .min(1, { message: "Please enter a name" }),
+      .min(3, { message: "Please enter a name" }),
     length: z
-      .string({ required_error: "Length is required" })
-      .min(1, { message: "Please enter a length" }),
+      .number({ required_error: "Length is required" })
+      .min(1, { message: "Please enter a valid length" }),
     width: z
-      .string({ required_error: "Width is required" })
-      .min(1, { message: "Please enter a width" }),
+      .number({ required_error: "Width is required" })
+      .min(1, { message: "Please enter a valid width" }),
     height: z
-      .string({ required_error: "Height is required" })
-      .min(1, { message: "Please enter a height" }),
+      .number({ required_error: "Height is required" })
+      .min(1, { message: "Please enter a valid height" }),
     maxWeight: z
-      .string({ required_error: "Max weight is required" })
-      .min(1, { message: "Please enter a max weight" }),
+      .number({ required_error: "Max weight is required" })
+      .min(1, { message: "Please enter a valid max weight" }),
     weightUnit: z
       .string({ required_error: "Weight unit is required" })
       .min(1, { message: "Please enter a weight unit" }),
@@ -70,7 +69,7 @@ export function PackageTypeModal({
     description: z
       // .string().optional(),
       .string({ required_error: "Description is required" })
-      .min(1, { message: "Please enter a description" }),
+      .min(5, { message: "Please enter a description" }),
     imageUrl: z
       .string({ required_error: "Image URL is required" })
       .min(1, { message: "Please upload an image" })
@@ -114,10 +113,10 @@ export function PackageTypeModal({
     } else if (open && type === "create") {
       reset({
         name: "",
-        length: "",
-        width: "",
-        height: "",
-        maxWeight: "",
+        length: undefined,
+        width: undefined,
+        height: undefined,
+        maxWeight: undefined,
         weightUnit: "",
         dimensionUnit: "",
         code: "",
@@ -207,9 +206,10 @@ export function PackageTypeModal({
           const response = await uploadImage(base64, selectedFile.name);
 
           // Extract URL from nested response structure
-          const imageUrl = response.data?.data?.url ||
-                           response.data?.data?.image?.url ||
-                           response.data?.data?.display_url;
+          const imageUrl =
+            response.data?.data?.url ||
+            response.data?.data?.image?.url ||
+            response.data?.data?.display_url;
 
           if (imageUrl) {
             setValue("imageUrl", imageUrl, { shouldValidate: true });
@@ -285,7 +285,9 @@ export function PackageTypeModal({
                   <div className="border-b mb-2">
                     <input
                       type="text"
-                      {...register("length")}
+                      {...register("length", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
                       defaultValue={info?.length}
                       placeholder="Enter length"
                       className="w-full outline-0 border-b-0 py-2 "
@@ -308,7 +310,9 @@ export function PackageTypeModal({
                   <div className="border-b mb-2">
                     <input
                       type="text"
-                      {...register("width")}
+                      {...register("width", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
                       defaultValue={info?.width}
                       placeholder="Enter width"
                       className="w-full outline-0 border-b-0 py-2 "
@@ -328,7 +332,9 @@ export function PackageTypeModal({
                   <div className="border-b mb-2">
                     <input
                       type="text"
-                      {...register("height")}
+                      {...register("height", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
                       defaultValue={info?.height}
                       placeholder="Enter height"
                       className="w-full outline-0 border-b-0 py-2"
@@ -351,7 +357,9 @@ export function PackageTypeModal({
                   <div className="border-b mb-2">
                     <input
                       type="text"
-                      {...register("maxWeight")}
+                      {...register("maxWeight", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
                       defaultValue={info?.maxWeight}
                       placeholder="Enter max weight"
                       className="w-full outline-0 border-b-0 py-2"
@@ -370,8 +378,10 @@ export function PackageTypeModal({
                   </label>
                   <div className="border-b mb-2">
                     <Select
-                      onValueChange={(val) => setValue("weightUnit", val)}
-                      defaultValue={weightUnit}
+                      onValueChange={(val) =>
+                        setValue("weightUnit", val, { shouldValidate: true })
+                      }
+                      value={weightUnit}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select weight unit" />
@@ -401,8 +411,10 @@ export function PackageTypeModal({
                   </label>
                   <div className="border-b mb-2">
                     <Select
-                      onValueChange={(val) => setValue("dimensionUnit", val)}
-                      defaultValue={dimensionUnit}
+                      onValueChange={(val) =>
+                        setValue("dimensionUnit", val, { shouldValidate: true })
+                      }
+                      value={dimensionUnit}
                     >
                       <SelectTrigger className="outline-0 border-0 focus-visible:border-transparent focus-visible:ring-transparent w-full py-2 px-0">
                         <SelectValue placeholder="Select dimension unit" />
@@ -481,7 +493,8 @@ export function PackageTypeModal({
                           alt="Package preview"
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
+                            (e.target as HTMLImageElement).src =
+                              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23ddd' width='100' height='100'/%3E%3Ctext fill='%23999' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
                           }}
                         />
                       </div>

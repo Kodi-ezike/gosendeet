@@ -193,14 +193,18 @@ export const createPackageType = async (data: any) => {
   }
 };
 
-export const getPackageType = async (options?: { page?: number; minimize?: boolean }) => {
+export const getPackageType = async (options?: { page?: number; minimize?: boolean; search?:string }) => {
   try {
     const params = new URLSearchParams();
 
     if (options?.page !== undefined) {
       params.append("page", options.page.toString());
-    } else if (options?.minimize !== undefined) {
+    }
+     if (options?.minimize !== undefined) {
       params.append("minimize", options.minimize.toString());
+    }
+    if (options?.search !== undefined) {
+      params.append("search", options.search);
     }
 
     const res = await authApi.get(`/package-types?${params.toString()}`);

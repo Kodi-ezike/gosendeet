@@ -33,14 +33,14 @@ const Bookings = () => {
   const [bookingStatus, setBookingStatus] = useState("");
   const [packageTypeId, setPackageTypeId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
   const userId = sessionStorage.getItem("userId") || "";
  const [range, setRange] = useState<DateRange | undefined>();
     const startStr = range?.from ? format(range.from, "yyyy-MM-dd") : "";
     const endStr = range?.to ? format(range.to, "yyyy-MM-dd") : "";
-  
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
 
   // Reset pagination when status changes
   useEffect(() => {
