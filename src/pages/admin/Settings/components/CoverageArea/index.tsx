@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BiSolidTrashAlt } from "react-icons/bi";
-import { IoSearchOutline } from "react-icons/io5";
+// import { IoSearchOutline } from "react-icons/io5";
 import { CoverageAreaModal } from "./modals/CoverageAreaModal";
 import { useGetCoverageArea } from "@/queries/admin/useGetAdminSettings";
 import { FiEdit } from "react-icons/fi";
@@ -52,7 +52,7 @@ const CoverageArea = () => {
   return (
     <div>
       <div className="flex items-center gap-4 justify-end mb-4">
-        <div className="flex items-center gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
+        {/* <div className="flex items-center gap-2 border-2 rounded-lg h-[40px] px-2 py-2">
           <IoSearchOutline className="text-neutral500" />
           <input
             type="text"
@@ -60,7 +60,7 @@ const CoverageArea = () => {
             className="border-0 outline-0 w-[150px] text-sm text-neutral600"
             placeholder="Search"
           />
-        </div>
+        </div> */}
 
         <Button
           variant={"secondary"}

@@ -9,7 +9,7 @@ import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { FiEdit } from "react-icons/fi";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 import { Spinner } from "@/components/Spinner";
-import { deletePackageType } from "@/services/adminSettings";
+import { deletePackageType, updatePackageType } from "@/services/adminSettings";
 import { toast } from "sonner";
 import DeleteModal from "@/components/modals/DeleteModal";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
@@ -18,10 +18,18 @@ import { PaginationComponent } from "@/components/Pagination";
 const PackageType = () => {
   const [lastPage, setLastPage] = useState(1);
   const { currentPage, updatePage } = usePaginationSync(lastPage);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const { data, isLoading, isSuccess, isError } = useGetPackageType({
     page: currentPage,
+    search: debouncedSearchTerm,
   });
+
+  // Reset pagination when status changes
+  useEffect(() => {
+    updatePage(1); // Reset to page 1
+  }, [debouncedSearchTerm]); // Reset when filters change
 
   useEffect(() => {
     const totalPages = data?.data?.page?.totalPages;
@@ -30,11 +38,36 @@ const PackageType = () => {
     }
   }, [data?.data?.page?.totalPages]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000); // 1 second after user stops typing
+
+    return () => {
+      clearTimeout(handler); // cancel timeout if user types again
+    };
+  }, [searchTerm]);
+
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [type, setType] = useState("");
   const [info, setInfo] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
+
+  const { mutate: updateType } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      updatePackageType(id, data), // call with correct shape
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["package_types"],
+      });
+    },
+
+    onError: (error: any) => {
+      toast.error(error?.message || "Something went wrong");
+    },
+  });
 
   const { mutate: deleteService, isPending: pendingDelete } = useMutation({
     mutationFn: (id: string) => deletePackageType(id), // ✅ call with correct shape
@@ -62,7 +95,10 @@ const PackageType = () => {
             type="text"
             role="search"
             className="border-0 outline-0 w-[150px] text-sm text-neutral600"
-            placeholder="Search"
+            placeholder="Search order"
+            onChange={(e: any) => {
+              setSearchTerm(e.target.value);
+            }}
           />
         </div>
 
@@ -144,7 +180,12 @@ const PackageType = () => {
                     <div className="flex-1">
                       <Switch
                         checked={item.active}
-                        // onCheckedChange={field.onChange}
+                        onCheckedChange={() =>
+                          updateType({
+                            id: item?.id,
+                            data: { active: !item?.active },
+                          })
+                        }
                       />
                     </div>
                     <div className="w-[5%] flex items-center gap-4">

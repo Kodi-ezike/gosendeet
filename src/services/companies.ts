@@ -147,3 +147,12 @@ export const getCompanyRatings = async (id: string, page: number) => {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const getCompanyRatingStats = async (id: string) => {
+  try {
+    const res = await api.get(`/ratings/stats?companyId=${id}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
