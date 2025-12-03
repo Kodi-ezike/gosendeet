@@ -53,20 +53,23 @@ const Delivery = () => {
       .email({ message: "Invalid email address" })
       .or(z.literal("")) // allow empty string
       .optional(),
-    receiver_name: z
-      .string({ required_error: "Receiver’s name is required" })
-      .min(1, { message: "Name cannot be empty" }),
+receiver_name: z
+  .string({ required_error: "Receiver’s name is required" })
+  .trim()
+  .min(1, { message: "Name cannot be empty" })
+  .regex(/^[A-Za-z\s'-]+$/, { message: "Name must contain only letters" }),
+
     receiver_phone: z
       .string({ required_error: "Receiver’s number is required" })
       .regex(/^\+?[0-9]{11,15}$/, {
-        message: "Invalid phone number",
+        message: "Receiver’s number is required",
       }),
 
     receiver_email: z
       .string()
-      .email({ message: "Invalid email address" })
-      .or(z.literal("")) // allow empty string
-      .optional(),
+      .email({ message: "Receiver’s email is required" })
+      // .or(z.literal("")) // allow empty string
+      // .optional(),
   });
 
   const {
@@ -163,6 +166,7 @@ const Delivery = () => {
                 type="text"
                 placeholder="Enter your name"
                 register={register}
+                disabled
               />
               {errors.sender_name && (
                 <p className="error text-xs text-[#FF0000]">
@@ -178,6 +182,7 @@ const Delivery = () => {
                 type="text"
                 placeholder="Enter your phone number"
                 register={register}
+                disabled
                 onKeyDown={allowOnlyNumbers}
               />
 
@@ -195,6 +200,7 @@ const Delivery = () => {
               label="Sender’s Email"
               name="sender_email"
               type="text"
+              disabled
               placeholder="Enter your email"
               register={register}
             />
@@ -259,7 +265,7 @@ const Delivery = () => {
           <div className="">
             <Button
               type="submit"
-              className="bg-purple400 rounded-full py-3 px-8 text-white"
+              className=" rounded-full py-3 px-8 text-white"
               loading={isPending}
             >
               {/* {isPending && <Loader2 className="h-6 w-6 animate-spin" />}  */}

@@ -438,7 +438,7 @@ const Calculator = () => {
                   {/* Price - Prominent Position */}
                   <div className="text-right">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                      Starting From
+                      Total Cost
                     </p>
                     <div className="flex items-baseline gap-1">
                       <span className="text-xs font-semibold text-gray-500">

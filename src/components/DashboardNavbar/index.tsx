@@ -43,7 +43,7 @@ const DashboardNavbar = () => {
         {/* Hamburger Icon (mobile view) */}
         <div className="lg:hidden flex items-center gap-4">
           <div className="flex flex-row gap-4 items-center">
-            <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+            <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-orange500">
               {letter}
             </div>
           </div>
@@ -75,7 +75,7 @@ const DashboardNavbar = () => {
         </ul>
 
         <div className="hidden lg:flex lg:flex-row items-center flex-col">
-          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-orange500">
             {letter}
           </div>
           <Button

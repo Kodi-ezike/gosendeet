@@ -1,5 +1,4 @@
 import Layout from "@/layouts/HomePageLayout";
-import purple from "@/assets/icons/big-purple-checkmark.png";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
 import { formatDate } from "@/lib/utils";
 import { trackBookingsHandler } from "@/hooks/useTrackBookings";
+import { Check } from "lucide-react";
 
 const Confirmation = () => {
   const [searchParams] = useSearchParams();
@@ -18,6 +18,7 @@ const Confirmation = () => {
   const userId = sessionStorage.getItem("userId") || "";
   const navigate = useNavigate();
   useEffect(() => {
+    sessionStorage.setItem("bookingCompleted", "true");
     if (!userId) {
       toast.error("Please sign in to continue");
       setTimeout(() => {
@@ -53,11 +54,10 @@ const Confirmation = () => {
             <div className="lg:w-[65%] flex flex-col gap-6">
               <div className="px-4 py-20 bg-purple300 rounded-xl">
                 <div className="flex flex-col gap-2 justify-center items-center text-center">
-                  <img
-                    src={purple}
-                    alt="check"
-                    className="w-[70px] h-[70px] rounded-full"
-                  />
+                 
+                  <div className="w-[70px] h-[70px] rounded-full bg-orange500 text-white flex justify-center items-center">
+                    <Check size={50}/>
+                  </div>
                   <h2 className="font-clash font-semibold text-2xl mt-1">
                     Order Placed Successfully
                   </h2>

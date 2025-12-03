@@ -307,6 +307,40 @@ const FormHorizontalBar = ({
     }
   }, [inputData?.packageTypeId, packages, setValue]);
 
+  // ----- Handle unauthenticated quick quote -----
+  useEffect(() => {
+    const isUnauthenticated =
+      sessionStorage.getItem("unauthenticated") === "true";
+    if (!isUnauthenticated) return;
+
+    const stored = sessionStorage.getItem("bookingInputData");
+    if (!stored) return;
+
+    let parsed;
+    try {
+      parsed = normalizeData(JSON.parse(stored));
+    } catch {
+      console.error("Invalid bookingInputData in sessionStorage");
+      return;
+    }
+
+    getQuotesDirectly([
+      {
+        ...parsed,
+        quantity: 1,
+        itemValue: Number(parsed.itemPrice),
+        packageDescription: {
+          isFragile: false,
+          isPerishable: false,
+          isExclusive: false,
+          isHazardous: false,
+        },
+      },
+    ]);
+
+    sessionStorage.removeItem("unauthenticated");
+  }, []);
+
   const onSubmit = (data: z.infer<typeof schema>) => {
     saveInputData(data);
   };

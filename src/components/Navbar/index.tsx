@@ -123,13 +123,13 @@ const Navbar = () => {
                 {letter}
               </div> */}
             <div
-              className="hidden lg:flex items-center gap-2 text-purple500 cursor-pointer"
+              className="hidden lg:flex items-center gap-2 text-orange500 cursor-pointer"
               onClick={() => {
                 role === "user" && navigate("/dashboard");
                 role === "super_admin" && navigate("/admin-dashboard");
               }}
             >
-              <Home className="text-purple500" size={24} />
+              <Home className="text-orange500" size={24} />
               <span>Dashboard</span>
             </div>
           </>
