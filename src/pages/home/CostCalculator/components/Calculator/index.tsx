@@ -3,7 +3,7 @@ import green from "@/assets/icons/green-checkmark.png";
 // import avatar1 from "@/assets/images/avatar1.png";
 // import { DetailsModal } from "./modals/details";
 import { Button } from "@/components/ui/button";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import FormHorizontalBar from "@/pages/home/components/FormHorizontalBar";
@@ -19,6 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Copy, Share2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { shareQuotes } from "@/services/user";
+import { LIVE_URL } from "@/services/axios";
+import { useGetSharedQuotes } from "@/queries/user/useGetUserBookings";
 
 const Calculator = () => {
   // const options = [
@@ -29,6 +34,12 @@ const Calculator = () => {
   const userId = sessionStorage.getItem("userId") || "";
 
   const location = useLocation();
+
+  const [searchParams] = useSearchParams();
+
+  const shareId = searchParams.get("shareId") || "";
+   
+  const {data: sharedQuote} = useGetSharedQuotes(shareId)
 
   const { results, inputData: stateInputData } = location.state || {};
 
@@ -52,7 +63,11 @@ const Calculator = () => {
   const [priceRange, setPriceRange] = useState("all");
 
   useEffect(() => {
-    if (results) {
+
+    if (shareId !== '') {
+      setData(sharedQuote);
+    }
+    else{
       setData(results);
     }
   }, [results]);
@@ -172,6 +187,53 @@ const Calculator = () => {
     }
   };
 
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+
+  const { mutate: share, isPending: shareLoading } = useMutation({
+    mutationFn: shareQuotes,
+    onSuccess: (data: any) => {
+      const shareId = data?.data?.shareId;
+      setShareUrl(`${LIVE_URL}/cost-calculator?shareId=${shareId}`);
+      toast.success('Share link created')
+    },
+    onError: (error: any) => {
+      toast.error(error?.error);
+    },
+  });
+
+  const copyUrl = async () => {
+    if (!shareUrl) return;
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied to clipboard!");
+  };
+
+   // ⏳ Auto-reset after 30 seconds
+  useEffect(() => {
+    if (!shareUrl) return;
+
+    const timer = setTimeout(() => {
+      setShareUrl(null); // revert back to Share Quote
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [shareUrl]);
+
+  const handleShare = () => {
+    share([
+      {
+        ...bookingRequest,
+        itemValue: Number(bookingRequest.itemPrice),
+        quantity: 1,
+        packageDescription: {
+          isFragile: false,
+          isPerishable: false,
+          isExclusive: false,
+          isHazardous: false,
+        },
+      },
+    ]);
+  };
+
   return (
     <div className="md:px-20 px-6 py-4 bg-white min-h-screen">
       <div className="w-full mb-12">
@@ -218,24 +280,35 @@ const Calculator = () => {
       {data?.data && data?.data?.length > 0 && (
         <div className="max-w-5xl mx-auto mt-4 mb-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <div>
+            <div className="md:w-5xl">
               <h2 className="font-clash font-bold text-2xl md:text-3xl text-[#1a1a1a] mb-2">
                 Available Courier Services
               </h2>
-              <p className="text-gray-600 text-sm md:text-base">
-                Found{" "}
-                <span className="font-bold text-amber-600">
-                  {filteredAndSortedData.length}
-                </span>{" "}
-                courier{filteredAndSortedData.length !== 1 ? "s" : ""} for your
-                route
-                {activeFiltersCount > 0 && (
-                  <span className="ml-2 text-xs text-gray-500">
-                    ({activeFiltersCount} filter
-                    {activeFiltersCount !== 1 ? "s" : ""} active)
-                  </span>
-                )}
-              </p>
+              <div className="flex md:flex-row flex-col gap-2 justify-between md:items-center">
+                <p className="text-gray-600 text-sm md:text-base">
+                  Found{" "}
+                  <span className="font-bold text-amber-600">
+                    {filteredAndSortedData.length}
+                  </span>{" "}
+                  courier{filteredAndSortedData.length !== 1 ? "s" : ""} for
+                  your route
+                  {activeFiltersCount > 0 && (
+                    <span className="ml-2 text-xs text-gray-500">
+                      ({activeFiltersCount} filter
+                      {activeFiltersCount !== 1 ? "s" : ""} active)
+                    </span>
+                  )}
+                </p>
+
+                <Button
+                  className="w-fit"
+                  loading={shareLoading}
+                  onClick={shareUrl ? copyUrl : handleShare}
+                >
+                  {shareUrl ? <Copy /> : <Share2 />}
+                  {shareUrl ? "Copy Link" : "Share Quote"}
+                </Button>
+              </div>
             </div>
           </div>
 

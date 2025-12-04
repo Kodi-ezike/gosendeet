@@ -61,7 +61,7 @@ const Navbar = () => {
                 {letter}
               </div> */}
               <Home
-                className="text-purple500"
+                className="text-orange500"
                 size={24}
                 onClick={() => {
                   role === "user" && navigate("/dashboard");
@@ -159,7 +159,7 @@ const Navbar = () => {
                 >
                   <li
                     className={` w-full  hover:bg-white cursor-pointer ${
-                      isActive ? " text-purple500 " : ""
+                      isActive ? " text-orange500 " : ""
                     }`}
                   >
                     {link.title}

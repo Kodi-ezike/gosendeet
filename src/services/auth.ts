@@ -33,6 +33,15 @@ export const login = async (data: { email: string; password: string }) => {
   }
 };
 
+export const logout = async () => {
+  try {
+    const res = await api.post("/auth/logout");
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
 export const resendVerification = async (email: string) => {
   try {
     const res = await authApi.post(`/auth/resend-verification?email=${email}`);

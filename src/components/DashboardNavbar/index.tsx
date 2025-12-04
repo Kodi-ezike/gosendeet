@@ -7,6 +7,9 @@ import { GoX } from "react-icons/go";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 import { PiSignOutBold } from "react-icons/pi";
 import { Button } from "../ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "@/services/auth";
+import { toast } from "sonner";
 
 const DashboardNavbar = () => {
   const navigate = useNavigate();
@@ -29,6 +32,17 @@ const DashboardNavbar = () => {
       refetchUserData();
     }
   }, [userId]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      sessionStorage.clear();
+      navigate("/");
+    },
+    onError: (error: any) => {
+      toast.error(error?.error);
+    },
+  });
 
   return (
     <nav className="w-full z-20">
@@ -81,10 +95,8 @@ const DashboardNavbar = () => {
           <Button
             variant={"ghost"}
             className="h-[40px]"
-            onClick={() => {
-              sessionStorage.clear();
-              navigate("/");
-            }}
+            loading={isPending}
+            onClick={() => mutate()}
           >
             Log out <PiSignOutBold />{" "}
           </Button>
@@ -124,15 +136,13 @@ const DashboardNavbar = () => {
               );
             })}
           </ul>
-          <button
+          <Button
             className="border-2 w-full font-semibold px-4 py-4 bg-black text-white rounded"
-            onClick={() => {
-              sessionStorage.clear();
-              navigate("/");
-            }}
+            loading={isPending}
+            onClick={() => mutate()}
           >
             Log Out
-          </button>
+          </Button>
         </div>
       </div>
     </nav>

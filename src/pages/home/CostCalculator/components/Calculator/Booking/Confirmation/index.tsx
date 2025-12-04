@@ -17,8 +17,9 @@ const Confirmation = () => {
 
   const userId = sessionStorage.getItem("userId") || "";
   const navigate = useNavigate();
+  
   useEffect(() => {
-    sessionStorage.setItem("bookingCompleted", "true");
+    // sessionStorage.setItem("bookingCompleted", "true");
     if (!userId) {
       toast.error("Please sign in to continue");
       setTimeout(() => {
@@ -27,6 +28,44 @@ const Confirmation = () => {
     }
   }, [userId]);
   const [loading, setLoading] = useState(false);
+
+
+useEffect(() => {
+  const handleBack = () => {
+    navigate("/", { replace: true });
+  };
+
+  // Only runs when user presses BACK
+  window.addEventListener("popstate", handleBack);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+  };
+}, [navigate]);
+
+
+// useEffect(() => {
+//   // Step 1: Replace the checkout history entry with the success page
+//   window.history.replaceState(null, "", window.location.pathname);
+
+//   // Step 2: Push home onto history
+//   window.history.pushState(null, "", "/");
+
+//   // Step 3: Push the success page back on top
+//   window.history.pushState(null, "", window.location.pathname);
+
+//   // Step 4: Intercept the back button
+//   const handleBack = () => {
+//     navigate("/", { replace: true });
+//   };
+
+//   window.addEventListener("popstate", handleBack);
+
+//   return () => {
+//     window.removeEventListener("popstate", handleBack);
+//   };
+// }, [navigate]);
+
 
   const onSubmit = () => {
     trackBookingsHandler(data?.data?.trackingNumber, navigate, setLoading);

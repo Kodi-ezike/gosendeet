@@ -27,14 +27,17 @@ const Checkout = () => {
     }
   }, [userId]);
 
-  useEffect(() => {
-    const bookingCompleted = sessionStorage.getItem("bookingCompleted") === "true";
-
+    useEffect(() => {
+    // If user somehow lands here after finishing a booking, redirect
+    const bookingCompleted = sessionStorage.getItem("bookingCompleted");
     if (bookingCompleted) {
-      sessionStorage.removeItem("bookingCompleted");
-      setTimeout(() => navigate("/", { replace: true }), 1000);
-      // navigate("/", { replace: true });
+      navigate("/", { replace: true });
     }
+
+    // Hard replace checkout history entry with "/" so back button never returns here
+    window.history.replaceState(null, "", "/");
+    sessionStorage.removeItem("bookingCompleted")
+
   }, []);
 
   const total = Number(bookingData?.tax) + Number(bookingData?.courierCost);
