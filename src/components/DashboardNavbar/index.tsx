@@ -7,6 +7,9 @@ import { GoX } from "react-icons/go";
 import { useGetUserDetails } from "@/queries/user/useGetUserDetails";
 import { PiSignOutBold } from "react-icons/pi";
 import { Button } from "../ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "@/services/auth";
+import { toast } from "sonner";
 
 const DashboardNavbar = () => {
   const navigate = useNavigate();
@@ -30,6 +33,17 @@ const DashboardNavbar = () => {
     }
   }, [userId]);
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      sessionStorage.clear();
+      navigate("/");
+    },
+    onError: (error: any) => {
+      toast.error(error?.error);
+    },
+  });
+
   return (
     <nav className="w-full z-20">
       <div className="flex justify-between items-center lg:py-5 py-6 xl:px-30 md:px-20 px-6 bg-white border-b border-b-neutral300">
@@ -43,7 +57,7 @@ const DashboardNavbar = () => {
         {/* Hamburger Icon (mobile view) */}
         <div className="lg:hidden flex items-center gap-4">
           <div className="flex flex-row gap-4 items-center">
-            <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+            <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-orange500">
               {letter}
             </div>
           </div>
@@ -75,16 +89,14 @@ const DashboardNavbar = () => {
         </ul>
 
         <div className="hidden lg:flex lg:flex-row items-center flex-col">
-          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-purple500">
+          <div className="w-[40px] h-[40px] flex justify-center items-center font-bold text-md rounded-full text-white bg-orange500">
             {letter}
           </div>
           <Button
             variant={"ghost"}
             className="h-[40px]"
-            onClick={() => {
-              sessionStorage.clear();
-              navigate("/");
-            }}
+            loading={isPending}
+            onClick={() => mutate()}
           >
             Log out <PiSignOutBold />{" "}
           </Button>
@@ -124,15 +136,13 @@ const DashboardNavbar = () => {
               );
             })}
           </ul>
-          <button
+          <Button
             className="border-2 w-full font-semibold px-4 py-4 bg-black text-white rounded"
-            onClick={() => {
-              sessionStorage.clear();
-              navigate("/");
-            }}
+            loading={isPending}
+            onClick={() => mutate()}
           >
             Log Out
-          </button>
+          </Button>
         </div>
       </div>
     </nav>

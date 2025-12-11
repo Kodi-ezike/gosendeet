@@ -223,6 +223,15 @@ export const updatePackageType = async (id: string, data: any) => {
   }
 };
 
+export const updatePackageTypeStatus = async (id: string, isActive: boolean) => {
+  try {
+    const res = await api.patch(`/admin/package-types/${id}/status?isActive=${isActive}`);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
 export const deletePackageType = async (id: string) => {
   try {
     const res = await api.delete(`/admin/package-types/${id}`);

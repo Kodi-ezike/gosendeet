@@ -9,14 +9,41 @@ export const userDetails = async (id: string) => {
   }
 };
 
-export const getQuotes = async (data: any) => {
+export const getQuotes = async ( data: any, direct: boolean = false) => {
   try {
-    const res = await authApi.post(`/quotes`, data);
+    const res = await authApi.post(`/quotes?direct=${direct}`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+export const shareQuotes = async (data: any) => {
+  try {
+    const res = await authApi.post(`/quotes/share`, data);
+    return res.data;
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+export const fetchSharedQuotes = async (id: string) => {
+  try {
+    const res = await authApi.get(`/quotes/share/${id}`);
+
+    const quotes = res.data?.data?.quotes || [];
+
+    return {
+      ...res.data,
+      data: quotes,                     // <- overwrite data with quotes
+      quoteRequests: res.data?.data?.quoteRequests || [] // keep extra field if needed
+    };
+  } catch (error: any) {
+    throw error?.response?.data || { message: error.message };
+  }
+};
+
+
 
 export const updateUserProfile = async (id: string, data: any) => {
   try {

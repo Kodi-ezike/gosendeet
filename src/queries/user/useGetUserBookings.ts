@@ -4,6 +4,7 @@ import {
   getBookingStats,
   trackBookings,
 } from "@/services/bookings";
+import { fetchSharedQuotes } from "@/services/user";
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export const useGetBookingsById = (id: string) => {
@@ -80,3 +81,20 @@ export const useGetTrackBookings = (id: string) => {
     refetchUserData: query.refetch,
   };
 };
+
+export const useGetSharedQuotes = (id: string) => {
+  const query = useQuery({
+    queryKey: ["quotes", id],
+    queryFn: () => fetchSharedQuotes(id),
+    enabled: !!id,
+  });
+  return {
+    isLoading: query.isPending,
+    isSuccess: query.isSuccess,
+    isError: query.isError,
+    data: query.data,
+    refetchUserData: query.refetch,
+  };
+};
+
+

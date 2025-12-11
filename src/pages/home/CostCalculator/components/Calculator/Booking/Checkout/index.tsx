@@ -27,6 +27,19 @@ const Checkout = () => {
     }
   }, [userId]);
 
+    useEffect(() => {
+    // If user somehow lands here after finishing a booking, redirect
+    const bookingCompleted = sessionStorage.getItem("bookingCompleted");
+    if (bookingCompleted) {
+      navigate("/", { replace: true });
+    }
+
+    // Hard replace checkout history entry with "/" so back button never returns here
+    window.history.replaceState(null, "", "/");
+    sessionStorage.removeItem("bookingCompleted")
+
+  }, []);
+
   const total = Number(bookingData?.tax) + Number(bookingData?.courierCost);
 
   const { mutate, isPending } = useMutation({
@@ -120,27 +133,27 @@ const Checkout = () => {
                     type="checkbox"
                     className="mt-1 h-5 w-5 rounded
                       appearance-none cursor-pointer
-                      border-2 border-purple400 bg-white
-                      hover:border-purple500 hover:bg-purple50
+                      border-2 border-orange500 bg-white
+                      hover:border-orange500 hover:bg-purple50
                       transition-all duration-200
-                      checked:bg-purple400 checked:border-purple400
-                      checked:hover:bg-purple500 checked:hover:border-purple500
+                      checked:bg-orange500 checked:border-orange500
+                      checked:hover:bg-orange500 checked:hover:border-orange500
                       checked:before:content-['✔']
                       checked:before:text-white checked:before:text-xs
                       checked:before:flex checked:before:items-center checked:before:justify-center
-                      shadow-sm focus:ring-2 focus:ring-purple400 focus:ring-offset-1"
+                      shadow-sm focus:ring-2 focus:ring-orange500 focus:ring-offset-1"
                     onChange={(e) => setIsChecked(e.target.checked)}
                   />
                   <p className="text-sm">
                     By clicking this, I acknowledge that I have read and agree
-                    with Sendeet terms.
+                    with Sendeet Terms and Conditions.
                   </p>
                 </div>
 
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="bg-purple400 hover:bg-purple500 rounded-full py-3 px-8 text-white"
+                  className="rounded-full py-3 px-8 text-white"
                   disabled={!isChecked}
                   onClick={submit}
                   loading={isPending}

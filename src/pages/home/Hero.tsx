@@ -1,20 +1,12 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import FormHorizontalBar from "./components/FormHorizontalBar";
-import { FiSend, FiBarChart2, FiPackage, FiBox } from "react-icons/fi";
+import ModeSwitcher, { FormMode } from "@/components/ModeSwitcher";
+import { FiBox, FiPackage } from "react-icons/fi";
 import { SiFedex, SiDhl, SiUps } from "react-icons/si";
-import { cn } from "@/lib/utils";
-
-type FormMode = "gosendeet" | "compare" | "tracking";
 
 const HeroOptionC = () => {
   const [formMode, setFormMode] = useState<FormMode>("gosendeet");
-
-  const modeTabs = [
-    { key: "gosendeet" as FormMode, label: "Direct", icon: FiSend },
-    { key: "compare" as FormMode, label: "Compare", icon: FiBarChart2 },
-    { key: "tracking" as FormMode, label: "Tracking", icon: FiPackage },
-  ];
 
   const trustSignals = [
     { icon: "✓", text: "Best Pricing", color: "from-emerald-400 to-emerald-500", clickable: false },
@@ -85,7 +77,7 @@ const HeroOptionC = () => {
       </motion.div>
 
       {/* Form Section - Centered in available space */}
-      <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full relative z-10 -mt-4 md:-mt-12 lg:-mt-16">
+      <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full relative z-10 md:mt-6 lg:-mt-16">
 
         {/* Mode Tabs - Combined Card Above Form */}
         <motion.div
@@ -95,43 +87,7 @@ const HeroOptionC = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div className="flex justify-center">
-            {/* Single card container for all tabs */}
-            <div className="inline-flex bg-white rounded-t-2xl shadow-lg border border-gray-200 overflow-hidden">
-              {modeTabs.map((tab, index) => {
-                const Icon = tab.icon;
-                const isActive = formMode === tab.key;
-                const isLast = index === modeTabs.length - 1;
-                return (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => setFormMode(tab.key)}
-                    className={cn(
-                      "flex flex-col items-center gap-0.5 px-4 py-2 md:gap-1 md:px-6 md:py-3 lg:px-8 lg:py-4 transition-all duration-300 group relative",
-                      !isLast && "border-r border-gray-200",
-                      isActive
-                        ? "border-b-4 border-b-amber-500 bg-amber-50 -mb-[2px]"
-                        : "hover:bg-gray-50"
-                    )}
-                  >
-                    <Icon
-                      className={cn(
-                        "w-5 h-5 md:w-6 md:h-6 transition-colors",
-                        isActive ? "text-amber-500" : "text-gray-500 group-hover:text-gray-700"
-                      )}
-                    />
-                    <span
-                      className={cn(
-                        "text-[10px] md:text-xs font-bold transition-colors",
-                        isActive ? "text-amber-600" : "text-gray-600 group-hover:text-gray-800"
-                      )}
-                    >
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <ModeSwitcher mode={formMode} onModeChange={setFormMode} />
           </div>
         </motion.div>
 

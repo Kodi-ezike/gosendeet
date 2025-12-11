@@ -1,5 +1,4 @@
 import Layout from "@/layouts/HomePageLayout";
-import purple from "@/assets/icons/big-purple-checkmark.png";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { useGetBookingsById } from "@/queries/user/useGetUserBookings";
 import { Spinner } from "@/components/Spinner";
 import { formatDate } from "@/lib/utils";
 import { trackBookingsHandler } from "@/hooks/useTrackBookings";
+import { Check } from "lucide-react";
 
 const Confirmation = () => {
   const [searchParams] = useSearchParams();
@@ -17,7 +17,9 @@ const Confirmation = () => {
 
   const userId = sessionStorage.getItem("userId") || "";
   const navigate = useNavigate();
+  
   useEffect(() => {
+    // sessionStorage.setItem("bookingCompleted", "true");
     if (!userId) {
       toast.error("Please sign in to continue");
       setTimeout(() => {
@@ -26,6 +28,44 @@ const Confirmation = () => {
     }
   }, [userId]);
   const [loading, setLoading] = useState(false);
+
+
+useEffect(() => {
+  const handleBack = () => {
+    navigate("/", { replace: true });
+  };
+
+  // Only runs when user presses BACK
+  window.addEventListener("popstate", handleBack);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+  };
+}, [navigate]);
+
+
+// useEffect(() => {
+//   // Step 1: Replace the checkout history entry with the success page
+//   window.history.replaceState(null, "", window.location.pathname);
+
+//   // Step 2: Push home onto history
+//   window.history.pushState(null, "", "/");
+
+//   // Step 3: Push the success page back on top
+//   window.history.pushState(null, "", window.location.pathname);
+
+//   // Step 4: Intercept the back button
+//   const handleBack = () => {
+//     navigate("/", { replace: true });
+//   };
+
+//   window.addEventListener("popstate", handleBack);
+
+//   return () => {
+//     window.removeEventListener("popstate", handleBack);
+//   };
+// }, [navigate]);
+
 
   const onSubmit = () => {
     trackBookingsHandler(data?.data?.trackingNumber, navigate, setLoading);
@@ -53,11 +93,10 @@ const Confirmation = () => {
             <div className="lg:w-[65%] flex flex-col gap-6">
               <div className="px-4 py-20 bg-purple300 rounded-xl">
                 <div className="flex flex-col gap-2 justify-center items-center text-center">
-                  <img
-                    src={purple}
-                    alt="check"
-                    className="w-[70px] h-[70px] rounded-full"
-                  />
+                 
+                  <div className="w-[70px] h-[70px] rounded-full bg-orange500 text-white flex justify-center items-center">
+                    <Check size={50}/>
+                  </div>
                   <h2 className="font-clash font-semibold text-2xl mt-1">
                     Order Placed Successfully
                   </h2>
@@ -122,6 +161,12 @@ const Confirmation = () => {
                     <span className="text-neutral600">Delivery Date</span>
                     <span className="text-right">
                       {formatDate(data?.data?.estimatedDeliveryDate)}
+                    </span>
+                  </p>
+                  <p className="flex justify-between items-center font-medium text-sm">
+                    <span className="text-neutral600">Tracking ID</span>
+                    <span className="text-right font-semibold">
+                      {data?.data?.trackingNumber}
                     </span>
                   </p>
                 </div>

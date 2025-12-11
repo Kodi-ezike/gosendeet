@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "crypto-js": "^4.2.0",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "framer-motion": "^12.23.24",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/google.maps": "^3.58.1",
     "@types/node": "^22.14.0",
     "@types/react": "^19.0.10",

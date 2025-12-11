@@ -28,6 +28,7 @@ import AdminRoutes from "./lib/AdminRoutes";
 import ErrorPage from "./pages/home/CostCalculator/components/Calculator/Booking/ErrorPage";
 import PublicDispatchPage from "./pages/dispatch/PublicDispatchPage";
 import TawkMessengerReact from "@tawk.to/tawk-messenger-react";
+import ValidateGoogleLogin from "./pages/auth/ValidateGoogleLogin";
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/:id/verify-email" element={<VerifyEmail />} />
           <Route path="/:id/reset-password" element={<ResetPassword />} />
+          <Route path="/oauth2/callback" element={<ValidateGoogleLogin />} />
         </Route>
 
         <Route element={<PrivateRoutes />}>

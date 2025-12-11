@@ -16,6 +16,7 @@ import {
   FiBarChart2,
   FiSearch,
 } from "react-icons/fi";
+import ModeSwitcher, { FormMode } from "@/components/ModeSwitcher";
 import { AddressModal } from "./modals/AddressModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
@@ -162,10 +163,15 @@ const FormHorizontalBar = ({
 
   // Detect dashboard route early so we can adjust styles/layout
   const isDashboard = location.pathname.includes("dashboard");
-  const [currentMode, setCurrentMode] = useState<
-    "gosendeet" | "compare" | "tracking"
-  >(activeMode);
+  const [currentMode, setCurrentMode] = useState<FormMode>(activeMode);
   const mode = isDashboard ? currentMode : activeMode;
+
+  // Sync external activeMode prop changes with internal currentMode when on dashboard
+  useEffect(() => {
+    if (isDashboard) {
+      setCurrentMode(activeMode);
+    }
+  }, [activeMode, isDashboard]);
 
   // Modal states for Direct mode
   const [pickupModalOpen, setPickupModalOpen] = useState(false);
@@ -178,33 +184,45 @@ const FormHorizontalBar = ({
   const [selectedPackageData, setSelectedPackageData] = useState<any>(null);
 
   const {
-    mutate: getQuotesDirectly,
-    isPending: isQuoteLoading,
-    reset: resetQuoteMutation,
-  } = useMutation({
-    mutationFn: getQuotes,
-    onSuccess: (data: any) => {
-      if (data?.data?.length === 0) {
-        toast.error("No quotes found! Please try a different package type.");
-      } else if (data?.data?.length > 0) {
-        toast.success("Successful");
-        navigate("/cost-calculator", {
-          state: {
-            inputData: inputData,
-            results: data,
-          },
-        });
-        if (typeof setData === "function") {
-          setData(data);
-        }
-      }
+  mutate: getQuotesDirectly,
+  isPending: isQuoteLoading,
+  reset: resetQuoteMutation,
+} = useMutation({
+  mutationFn: (vars: { data: any; direct?: boolean }) =>
+    getQuotes(vars.data, vars.direct),
+
+  onSuccess: (response: any) => {
+    const quotes = response?.data ?? [];
+
+    if (quotes.length === 0) {
+      toast.error("No quotes found! Please try a different package type.");
       resetQuoteMutation();
-    },
-    onError: (data: any) => {
-      toast.error(data?.message);
-      resetQuoteMutation();
-    },
-  });
+      return;
+    }
+
+    toast.success("Successful");
+
+    navigate("/cost-calculator", {
+      state: {
+        inputData,
+        results: response,
+        mode: mode, // Use the actual current mode
+      },
+    });
+
+    if (typeof setData === "function") {
+      setData(response);
+    }
+
+    resetQuoteMutation();
+  },
+
+  onError: (error: any) => {
+    toast.error(error?.message || "Something went wrong.");
+    resetQuoteMutation();
+  },
+});
+
 
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
@@ -306,6 +324,40 @@ const FormHorizontalBar = ({
       }
     }
   }, [inputData?.packageTypeId, packages, setValue]);
+
+  // ----- Handle unauthenticated quick quote -----
+  useEffect(() => {
+    const isUnauthenticated =
+      sessionStorage.getItem("unauthenticated") === "true";
+    if (!isUnauthenticated) return;
+
+    const stored = sessionStorage.getItem("bookingInputData");
+    if (!stored) return;
+
+    let parsed;
+    try {
+      parsed = normalizeData(JSON.parse(stored));
+    } catch {
+      console.error("Invalid bookingInputData in sessionStorage");
+      return;
+    }
+
+    getQuotesDirectly({data: [
+      {
+        ...parsed,
+        quantity: 1,
+        itemValue: Number(parsed.itemPrice),
+        packageDescription: {
+          isFragile: false,
+          isPerishable: false,
+          isExclusive: false,
+          isHazardous: false,
+        },
+      },
+    ], direct:false});
+
+    sessionStorage.removeItem("unauthenticated");
+  }, []);
 
   const onSubmit = (data: z.infer<typeof schema>) => {
     saveInputData(data);
@@ -415,47 +467,12 @@ const FormHorizontalBar = ({
     <div className={containerStyles}>
       {isDashboard && (
         <div className="absolute left-1/2 transform -translate-x-1/2 top-[-20px]">
-          <div className="inline-flex items-center bg-white rounded-full shadow-sm border border-amber-100">
-            <button
-              type="button"
-              onClick={() => setCurrentMode("gosendeet")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "gosendeet"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiTruck className="w-4 h-4" />
-              Direct
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentMode("compare")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "compare"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiBarChart2 className="w-4 h-4" />
-              Compare
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentMode("tracking")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "tracking"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiSearch className="w-4 h-4" />
-              Track
-            </button>
-          </div>
+          <ModeSwitcher
+            mode={mode}
+            onModeChange={setCurrentMode}
+            variant="pill"
+            animate
+          />
         </div>
       )}
       {/* Tracking Mode Form */}
@@ -710,7 +727,7 @@ const FormHorizontalBar = ({
                   }
 
                   saveInputData(data);
-                  getQuotesDirectly([
+                  getQuotesDirectly({data : [
                     {
                       ...data,
                       itemValue: Number(data.itemPrice),
@@ -722,7 +739,7 @@ const FormHorizontalBar = ({
                         isHazardous: false,
                       },
                     },
-                  ]);
+                  ], direct:true});
                 })}
               >
                 <FiTruck className="text-white mr-1.5 w-4 h-4" />
@@ -875,7 +892,7 @@ const FormHorizontalBar = ({
                 onClick={handleSubmit((data) => {
                   saveInputData(data);
                   // Compare directly - get quotes immediately without opening modal
-                  getQuotesDirectly([
+                  getQuotesDirectly({data : [
                     {
                       ...data,
                       itemValue: Number(data.itemPrice),
@@ -887,7 +904,7 @@ const FormHorizontalBar = ({
                         isHazardous: false,
                       },
                     },
-                  ]);
+                  ], direct:false});
                 })}
               >
                 <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />
