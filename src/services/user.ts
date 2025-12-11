@@ -9,9 +9,9 @@ export const userDetails = async (id: string) => {
   }
 };
 
-export const getQuotes = async (data: any) => {
+export const getQuotes = async ( data: any, direct: boolean = false) => {
   try {
-    const res = await authApi.post(`/quotes`, data);
+    const res = await authApi.post(`/quotes?direct=${direct}`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };

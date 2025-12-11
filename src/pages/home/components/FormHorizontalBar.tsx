@@ -178,33 +178,45 @@ const FormHorizontalBar = ({
   const [selectedPackageData, setSelectedPackageData] = useState<any>(null);
 
   const {
-    mutate: getQuotesDirectly,
-    isPending: isQuoteLoading,
-    reset: resetQuoteMutation,
-  } = useMutation({
-    mutationFn: getQuotes,
-    onSuccess: (data: any) => {
-      if (data?.data?.length === 0) {
-        toast.error("No quotes found! Please try a different package type.");
-      } else if (data?.data?.length > 0) {
-        toast.success("Successful");
-        navigate("/cost-calculator", {
-          state: {
-            inputData: inputData,
-            results: data,
-          },
-        });
-        if (typeof setData === "function") {
-          setData(data);
-        }
-      }
+  mutate: getQuotesDirectly,
+  isPending: isQuoteLoading,
+  reset: resetQuoteMutation,
+} = useMutation({
+  mutationFn: (vars: { data: any; direct?: boolean }) =>
+    getQuotes(vars.data, vars.direct),
+
+  onSuccess: (response: any) => {
+    const quotes = response?.data ?? [];
+
+    if (quotes.length === 0) {
+      toast.error("No quotes found! Please try a different package type.");
       resetQuoteMutation();
-    },
-    onError: (data: any) => {
-      toast.error(data?.message);
-      resetQuoteMutation();
-    },
-  });
+      return;
+    }
+
+    toast.success("Successful");
+
+    navigate("/cost-calculator", {
+      state: {
+        inputData,
+        results: response,
+        mode: activeMode,
+      },
+    });
+
+    if (typeof setData === "function") {
+      setData(response);
+    }
+
+    resetQuoteMutation();
+  },
+
+  onError: (error: any) => {
+    toast.error(error?.message || "Something went wrong.");
+    resetQuoteMutation();
+  },
+});
+
 
   const { data: packageTypes } = useGetPackageType({ minimize: true });
   const packages = packageTypes?.data;
@@ -324,7 +336,7 @@ const FormHorizontalBar = ({
       return;
     }
 
-    getQuotesDirectly([
+    getQuotesDirectly({data: [
       {
         ...parsed,
         quantity: 1,
@@ -336,7 +348,7 @@ const FormHorizontalBar = ({
           isHazardous: false,
         },
       },
-    ]);
+    ], direct:false});
 
     sessionStorage.removeItem("unauthenticated");
   }, []);
@@ -744,7 +756,7 @@ const FormHorizontalBar = ({
                   }
 
                   saveInputData(data);
-                  getQuotesDirectly([
+                  getQuotesDirectly({data : [
                     {
                       ...data,
                       itemValue: Number(data.itemPrice),
@@ -756,7 +768,7 @@ const FormHorizontalBar = ({
                         isHazardous: false,
                       },
                     },
-                  ]);
+                  ], direct:true});
                 })}
               >
                 <FiTruck className="text-white mr-1.5 w-4 h-4" />
@@ -909,7 +921,7 @@ const FormHorizontalBar = ({
                 onClick={handleSubmit((data) => {
                   saveInputData(data);
                   // Compare directly - get quotes immediately without opening modal
-                  getQuotesDirectly([
+                  getQuotesDirectly({data : [
                     {
                       ...data,
                       itemValue: Number(data.itemPrice),
@@ -921,7 +933,7 @@ const FormHorizontalBar = ({
                         isHazardous: false,
                       },
                     },
-                  ]);
+                  ], direct:false});
                 })}
               >
                 <FiBarChart2 className="text-white mr-1.5 w-4 h-4" />

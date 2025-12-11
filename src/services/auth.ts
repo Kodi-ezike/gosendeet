@@ -1,6 +1,5 @@
 import { api } from "./axios";
 import { authApi } from "./axios";
-import axios from "axios";
 
 export const signup = async (data: {
   email: string;
