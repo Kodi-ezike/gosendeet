@@ -166,6 +166,13 @@ const FormHorizontalBar = ({
   const [currentMode, setCurrentMode] = useState<FormMode>(activeMode);
   const mode = isDashboard ? currentMode : activeMode;
 
+  // Sync external activeMode prop changes with internal currentMode when on dashboard
+  useEffect(() => {
+    if (isDashboard) {
+      setCurrentMode(activeMode);
+    }
+  }, [activeMode, isDashboard]);
+
   // Modal states for Direct mode
   const [pickupModalOpen, setPickupModalOpen] = useState(false);
   const [destinationModalOpen, setDestinationModalOpen] = useState(false);
@@ -199,7 +206,7 @@ const FormHorizontalBar = ({
       state: {
         inputData,
         results: response,
-        mode: activeMode,
+        mode: mode, // Use the actual current mode
       },
     });
 
