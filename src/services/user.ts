@@ -30,11 +30,19 @@ export const shareQuotes = async (data: any) => {
 export const fetchSharedQuotes = async (id: string) => {
   try {
     const res = await authApi.get(`/quotes/share/${id}`);
-    return res.data;
+
+    const quotes = res.data?.data?.quotes || [];
+
+    return {
+      ...res.data,
+      data: quotes,                     // <- overwrite data with quotes
+      quoteRequests: res.data?.data?.quoteRequests || [] // keep extra field if needed
+    };
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
+
 
 
 export const updateUserProfile = async (id: string, data: any) => {

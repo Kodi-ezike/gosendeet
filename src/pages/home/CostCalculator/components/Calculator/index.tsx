@@ -27,10 +27,6 @@ import { useGetSharedQuotes } from "@/queries/user/useGetUserBookings";
 import logo from "@/assets/images/sendeet-logo.png";
 
 const Calculator = () => {
-  // const options = [
-  //   { value: "price", title: "Price (cheapest first)" },
-  //   { value: "time", title: "Delivery time (fastest)" },
-  // ];
   const navigate = useNavigate();
   const userId = sessionStorage.getItem("userId") || "";
 
@@ -43,8 +39,7 @@ const Calculator = () => {
   const { data: sharedQuote } = useGetSharedQuotes(shareId);
 
   const { results, inputData: stateInputData } = location.state || {};
-  const { mode } = location?.state || "gosendeet";
-  console.log(mode);
+  const mode = location?.state?.mode ?? "gosendeet";
 
   const storedInputData = useMemo(() => {
     try {
@@ -56,12 +51,12 @@ const Calculator = () => {
     }
   }, []);
 
-  const sharedQuoteRequest = sharedQuote?.data?.quoteRequests?.[0];
+  const sharedQuoteRequest = sharedQuote?.quoteRequests[0];
 
   const inputData =
     sharedQuoteRequest || stateInputData || storedInputData || {};
 
-  const [bookingRequest] = useState(inputData);
+  const bookingRequest = inputData;
   const [data, setData] = useState(results || {});
   const [sortBy, setSortBy] = useState("price-asc");
   const [filterPickupDate, setFilterPickupDate] = useState("");
@@ -70,7 +65,7 @@ const Calculator = () => {
 
   useEffect(() => {
     if (shareId && sharedQuote) {
-      setData(sharedQuote?.quotes);
+      setData(sharedQuote);
     } else if (results) {
       setData(results);
     }
@@ -615,11 +610,25 @@ const Calculator = () => {
 
       {mode === "gosendeet" && data?.data && data?.data?.length > 0 && (
         <div className="max-w-3xl mx-auto my-8">
-          <div className="flex items-center gap-6 mb-8">
-            <img src={logo} alt="logo" className="h-8 md:h-10 lg:h-12 w-auto" />
-            <h1 className=" font-semibold text-xl text-[#1a1a1a]">
-              Direct Quote
-            </h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6 mb-8">
+              <img
+                src={logo}
+                alt="logo"
+                className="h-8 md:h-10 lg:h-12 w-auto"
+              />
+              <h1 className=" font-semibold text-xl text-[#1a1a1a]">
+                Direct Quote
+              </h1>
+            </div>
+            <Button
+              className="w-fit"
+              loading={shareLoading}
+              onClick={shareUrl ? copyUrl : handleShare}
+            >
+              {shareUrl ? <Copy /> : <Share2 />}
+              {shareUrl ? "Copy Link" : "Share Quote"}
+            </Button>
           </div>
           <div className="bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
             {/* Quote Details */}
@@ -693,8 +702,8 @@ const Calculator = () => {
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-700 font-medium">Total Cost</span>
                   <span className="text-blue-500 font-bold">
-                    {/* removes NGN */}
-                     ₦ {data?.data?.[0]?.price?.replace(/ngn/i, "") || "0"} 
+                    {/* removes NGN */}₦{" "}
+                    {data?.data?.[0]?.price?.replace(/ngn/i, "") || "0"}
                   </span>
                 </div>
               </div>
