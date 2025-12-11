@@ -53,8 +53,10 @@ const Calculator = () => {
     }
   }, []);
 
-  const inputData = stateInputData || storedInputData || {};
-
+  const sharedQuoteRequest = sharedQuote?.data?.quoteRequests?.[0]  
+  
+  const inputData = sharedQuoteRequest || stateInputData || storedInputData || {};
+  
   const [bookingRequest] = useState(inputData);
   const [data, setData] = useState(results || {});
   const [sortBy, setSortBy] = useState("price-asc");
@@ -63,14 +65,12 @@ const Calculator = () => {
   const [priceRange, setPriceRange] = useState("all");
 
   useEffect(() => {
-
-    if (shareId !== '') {
-      setData(sharedQuote);
-    }
-    else{
+    if (shareId && sharedQuote) {
+      setData(sharedQuote?.quotes);
+    } else if (results) {
       setData(results);
     }
-  }, [results]);
+  }, [results, sharedQuote, shareId]);
 
   // Filter and sort data
   const filteredAndSortedData = useMemo(() => {

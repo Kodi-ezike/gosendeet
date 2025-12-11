@@ -9,7 +9,7 @@ import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { FiEdit } from "react-icons/fi";
 import { useGetPackageType } from "@/queries/admin/useGetAdminSettings";
 import { Spinner } from "@/components/Spinner";
-import { deletePackageType, updatePackageType } from "@/services/adminSettings";
+import { deletePackageType, updatePackageTypeStatus } from "@/services/adminSettings";
 import { toast } from "sonner";
 import DeleteModal from "@/components/modals/DeleteModal";
 import { usePaginationSync } from "@/hooks/usePaginationSync";
@@ -54,9 +54,9 @@ const PackageType = () => {
   const [info, setInfo] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
 
-  const { mutate: updateType } = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) =>
-      updatePackageType(id, data), // call with correct shape
+  const { mutate: updateStatus } = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      updatePackageTypeStatus(id, isActive), // call with correct shape
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -181,9 +181,9 @@ const PackageType = () => {
                       <Switch
                         checked={item.active}
                         onCheckedChange={() =>
-                          updateType({
+                          updateStatus({
                             id: item?.id,
-                            data: { active: !item?.active },
+                             isActive: !item?.active
                           })
                         }
                       />

@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { TWClassNames } from "./types";
+import CryptoJS from "crypto-js";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -240,3 +241,19 @@ export const formatToDatetimeLocal = (date: Date): string => {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
+
+export function decryptAES256(encryptedText: string, key: string) {
+    if (key.length !== 32) {
+        throw new Error("AES-256 key must be exactly 32 characters long");
+    }
+    const decrypted = CryptoJS.AES.decrypt(
+        encryptedText,
+        CryptoJS.enc.Utf8.parse(key),
+        {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+        }
+    );
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+

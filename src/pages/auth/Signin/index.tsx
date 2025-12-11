@@ -7,9 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { useMutation } from "@tanstack/react-query";
-import { validateEmail } from "@/services/auth";
+import { googleLogin, validateEmail } from "@/services/auth";
 import { toast } from "sonner";
-import { BASE_URL } from "@/services/axios";
+import { useState } from "react";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -52,8 +52,21 @@ const Signin = () => {
     mutate(data.email);
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${BASE_URL}/auth/google-login`;
+ const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+
+      await googleLogin(); // your auth function
+
+      toast.success("Login successful!");
+      // navigate("/dashboard"); // optional redirect
+    } catch (error: any) {
+      toast.error(error?.message || "Google login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,6 +84,7 @@ const Signin = () => {
             variant={"outline"}
             className="border-neutral500 bg-transparent w-full mt-8 mb-4 hover:bg-white hover:border-0"
             onClick={handleGoogleLogin}
+            loading={loading}
           >
             <img src={google} alt="google" className="w-[20px]" />
             <span>Continue with Google</span>

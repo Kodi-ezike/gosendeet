@@ -1,5 +1,6 @@
 import { api } from "./axios";
 import { authApi } from "./axios";
+import axios from "axios";
 
 export const signup = async (data: {
   email: string;
@@ -110,9 +111,28 @@ export const activateAccount = async (status: string) => {
 
 export const googleLogin = async () => {
   try {
-    const res = await api.get(`/auth/google-login`);
+    const res = await authApi.get("/auth/google-login"); // no baseURL
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
   }
 };
+
+
+// export const googleLogin = async () => {
+//   try {
+//     const res = await fetch("/auth/google-login", {
+//       method: "GET",
+//       credentials: "include", // only if cookies/sessions are used
+//     });
+
+//     if (!res.ok) {
+//       const errorData = await res.json().catch(() => ({}));
+//       throw errorData || { message: "Request failed" };
+//     }
+
+//     return await res.json();
+//   } catch (error: any) {
+//     throw error?.message ? { message: error.message } : error;
+//   }
+// };
