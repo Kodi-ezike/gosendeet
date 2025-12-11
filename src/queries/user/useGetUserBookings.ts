@@ -86,6 +86,7 @@ export const useGetSharedQuotes = (id: string) => {
   const query = useQuery({
     queryKey: ["quotes", id],
     queryFn: () => fetchSharedQuotes(id),
+    enabled: !!id,
   });
   return {
     isLoading: query.isPending,

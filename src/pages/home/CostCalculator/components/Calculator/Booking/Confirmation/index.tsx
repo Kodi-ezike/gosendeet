@@ -163,6 +163,12 @@ useEffect(() => {
                       {formatDate(data?.data?.estimatedDeliveryDate)}
                     </span>
                   </p>
+                  <p className="flex justify-between items-center font-medium text-sm">
+                    <span className="text-neutral600">Tracking ID</span>
+                    <span className="text-right font-semibold">
+                      {data?.data?.trackingNumber}
+                    </span>
+                  </p>
                 </div>
 
                 <hr className="border-b border-b-neutral200 my-6" />

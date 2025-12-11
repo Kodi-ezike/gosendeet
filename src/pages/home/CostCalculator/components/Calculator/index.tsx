@@ -19,11 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Copy, Share2 } from "lucide-react";
+import { Copy, MapPin, Share2, Shield } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { shareQuotes } from "@/services/user";
 import { LIVE_URL } from "@/services/axios";
 import { useGetSharedQuotes } from "@/queries/user/useGetUserBookings";
+import logo from "@/assets/images/sendeet-logo.png";
 
 const Calculator = () => {
   // const options = [
@@ -612,8 +613,125 @@ const Calculator = () => {
         </>
       )}
 
-      {mode === "gosendeet" && (
-        <></>
+      {mode === "gosendeet" && data?.data && data?.data?.length > 0 && (
+        <div className="max-w-3xl mx-auto my-8">
+          <div className="flex items-center gap-6 mb-8">
+            <img src={logo} alt="logo" className="h-8 md:h-10 lg:h-12 w-auto" />
+            <h1 className=" font-semibold text-xl text-[#1a1a1a]">
+              Direct Quote
+            </h1>
+          </div>
+          <div className="bg-white rounded-3xl border border-gray-200 shadow-lg overflow-hidden">
+            {/* Quote Details */}
+            <div className="px-8 py-6 space-y-6">
+              {/* Route Info */}
+              <div className="">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <FiPackage className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start gap-4 mb-4">
+                      <MapPin className="text-gray-500" />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                          From
+                        </p>
+                        <p className="text-base font-medium text-[#1a1a1a]">
+                          {bookingRequest?.pickupLocation || "Not specified"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4 mb-4">
+                      <MapPin className="text-gray-500" />
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase mb-1">
+                          To
+                        </p>
+                        <p className="text-base font-medium text-[#1a1a1a]">
+                          {bookingRequest?.dropOffLocation || "Not specified"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Time */}
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div>
+                  <p className="text-xs font-semibold text-gray-600 uppercase mb-1">
+                    Estimated Delivery Date
+                  </p>
+                  <p className="text-lg font-bold text-[#1a1a1a]">
+                    {data?.data?.[0]?.estimatedDeliveryDate}
+                  </p>
+                </div>
+                <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                  {data?.data?.[0]?.pickupOptions[0]}
+                </span>
+              </div>
+
+              {/* Cost Breakdown */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-700 font-medium">
+                    Delivery Fee
+                  </span>
+                  <span className="text-[#1a1a1a] font-bold">
+                    ₦{data?.data?.[0]?.deliveryFee || "0"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-700 font-medium">
+                    Service Charge
+                  </span>
+                  <span className="text-[#1a1a1a] font-bold">
+                    ₦{data?.data?.[0]?.serviceCharge || "0"}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-700 font-medium">Total Cost</span>
+                  <span className="text-blue-500 font-bold">
+                    {/* removes NGN */}
+                     ₦ {data?.data?.[0]?.price?.replace(/ngn/i, "") || "0"} 
+                  </span>
+                </div>
+              </div>
+
+              {/* Book Now Button */}
+              <Button
+                onClick={() => {
+                  const quoteItem = data?.data?.[0];
+                  handleClick(quoteItem);
+                }}
+                className={cn(
+                  "w-full py-3 rounded-xl font-bold text-base",
+                  "bg-[#1a1a1a] hover:bg-amber-600",
+                  "text-white transition-all duration-300",
+                  "shadow-[0_4px_14px_0_rgba(0,0,0,0.1)]"
+                )}
+              >
+                Book Now
+              </Button>
+
+              {/* Insurance Info */}
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="flex items-start gap-3">
+                  <Shield size={20} className="text-blue-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-[#1a1a1a] mb-1">
+                      Insurance included for packages under ₦100,000
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Your package is protected against loss or damage
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

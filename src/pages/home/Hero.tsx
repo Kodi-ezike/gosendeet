@@ -85,7 +85,7 @@ const HeroOptionC = () => {
       </motion.div>
 
       {/* Form Section - Centered in available space */}
-      <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full relative z-10 -mt-4 md:-mt-12 lg:-mt-16">
+      <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full relative z-10 md:mt-6 lg:-mt-16">
 
         {/* Mode Tabs - Combined Card Above Form */}
         <motion.div

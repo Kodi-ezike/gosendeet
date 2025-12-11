@@ -75,6 +75,7 @@ receiver_name: z
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
   } = useForm<z.infer<typeof schema>>({
@@ -143,6 +144,7 @@ receiver_name: z
     });
     mutate(payload);
   };
+  const senderPhone = watch("sender_phone");
 
   return (
     <Layout>
@@ -182,7 +184,7 @@ receiver_name: z
                 type="text"
                 placeholder="Enter your phone number"
                 register={register}
-                disabled
+                disabled={Boolean(senderPhone)}
                 onKeyDown={allowOnlyNumbers}
               />
 
