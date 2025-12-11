@@ -7,6 +7,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect, useMemo, useState } from "react";
 import FormHorizontalBar from "@/pages/home/components/FormHorizontalBar";
+import ModeSwitcher, { FormMode } from "@/components/ModeSwitcher";
 import empty from "@/assets/images/white-empty.png";
 import Rating from "@/components/Rating";
 import { FiCalendar, FiTruck, FiFilter, FiX, FiPackage } from "react-icons/fi";
@@ -39,7 +40,7 @@ const Calculator = () => {
   const { data: sharedQuote } = useGetSharedQuotes(shareId);
 
   const { results, inputData: stateInputData } = location.state || {};
-  const mode = location?.state?.mode ?? "gosendeet";
+  const [mode, setMode] = useState<FormMode>(location?.state?.mode ?? "gosendeet");
 
   const storedInputData = useMemo(() => {
     try {
@@ -235,6 +236,16 @@ const Calculator = () => {
 
   return (
     <div className="md:px-20 px-6 py-4 bg-white min-h-screen">
+      {/* Mode Switcher Tabs - Top of Calculator */}
+      <div className="w-full -mb-12 flex justify-center">
+        <ModeSwitcher
+          mode={mode}
+          onModeChange={setMode}
+          variant="card"
+          animate
+        />
+      </div>
+
       <div className="w-full mb-12">
         <FormHorizontalBar
           variant="minimal"

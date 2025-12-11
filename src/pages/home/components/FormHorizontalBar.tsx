@@ -16,6 +16,7 @@ import {
   FiBarChart2,
   FiSearch,
 } from "react-icons/fi";
+import ModeSwitcher, { FormMode } from "@/components/ModeSwitcher";
 import { AddressModal } from "./modals/AddressModal";
 import { PackageTypeModal } from "./modals/PackageTypeModal";
 import { PickupDateModal } from "./modals/PickupDateModal";
@@ -162,9 +163,7 @@ const FormHorizontalBar = ({
 
   // Detect dashboard route early so we can adjust styles/layout
   const isDashboard = location.pathname.includes("dashboard");
-  const [currentMode, setCurrentMode] = useState<
-    "gosendeet" | "compare" | "tracking"
-  >(activeMode);
+  const [currentMode, setCurrentMode] = useState<FormMode>(activeMode);
   const mode = isDashboard ? currentMode : activeMode;
 
   // Modal states for Direct mode
@@ -461,47 +460,12 @@ const FormHorizontalBar = ({
     <div className={containerStyles}>
       {isDashboard && (
         <div className="absolute left-1/2 transform -translate-x-1/2 top-[-20px]">
-          <div className="inline-flex items-center bg-white rounded-full shadow-sm border border-amber-100">
-            <button
-              type="button"
-              onClick={() => setCurrentMode("gosendeet")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "gosendeet"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiTruck className="w-4 h-4" />
-              Direct
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentMode("compare")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "compare"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiBarChart2 className="w-4 h-4" />
-              Compare
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentMode("tracking")}
-              className={cn(
-                "px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-2 cursor-pointer",
-                mode === "tracking"
-                  ? "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-                  : "text-gray-600"
-              )}
-            >
-              <FiSearch className="w-4 h-4" />
-              Track
-            </button>
-          </div>
+          <ModeSwitcher
+            mode={mode}
+            onModeChange={setCurrentMode}
+            variant="pill"
+            animate
+          />
         </div>
       )}
       {/* Tracking Mode Form */}
