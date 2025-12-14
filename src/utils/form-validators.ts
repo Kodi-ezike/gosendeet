@@ -106,26 +106,23 @@ export const formatDimensions = (
 
 /**
  * Validates manual address input
+ * Note: apartment is optional and not validated
  */
 export const validateManualAddress = (
   street: string,
-  apartment: string,
-  city: string,
-  state: string
+  _apartment?: string,
+  city?: string,
+  state?: string
 ): { valid: boolean; message?: string } => {
   if (!street.trim()) {
     return { valid: false, message: "Street address is required" };
   }
 
-  if (!apartment.trim()) {
-    return { valid: false, message: "Apartment/Unit is required" };
-  }
-
-  if (!city.trim()) {
+  if (!city || !city.trim()) {
     return { valid: false, message: "City is required" };
   }
 
-  if (!state.trim()) {
+  if (!state || !state.trim()) {
     return { valid: false, message: "State is required" };
   }
 

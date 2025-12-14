@@ -32,8 +32,8 @@ const Navbar = () => {
   //   }
   // }, [userId]);
   return (
-    <nav className="w-full z-20">
-      <div className="flex justify-between items-center py-3 lg:py-5 xl:px-30 md:px-20 px-6 bg-transparent">
+    <nav className="w-full z-20 bg-[#fafafa]">
+      <div className="flex justify-between items-center py-3 lg:py-5 xl:px-30 md:px-20 px-6">
         {/* Logo or Brand Name */}
         <div>
           <Link to="/">

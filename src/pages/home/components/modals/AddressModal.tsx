@@ -368,7 +368,13 @@ export function AddressModal({
       return;
     }
 
-    const formattedAddress = `${street}, ${apartment}, ${city}, ${state}, Nigeria`;
+    const addressParts = [street];
+    if (apartment.trim()) {
+      addressParts.push(apartment);
+    }
+    addressParts.push(city, state, 'Nigeria');
+    const formattedAddress = addressParts.join(', ');
+
     onSelect(formattedAddress);
     onOpenChange(false);
     setManualAddress({
@@ -381,7 +387,6 @@ export function AddressModal({
 
   const hasRequiredFields =
     manualAddress.street.trim() &&
-    manualAddress.apartment.trim() &&
     manualAddress.city.trim() &&
     manualAddress.state.trim();
 
@@ -473,7 +478,7 @@ export function AddressModal({
           {/* Apartment/House Number */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-              Apartment/House Number <span className="text-red-500">*</span>
+              Apartment/House Number
             </label>
             <input
               type="text"
