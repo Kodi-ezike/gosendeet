@@ -52,21 +52,11 @@ const Signin = () => {
     mutate(data.email);
   };
 
- const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleGoogleLogin = async () => {
-    try {
-      setLoading(true);
-
-      await googleLogin(); // your auth function
-
-      toast.success("Login successful!");
-      // navigate("/dashboard"); // optional redirect
-    } catch (error: any) {
-      toast.error(error?.message || "Google login failed");
-    } finally {
-      setLoading(false);
-    }
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    googleLogin();
   };
 
   return (

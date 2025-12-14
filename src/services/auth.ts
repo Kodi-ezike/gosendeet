@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, BASE_URL } from "./axios";
 import { authApi } from "./axios";
 
 export const signup = async (data: {
@@ -108,13 +108,9 @@ export const activateAccount = async (status: string) => {
   }
 };
 
-export const googleLogin = async () => {
-  try {
-    const res = await authApi.get("/auth/google-login"); // no baseURL
-    return res.data;
-  } catch (error: any) {
-    throw error?.response?.data || { message: error.message };
-  }
+export const googleLogin = () => {
+  // OAuth requires full page redirect, not XHR
+  window.location.href = `${BASE_URL}/auth/google-login`;
 };
 
 

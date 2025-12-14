@@ -66,15 +66,9 @@ const Signup = () => {
     mutate(data);
   };
 
-  const { mutate: googleMutation } = useMutation({
-    mutationFn: googleLogin,
-    onSuccess: () => {
-      toast.success("Success");
-    },
-    onError: (data) => {
-      toast.error(data?.message);
-    },
-  });
+  const handleGoogleLogin = () => {
+    googleLogin();
+  };
 
   return (
     <AuthLayout>
@@ -201,7 +195,7 @@ const Signup = () => {
             <Button
               variant={"outline"}
               className="border-neutral500 bg-transparent w-full mt-5 mb-4 hover:bg-white hover:border-0"
-              onClick={() => googleMutation()}
+              onClick={handleGoogleLogin}
             >
               <img src={google} alt="google" className="w-[20px]" />
               <span>Continue with Google</span>
