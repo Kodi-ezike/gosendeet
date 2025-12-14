@@ -229,10 +229,6 @@ export function PackageTypeModal({
                       )}>
                         {pkg.name}
                       </h4>
-
-                      <p className="text-xs text-gray-500 text-center">
-                        {pkg.maxWeight}{pkg.weightUnit}
-                      </p>
                     </button>
                   );
                 })}
@@ -290,28 +286,9 @@ export function PackageTypeModal({
                 Max weight: {selectedPackage?.maxWeight}{selectedPackage?.weightUnit}
               </label>
 
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                {weightPresets.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => setWeight(String(preset.value))}
-                    disabled={!step1Complete}
-                    className={cn(
-                      "py-2.5 px-3 rounded-lg text-xs font-semibold transition-all shadow-sm",
-                      weight === String(preset.value)
-                        ? "border-2 border-amber-500 bg-amber-50 text-amber-700"
-                        : "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700"
-                    )}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-
               {/* Bold Money-Style Weight Display */}
               <div className={cn(
-                "relative p-4 rounded-lg border-2 transition-all overflow-hidden",
+                "relative p-4 rounded-lg border-2 transition-all overflow-hidden mb-3",
                 step1Complete
                   ? "border-amber-400 bg-white shadow-sm"
                   : "border-gray-200 bg-gray-50"
@@ -336,6 +313,25 @@ export function PackageTypeModal({
                     {selectedPackage?.weightUnit || 'kg'}
                   </span>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                {weightPresets.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setWeight(String(preset.value))}
+                    disabled={!step1Complete}
+                    className={cn(
+                      "py-2.5 px-3 rounded-lg text-xs font-semibold transition-all shadow-sm",
+                      weight === String(preset.value)
+                        ? "border border-amber-500 bg-amber-50 text-amber-700"
+                        : "bg-white text-gray-700 border border-gray-200 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700"
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
               </div>
 
               {weight && selectedPackage?.maxWeight && parseFloat(weight) > selectedPackage.maxWeight && (
