@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/home";
 import About from "./pages/home/About";
+import Terms from "./pages/home/Terms";
+import Privacy from "./pages/home/Privacy";
 import CostCalculator from "./pages/home/CostCalculator";
 import FAQ from "./pages/home/FAQ";
 import Track from "./pages/home/Track";
@@ -48,6 +50,8 @@ function App() {
           <Route path="/success-page" element={<Confirmation />} />
           <Route path="/error-page" element={<ErrorPage />} />
           <Route path="/track-booking" element={<Tracking />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/dispatch/:trackingId/:token" element={<PublicDispatchPage />} />
 
         <Route element={<PublicRoutes />}>

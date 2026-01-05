@@ -14,6 +14,7 @@ import { googleLogin, signup } from "@/services/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SignupModal } from "./SignupModal";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const [toggle, setToggle] = useState(false);
@@ -203,9 +204,15 @@ const Signup = () => {
           </div>
           <p className="font-medium text-neutral800 text-center lg:text-base text-sm">
             By continuing, you accept our{" "}
-            <span className="border-b border-b-neutral800">Terms of Use</span>{" "}
+            <Link to="/terms">
+              <span className="border-b border-b-neutral800">Terms of Use</span>{" "}
+            </Link>
             and{" "}
-            <span className="border-b border-b-neutral800">Privacy Policy</span>
+            <Link to="/privacy">
+              <span className="border-b border-b-neutral800">
+                Privacy Policy
+              </span>
+            </Link>
           </p>
         </div>
       </div>

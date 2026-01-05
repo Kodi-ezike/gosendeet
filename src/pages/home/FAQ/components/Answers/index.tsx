@@ -42,18 +42,18 @@ const Answers = () => {
       <div className="lg:flex lg:flex-row flex-col lg:justify-between mb-8">
         {/* Sidebar Options */}
         <div className="lg:w-[25%] hidden lg:flex flex-col gap-2">
-          {options.map(({ title, icon }) => (
+          {options.map(({ title }) => (
             <p
               key={title}
               className={`flex items-center gap-4 font-clash font-semibold px-4 py-2 text-[18px] leading-[140%] cursor-pointer transition-all 
               ${
                 selectedTitle === title
-                  ? "bg-purple200 rounded"
-                  : "hover:bg-purple300 hover:rounded"
+                  ? "bg-orange-50 rounded"
+                  : "hover:bg-orange-50 hover:rounded"
               }`}
               onClick={() => setSelectedTitle(title)}
             >
-              <img src={icon} alt={title} className="w-[18px] h-[18px]" />
+              {/* <img src={icon} alt={title} className="w-[18px] h-[18px]" /> */}
               <span>{title}</span>
             </p>
           ))}

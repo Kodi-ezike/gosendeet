@@ -1,4 +1,5 @@
 import faq from "@/assets/images/faq.png";
+import ContactSupport from "@/components/Support";
 
 const Suitable = () => {
   return (
@@ -6,7 +7,7 @@ const Suitable = () => {
       <div className="lg:w-[40%]">
         <img src={faq} alt="faq" className="mx-auto" />
       </div>
-      <div className="lg:w-[60%] bg-purple300 flex flex-col justify-center p-8 min-h-[350px]">
+      <div className="lg:w-[60%] bg-orange-50 flex flex-col justify-center p-8 min-h-[350px]">
         <p className="font-clash font-semibold md:text-[32px] text-2xl leading-[130%] mb-2">
           Couldn’t find a suitable answer?
         </p>
@@ -14,12 +15,8 @@ const Suitable = () => {
           No problem! Just create a support ticket, our team will take care of
           your request as soon as possible.
         </p>
-        <a
-          href="#"
-          className="text-purple700 border-b border-b-purple700 w-fit"
-        >
-          Create a support ticket
-        </a>
+   
+        <ContactSupport/>
       </div>
     </div>
   );
