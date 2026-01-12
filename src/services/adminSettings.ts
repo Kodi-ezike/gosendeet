@@ -186,7 +186,7 @@ export const deleteLocationCode = async (id: string) => {
 
 export const createPackageType = async (data: any) => {
   try {
-    const res = await api.post(`/admin/package-types`, data);
+    const res = await api.post(`/package-types`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -216,7 +216,7 @@ export const getPackageType = async (options?: { page?: number; minimize?: boole
 
 export const updatePackageType = async (id: string, data: any) => {
   try {
-    const res = await api.put(`/admin/package-types/${id}`, data);
+    const res = await api.put(`/package-types/${id}`, data);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -225,7 +225,7 @@ export const updatePackageType = async (id: string, data: any) => {
 
 export const updatePackageTypeStatus = async (id: string, isActive: boolean) => {
   try {
-    const res = await api.patch(`/admin/package-types/${id}/status?isActive=${isActive}`);
+    const res = await api.patch(`/package-types/${id}/status?isActive=${isActive}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -234,7 +234,7 @@ export const updatePackageTypeStatus = async (id: string, isActive: boolean) => 
 
 export const deletePackageType = async (id: string) => {
   try {
-    const res = await api.delete(`/admin/package-types/${id}`);
+    const res = await api.delete(`/package-types/${id}`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -292,7 +292,7 @@ export const deleteDeliveryProgress = async (id: string) => {
 
 export const getAdminWeightUnits = async () => {
   try {
-    const res = await api.get(`/admin/package-types/weight-units`);
+    const res = await api.get(`/package-types/weight-units`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
@@ -301,7 +301,7 @@ export const getAdminWeightUnits = async () => {
 
 export const getAdminDimensionUnits = async () => {
   try {
-    const res = await api.get(`/admin/package-types/dimension-units`);
+    const res = await api.get(`/package-types/dimension-units`);
     return res.data;
   } catch (error: any) {
     throw error?.response?.data || { message: error.message };
